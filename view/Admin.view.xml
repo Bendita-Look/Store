@@ -11,7 +11,7 @@
             <Bar class="blHeader">
                 <contentLeft>
                     <HBox alignItems="Center" class="blBrand">
-                        <Image src="img/logo.svg" width="2rem" height="2rem" decorative="true" class="sapUiTinyMarginEnd" />
+                        <Image src="img/logo.jpg" width="2rem" height="2rem" decorative="true" class="sapUiTinyMarginEnd" />
                         <Title text="{i18n>adminTitle}" class="blBrandTitle" />
                     </HBox>
                 </contentLeft>
@@ -45,6 +45,7 @@
                                 </items>
                             </SegmentedButton>
                             <ToolbarSpacer />
+                            <Button text="{i18n>registerStoreSale}" icon="sap-icon://cart-approval" type="Emphasized" press=".storeSale.onOpenStoreSale" />
                             <Button icon="sap-icon://refresh" tooltip="{i18n>refresh}" press=".orders.onRefresh" />
                         </Toolbar>
                         <Table
@@ -63,6 +64,9 @@
                                     <Text text="{i18n>customer}" />
                                 </Column>
                                 <Column minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>channel}" />
+                                </Column>
+                                <Column minScreenWidth="Tablet" demandPopin="true">
                                     <Text text="{i18n>date}" />
                                 </Column>
                                 <Column hAlign="End">
@@ -76,7 +80,14 @@
                                 <ColumnListItem type="Navigation" press=".orders.onOrderPress">
                                     <cells>
                                         <ObjectIdentifier title="{= '#' + ${path: 'Number', targetType: 'any'} }" />
-                                        <ObjectIdentifier title="{CustomerName}" text="{CustomerPhone}" />
+                                        <ObjectIdentifier
+                                            title="{parts: ['CustomerName', 'i18n>storeCustomer'], formatter: '.formatter.firstText'}"
+                                            text="{CustomerPhone}"
+                                        />
+                                        <VBox>
+                                            <Text text="{path: 'Channel', formatter: '.formatChannel'}" />
+                                            <Text text="{path: 'FulfillmentType', formatter: '.formatFulfillment'}" class="blMuted" />
+                                        </VBox>
                                         <Text text="{path: 'createdAt', targetType: 'any', formatter: '.formatter.dateTime'}" />
                                         <Text text="{path: 'TotalAmount', targetType: 'any', formatter: '.formatter.currency'}" />
                                         <ObjectStatus
@@ -204,6 +215,62 @@
                         </Table>
                     </IconTabFilter>
 
+                    <IconTabFilter key="promotions" icon="sap-icon://lead" text="{i18n>promotionsTab}">
+                        <Toolbar style="Clear">
+                            <ToolbarSpacer />
+                            <Button text="{i18n>newPromotion}" icon="sap-icon://add" type="Emphasized" press=".promotions.onNewPromotion" />
+                        </Toolbar>
+                        <Table
+                            id="promotionsTable"
+                            noDataText="{i18n>noPromotions}"
+                            class="blTable"
+                            items="{
+                                path: '/Promotions',
+                                parameters: {
+                                    $filter: 'IsActiveEntity eq false or SiblingEntity/IsActiveEntity eq null',
+                                    $orderby: 'Name'
+                                }
+                            }"
+                        >
+                            <columns>
+                                <Column>
+                                    <Text text="{i18n>promotionName}" />
+                                </Column>
+                                <Column minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>rewardType}" />
+                                </Column>
+                                <Column minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>couponCode}" />
+                                </Column>
+                                <Column minScreenWidth="Desktop" demandPopin="true">
+                                    <Text text="{i18n>period}" />
+                                </Column>
+                                <Column hAlign="Center">
+                                    <Text text="{i18n>status}" />
+                                </Column>
+                                <Column width="6rem" />
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <ObjectIdentifier title="{Name}" text="{= ${path: 'IsActiveEntity', targetType: 'any'} ? ${Description} : ${i18n>draft} }" />
+                                        <Text text="{parts: ['RewardType', {path: 'RewardValue', targetType: 'any'}, 'GiftDescription'], formatter: '.formatReward'}" />
+                                        <Text text="{parts: ['CouponCode', {path: 'UsedCount', targetType: 'any'}, {path: 'MaxUses', targetType: 'any'}], formatter: '.formatCouponUsage'}" />
+                                        <Text text="{parts: [{path: 'StartDate', targetType: 'any'}, {path: 'EndDate', targetType: 'any'}], formatter: '.formatPeriod'}" />
+                                        <ObjectStatus
+                                            text="{= ${path: 'Active', targetType: 'any'} ? ${i18n>active} : ${i18n>inactive} }"
+                                            state="{= ${path: 'Active', targetType: 'any'} ? 'Success' : 'None' }"
+                                        />
+                                        <HBox justifyContent="End">
+                                            <Button icon="sap-icon://edit" type="Transparent" tooltip="{i18n>edit}" press=".promotions.onEditPromotion" />
+                                            <Button icon="sap-icon://delete" type="Transparent" tooltip="{i18n>delete}" press=".promotions.onDeletePromotion" />
+                                        </HBox>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </IconTabFilter>
+
                     <IconTabFilter key="reports" icon="sap-icon://line-chart" text="{i18n>reportsTab}">
                         <Toolbar style="Clear">
                             <Label text="{i18n>reportYear}" class="sapUiTinyMarginEnd" />
@@ -324,6 +391,16 @@
                                 <Input value="{ContactEmail}" maxLength="120" type="Email" editable="{settings>/editing}" />
                                 <Label text="{i18n>storeInstagram}" />
                                 <Input value="{Instagram}" maxLength="60" placeholder="{i18n>storeInstagramPlaceholder}" editable="{settings>/editing}" />
+                                <Label text="{i18n>pickupAddress}" />
+                                <TextArea
+                                    value="{PickupAddress}"
+                                    maxLength="255"
+                                    rows="2"
+                                    placeholder="{i18n>pickupAddressPlaceholder}"
+                                    editable="{settings>/editing}"
+                                />
+                                <Label text="{i18n>storeUrl}" />
+                                <Input value="{StoreUrl}" maxLength="255" placeholder="{i18n>storeUrlPlaceholder}" editable="{settings>/editing}" />
                                 <Label text="{i18n>notificationEmails}" />
                                 <TextArea
                                     value="{NotificationEmails}"

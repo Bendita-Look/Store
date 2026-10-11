@@ -37,6 +37,10 @@ function languageTag(): string {
     return Localization.getLanguageTag().toString();
 }
 
+function formatCurrency(value: number | string | null | undefined): string {
+    return new Intl.NumberFormat(languageTag(), { style: "currency", currency: CURRENCY }).format(Number(value ?? 0));
+}
+
 function catalogImageUrl(imageId: string | null | undefined): string {
     return imageId
         ? `${XsuaaAuthHelper.getConfig().catalogService}ProductImages(${imageId})/Image`
@@ -57,8 +61,16 @@ function whatsappUrl(phone: string | null | undefined, message?: string): string
 
 export default {
 
-    currency(value: number | string | null | undefined): string {
-        return new Intl.NumberFormat(languageTag(), { style: "currency", currency: CURRENCY }).format(Number(value ?? 0));
+    currency: formatCurrency,
+
+    negativeAmount(value: number | string | null | undefined): string {
+        const amount = Number(value ?? 0);
+        return amount > 0 ? `- ${formatCurrency(amount)}` : "";
+    },
+
+    firstAmount(...values: Array<number | string | null | undefined>): string {
+        const amount = values.find((value) => value !== null && value !== undefined && value !== "");
+        return formatCurrency(amount);
     },
 
     message(pattern: string, ...values: unknown[]): string {
@@ -71,6 +83,21 @@ export default {
 
     variantDescription(...parts: Array<string | null | undefined>): string {
         return parts.filter(Boolean).join(" / ");
+    },
+
+    date(value: string | null | undefined): string {
+        return value ? new Intl.DateTimeFormat(languageTag(), { dateStyle: "short", timeZone: "UTC" }).format(new Date(value)) : "";
+    },
+
+    firstText(...values: Array<string | null | undefined>): string {
+        return values.find((value) => Boolean(value?.trim())) ?? "";
+    },
+
+    fullAddress(street: string, number: string, complement: string, district: string, city: string, state: string, zipCode: string): string {
+        const streetLine = [street, number].filter(Boolean).join(", ");
+        const cityLine = [city, state].filter(Boolean).join("/");
+
+        return [streetLine, complement, district, cityLine, zipCode].filter(Boolean).join(" - ");
     },
 
     dateTime(value: string | null | undefined): string {

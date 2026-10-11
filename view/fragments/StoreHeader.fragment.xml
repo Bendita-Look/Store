@@ -14,7 +14,7 @@
         <contentMiddle>
             <HBox alignItems="Center" class="blBrand">
                 <Image
-                    src="img/logo.svg"
+                    src="img/logo.jpg"
                     width="2rem"
                     height="2rem"
                     alt="{i18n>appTitle}"

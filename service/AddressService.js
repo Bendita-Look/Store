@@ -1,0 +1,2 @@
+sap.ui.define([],function(){"use strict";const t="https://viacep.com.br/ws";const e=8;class i{static normalizeZipCode(t){return(t??"").replace(/\D/g,"")}static isCompleteZipCode(t){return this.normalizeZipCode(t).length===e}static async lookup(e){const i=this.normalizeZipCode(e);const o=await fetch(`${t}/${i}/json/`);if(!o.ok){return null}const r=await o.json();if(r.erro){return null}return{Address:r.logradouro??"",District:r.bairro??"",City:r.localidade??"",State:r.uf??""}}}return i});
+//# sourceMappingURL=AddressService.js.map

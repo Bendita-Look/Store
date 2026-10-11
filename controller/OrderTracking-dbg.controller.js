@@ -6,6 +6,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/Or
   }
   const BaseController = _interopRequireDefault(__BaseController);
   const OrderService = _interopRequireDefault(__OrderService);
+  const FulfillmentType = __OrderService["FulfillmentType"];
   const formatter = _interopRequireDefault(__formatter);
   const OrderStatus = __formatter["OrderStatus"];
   const STEPS = [OrderStatus.New, OrderStatus.InService, OrderStatus.OutForDelivery, OrderStatus.Completed];
@@ -44,16 +45,18 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/Or
           loaded: true,
           order,
           cancelled: order.Status === OrderStatus.Cancelled,
+          isPickup: order.FulfillmentType === FulfillmentType.Pickup,
           hasDelivery: !!order.DeliveryType,
           deliveryTypeText: this.formatDeliveryType(order.DeliveryType),
-          steps: this.buildSteps(order.Status, !!order.DeliveryType)
+          steps: this.buildSteps(order.Status, !!order.DeliveryType, order.FulfillmentType === FulfillmentType.Pickup)
         });
       } catch (error) {
         this.handleError(error, "orderNotFound");
       }
     },
-    buildSteps: function _buildSteps(status, hasDelivery) {
-      const steps = STEPS.filter(step => step !== OrderStatus.OutForDelivery || hasDelivery || status !== OrderStatus.Completed);
+    buildSteps: function _buildSteps(status, hasDelivery, isPickup) {
+      const showDeliveryStep = !isPickup && (hasDelivery || status !== OrderStatus.Completed);
+      const steps = STEPS.filter(step => step !== OrderStatus.OutForDelivery || showDeliveryStep);
       const currentIndex = steps.indexOf(status);
       return steps.map((step, index) => ({
         text: this.formatStatus(step),

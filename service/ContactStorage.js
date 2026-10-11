@@ -1,0 +1,2 @@
+sap.ui.define(["sap/ui/util/Storage"],function(t){"use strict";const e="benditaLook.contact";const s=["CustomerName","CustomerEmail","CustomerPhone","FulfillmentType","ZipCode","Address","AddressNumber","Complement","District","City","State"];class a{static storage=new t(t.Type.local);static load(){return this.storage.get(e)??{}}static save(t){const a=Object.fromEntries(s.map(e=>[e,t[e]]));this.storage.put(e,a)}static clear(){this.storage.remove(e)}}return a});
+//# sourceMappingURL=ContactStorage.js.map

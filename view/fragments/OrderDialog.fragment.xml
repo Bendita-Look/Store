@@ -5,7 +5,7 @@
 >
     <Dialog
         id="orderDialog"
-        title="{= '#' + ${path: 'Number', targetType: 'any'} + ' · ' + ${path: 'CustomerName', targetType: 'any'} }"
+        title="{parts: ['i18n>orderNumber', 'Number'], formatter: '.formatter.message'}"
         contentWidth="40rem"
         resizable="true"
         draggable="true"
@@ -21,6 +21,10 @@
                     />
                     <Text text="{path: 'createdAt', targetType: 'any', formatter: '.formatter.dateTime'}" class="blMuted" />
                 </HBox>
+                <HBox class="sapUiTinyMarginTop">
+                    <ObjectStatus text="{path: 'Channel', formatter: '.formatChannel'}" icon="sap-icon://retail-store" class="sapUiSmallMarginEnd" />
+                    <ObjectStatus text="{path: 'FulfillmentType', formatter: '.formatFulfillment'}" icon="sap-icon://shipping-status" />
+                </HBox>
 
                 <form:SimpleForm editable="false" layout="ColumnLayout" title="{i18n>contactTitle}">
                     <Label text="{i18n>customerName}" />
@@ -29,8 +33,11 @@
                     <Text text="{CustomerPhone}" />
                     <Label text="{i18n>customerEmail}" />
                     <Link text="{CustomerEmail}" href="{= 'mailto:' + ${path: 'CustomerEmail', targetType: 'any'} }" />
-                    <Label text="{i18n>address}" />
-                    <Text text="{parts: ['Address', 'District', 'City', 'ZipCode'], formatter: '.formatter.variantDescription'}" />
+                    <Label text="{i18n>address}" visible="{= ${path: 'FulfillmentType', targetType: 'any'} === 'DELIVERY' }" />
+                    <Text
+                        text="{parts: ['Address', 'AddressNumber', 'Complement', 'District', 'City', 'State', 'ZipCode'], formatter: '.formatter.fullAddress'}"
+                        visible="{= ${path: 'FulfillmentType', targetType: 'any'} === 'DELIVERY' }"
+                    />
                     <Label text="{i18n>notes}" />
                     <Text text="{Notes}" />
                 </form:SimpleForm>
@@ -74,6 +81,30 @@
                     </items>
                 </Table>
 
+                <List
+                    items="{path: 'Promotions', templateShareable: false}"
+                    headerText="{i18n>appliedPromotions}"
+                    showSeparators="None"
+                    noDataText="{i18n>noPromotionsApplied}"
+                    class="blPromotionList sapUiSmallMarginTop"
+                >
+                    <StandardListItem
+                        icon="{= ${path: 'RewardType', targetType: 'any'} === 'GIFT' ? 'sap-icon://gift' : 'sap-icon://lead' }"
+                        title="{PromotionName}"
+                        description="{parts: ['GiftDescription', 'CouponCode'], formatter: '.formatter.variantDescription'}"
+                        info="{path: 'DiscountAmount', targetType: 'any', formatter: '.formatter.negativeAmount'}"
+                        infoState="Success"
+                    />
+                </List>
+
+                <HBox justifyContent="End" alignItems="Center" visible="{= ${path: 'DiscountAmount', targetType: 'any'} > 0 }">
+                    <Text text="{i18n>subtotal}" class="sapUiSmallMarginEnd" />
+                    <Text text="{path: 'SubtotalAmount', targetType: 'any', formatter: '.formatter.currency'}" />
+                </HBox>
+                <HBox justifyContent="End" alignItems="Center" visible="{= ${path: 'DiscountAmount', targetType: 'any'} > 0 }">
+                    <Text text="{i18n>discount}" class="sapUiSmallMarginEnd" />
+                    <ObjectStatus text="{path: 'DiscountAmount', targetType: 'any', formatter: '.formatter.negativeAmount'}" state="Success" />
+                </HBox>
                 <HBox justifyContent="End" alignItems="Center" class="blCartTotal">
                     <Text text="{i18n>total}" class="sapUiSmallMarginEnd" />
                     <Text text="{path: 'TotalAmount', targetType: 'any', formatter: '.formatter.currency'}" class="blDetailPrice" />
@@ -81,7 +112,7 @@
             </VBox>
         </content>
         <buttons>
-            <Button text="{i18n>whatsapp}" icon="sap-icon://discussion" type="Success" press=".orders.onWhatsapp" />
+            <Button text="{i18n>whatsapp}" icon="sap-icon://discussion" type="Success" press=".orders.onWhatsapp" visible="{= !!${path: 'CustomerPhone', targetType: 'any'} }" />
             <Button
                 text="{i18n>startService}"
                 type="Emphasized"
@@ -91,7 +122,7 @@
             <Button
                 text="{i18n>outForDelivery}"
                 type="Emphasized"
-                visible="{= ${path: 'Status', targetType: 'any'} === 'IN_SERVICE' }"
+                visible="{= ${path: 'Status', targetType: 'any'} === 'IN_SERVICE' &amp;&amp; ${path: 'FulfillmentType', targetType: 'any'} === 'DELIVERY' }"
                 press=".orders.onOpenDeliveryDialog"
             />
             <Button

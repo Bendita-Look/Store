@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/model/FilterOperator", "./BaseController", "../model/formatter"], function (JSONModel, Filter, FilterOperator, __BaseController, __formatter) {
+sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/model/FilterOperator", "./BaseController", "../model/formatter", "../service/OrderService"], function (JSONModel, Filter, FilterOperator, __BaseController, __formatter, __OrderService) {
   "use strict";
 
   function _interopRequireDefault(obj) {
@@ -6,6 +6,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/mod
   }
   const BaseController = _interopRequireDefault(__BaseController);
   const formatter = _interopRequireDefault(__formatter);
+  const OrderService = _interopRequireDefault(__OrderService);
   /**
    * @namespace apps.dflc.benditalook.controller
    */
@@ -13,9 +14,11 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/mod
     onInit: function _onInit() {
       this.viewModel = new JSONModel({
         categoryId: "",
-        search: ""
+        search: "",
+        promotions: []
       });
       this.getView()?.setModel(this.viewModel, "catalogView");
+      this.getRouter().getRoute("catalog")?.attachPatternMatched(() => void this.loadPromotions());
     },
     onCategoryPress: function _onCategoryPress(event) {
       const context = event.getSource().getBindingContext("catalog");
@@ -43,6 +46,13 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/mod
     },
     onOpenInstagram: function _onOpenInstagram() {
       window.open(formatter.instagramUrl(this.getStoreModel().getProperty("/Instagram")), "_blank");
+    },
+    loadPromotions: async function _loadPromotions() {
+      try {
+        this.viewModel.setProperty("/promotions", await new OrderService(this.getCatalogModel()).activePromotions());
+      } catch {
+        this.viewModel.setProperty("/promotions", []);
+      }
     },
     applyFilters: function _applyFilters() {
       const {

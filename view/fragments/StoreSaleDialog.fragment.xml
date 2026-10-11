@@ -1,0 +1,122 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+>
+    <Dialog
+        id="storeSaleDialog"
+        title="{i18n>registerStoreSale}"
+        contentWidth="44rem"
+        resizable="true"
+        class="blDialog"
+    >
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <MessageStrip text="{i18n>storeSaleInfo}" type="Information" showIcon="true" class="sapUiSmallMarginBottom" />
+
+                <HBox alignItems="End" wrap="Wrap">
+                    <VBox class="sapUiSmallMarginEnd blGrow">
+                        <Label text="{i18n>product}" />
+                        <ComboBox
+                            id="saleVariantCombo"
+                            selectedKey="{sale>/selectedVariantId}"
+                            width="100%"
+                            showSecondaryValues="true"
+                            items="{
+                                path: '/ProductVariants',
+                                parameters: {
+                                    $filter: 'IsActiveEntity eq true and Stock gt 0 and Product/Active eq true',
+                                    $expand: 'Product($select=Name,Price,Active),Color($select=Name)',
+                                    $select: 'ID,Size,Stock'
+                                },
+                                templateShareable: false
+                            }"
+                        >
+                            <core:ListItem
+                                key="{ID}"
+                                text="{parts: ['Product/Name', 'Color/Name', 'Size'], formatter: '.formatter.variantDescription'}"
+                                additionalText="{parts: ['i18n>inStock', 'i18n>soldOut', {path: 'Stock', targetType: 'any'}], formatter: '.formatter.stockMessage'}"
+                            />
+                        </ComboBox>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>quantity}" />
+                        <StepInput value="{sale>/quantity}" min="1" max="20" width="7rem" />
+                    </VBox>
+                    <Button text="{i18n>addItem}" icon="sap-icon://add" press=".storeSale.onAddLine" />
+                </HBox>
+
+                <Table items="{sale>/lines}" noDataText="{i18n>saleNoItems}" class="blTable sapUiSmallMarginTop">
+                    <columns>
+                        <Column>
+                            <Text text="{i18n>product}" />
+                        </Column>
+                        <Column hAlign="Center" width="8rem">
+                            <Text text="{i18n>quantity}" />
+                        </Column>
+                        <Column hAlign="End" width="7rem">
+                            <Text text="{i18n>unitPrice}" />
+                        </Column>
+                        <Column width="3rem" />
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{sale>Description}" />
+                                <StepInput value="{sale>Quantity}" min="1" max="{sale>Stock}" width="7rem" change=".storeSale.onLineQuantityChange" />
+                                <Text text="{path: 'sale>UnitPrice', formatter: '.formatter.currency'}" />
+                                <Button icon="sap-icon://delete" type="Transparent" tooltip="{i18n>remove}" press=".storeSale.onRemoveLine" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+
+                <HBox alignItems="End" class="sapUiSmallMarginTop">
+                    <Input value="{sale>/couponInput}" placeholder="{i18n>couponPlaceholder}" width="12rem" submit=".storeSale.onApplySaleCoupon" class="sapUiTinyMarginEnd" />
+                    <Button text="{i18n>applyCoupon}" press=".storeSale.onApplySaleCoupon" />
+                </HBox>
+                <ObjectStatus
+                    text="{sale>/quote/CouponMessage}"
+                    state="{= ${sale>/quote/CouponStatus} === 'APPLIED' ? 'Success' : 'Warning' }"
+                    visible="{= !!${sale>/quote/CouponMessage} }"
+                />
+
+                <List
+                    items="{sale>/quote/Promotions}"
+                    visible="{= !!${sale>/quote/Promotions} &amp;&amp; ${sale>/quote/Promotions}.length > 0 }"
+                    headerText="{i18n>appliedPromotions}"
+                    showSeparators="None"
+                    class="blPromotionList"
+                >
+                    <StandardListItem
+                        icon="{= ${sale>RewardType} === 'GIFT' ? 'sap-icon://gift' : 'sap-icon://lead' }"
+                        title="{sale>PromotionName}"
+                        description="{sale>GiftDescription}"
+                        info="{path: 'sale>DiscountAmount', formatter: '.formatter.negativeAmount'}"
+                        infoState="Success"
+                    />
+                </List>
+
+                <HBox justifyContent="End" alignItems="Center" class="blCartTotal" visible="{= !!${sale>/quote} }">
+                    <Text text="{i18n>total}" class="sapUiSmallMarginEnd" />
+                    <Text text="{path: 'sale>/quote/TotalAmount', formatter: '.formatter.currency'}" class="blDetailPrice" />
+                </HBox>
+
+                <form:SimpleForm editable="true" layout="ColumnLayout" columnsM="2" columnsL="2" columnsXL="2" title="{i18n>saleCustomerOptional}">
+                    <Label text="{i18n>customerName}" />
+                    <Input value="{sale>/customer/CustomerName}" maxLength="120" />
+                    <Label text="{i18n>customerEmail}" />
+                    <Input value="{sale>/customer/CustomerEmail}" type="Email" maxLength="120" placeholder="{i18n>saleEmailHint}" />
+                    <Label text="{i18n>customerPhone}" />
+                    <Input value="{sale>/customer/CustomerPhone}" type="Tel" maxLength="20" />
+                    <Label text="{i18n>notes}" />
+                    <TextArea value="{sale>/customer/Notes}" maxLength="500" rows="2" />
+                </form:SimpleForm>
+            </VBox>
+        </content>
+        <buttons>
+            <Button text="{i18n>confirmStoreSale}" type="Emphasized" icon="sap-icon://accept" press=".storeSale.onConfirmStoreSale" />
+            <Button text="{i18n>cancel}" press=".storeSale.onCloseStoreSale" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

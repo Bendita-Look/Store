@@ -31,7 +31,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
       dialog.bindElement({
         path: context.getPath(),
         parameters: {
-          $expand: "Items"
+          $expand: "Items,Promotions"
         }
       });
       dialog.open();

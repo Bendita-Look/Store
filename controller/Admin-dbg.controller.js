@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/OrdersSection", "./admin/ProductsSection", "./admin/CategoriesSection", "./admin/BackupSection", "./admin/ReportsSection", "./admin/SettingsSection", "../auth/AuthenticationService"], function (JSONModel, __BaseController, __OrdersSection, __ProductsSection, __CategoriesSection, __BackupSection, __ReportsSection, __SettingsSection, ___auth_AuthenticationService) {
+sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/OrdersSection", "./admin/ProductsSection", "./admin/CategoriesSection", "./admin/BackupSection", "./admin/ReportsSection", "./admin/SettingsSection", "./admin/PromotionsSection", "./admin/StoreSaleSection", "../auth/AuthenticationService"], function (JSONModel, __BaseController, __OrdersSection, __ProductsSection, __CategoriesSection, __BackupSection, __ReportsSection, __SettingsSection, __PromotionsSection, __StoreSaleSection, ___auth_AuthenticationService) {
   "use strict";
 
   function _interopRequireDefault(obj) {
@@ -11,6 +11,8 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/Order
   const BackupSection = _interopRequireDefault(__BackupSection);
   const ReportsSection = _interopRequireDefault(__ReportsSection);
   const SettingsSection = _interopRequireDefault(__SettingsSection);
+  const PromotionsSection = _interopRequireDefault(__PromotionsSection);
+  const StoreSaleSection = _interopRequireDefault(__StoreSaleSection);
   const AuthenticationService = ___auth_AuthenticationService["AuthenticationService"];
   const DEFAULT_TAB = "orders";
   const REPORTS_TAB = "reports";
@@ -28,6 +30,8 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/Order
       this.backup = new BackupSection(this);
       this.reports = new ReportsSection(this);
       this.settings = new SettingsSection(this);
+      this.promotions = new PromotionsSection(this);
+      this.storeSale = new StoreSaleSection(this);
     },
     onInit: function _onInit() {
       this.viewModel = new JSONModel({
@@ -68,6 +72,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/Order
       this.viewModel.setProperty("/userName", AuthenticationService.getSession()?.userName ?? "");
       this.orders.refresh();
       this.products.refresh();
+      this.promotions.refresh();
       if (selectedTab === REPORTS_TAB) {
         await this.reports.load();
       }

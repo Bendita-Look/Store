@@ -10,6 +10,18 @@ sap.ui.define([], function () {
     constructor(adminModel) {
       this.adminModel = adminModel;
     }
+    async registerStoreSale(sale) {
+      const operation = this.adminModel.bindContext("/RegisterStoreSale(...)");
+      operation.setParameter("Sale", {
+        ...sale,
+        Items: sale.Items.map(item => ({
+          Variant_ID: item.VariantId,
+          Quantity: item.Quantity
+        }))
+      });
+      await operation.invoke();
+      return operation.getBoundContext().getObject();
+    }
     async changeStatus(orderId, status, delivery) {
       const operation = this.adminModel.bindContext("/ChangeOrderStatus(...)");
       operation.setParameter("OrderId", orderId);

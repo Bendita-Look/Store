@@ -7,6 +7,7 @@ import type ListBinding from "sap/ui/model/ListBinding";
 import type { SearchField$SearchEvent } from "sap/m/SearchField";
 import BaseController from "./BaseController";
 import formatter from "../model/formatter";
+import OrderService from "../service/OrderService";
 
 interface CatalogViewState {
     categoryId: string;
@@ -21,8 +22,9 @@ export default class Catalog extends BaseController {
     private viewModel: JSONModel;
 
     public onInit(): void {
-        this.viewModel = new JSONModel({ categoryId: "", search: "" } as CatalogViewState);
+        this.viewModel = new JSONModel({ categoryId: "", search: "", promotions: [] });
         this.getView()?.setModel(this.viewModel, "catalogView");
+        this.getRouter().getRoute("catalog")?.attachPatternMatched(() => void this.loadPromotions());
     }
 
     public onCategoryPress(event: Event): void {
@@ -57,6 +59,14 @@ export default class Catalog extends BaseController {
 
     public onOpenInstagram(): void {
         window.open(formatter.instagramUrl(this.getStoreModel().getProperty("/Instagram") as string), "_blank");
+    }
+
+    private async loadPromotions(): Promise<void> {
+        try {
+            this.viewModel.setProperty("/promotions", await new OrderService(this.getCatalogModel()).activePromotions());
+        } catch {
+            this.viewModel.setProperty("/promotions", []);
+        }
     }
 
     private applyFilters(): void {

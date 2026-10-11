@@ -56,10 +56,64 @@
                     </CustomListItem>
                 </List>
 
-                <HBox justifyContent="End" alignItems="Center" class="blCartTotal">
-                    <Text text="{i18n>total}" class="sapUiSmallMarginEnd" />
-                    <Text text="{path: 'cart>/total', targetType: 'any', formatter: '.formatter.currency'}" class="blDetailPrice" />
-                </HBox>
+                <VBox class="blSummary sapUiSmallMarginTop">
+                    <HBox alignItems="End" class="sapUiSmallMarginBottom">
+                        <Input
+                            value="{checkout>/couponInput}"
+                            placeholder="{i18n>couponPlaceholder}"
+                            width="14rem"
+                            maxLength="20"
+                            submit=".onApplyCoupon"
+                            class="sapUiTinyMarginEnd"
+                        />
+                        <Button text="{i18n>applyCoupon}" press=".onApplyCoupon" class="sapUiTinyMarginEnd" />
+                        <Button
+                            icon="sap-icon://decline"
+                            type="Transparent"
+                            tooltip="{i18n>removeCoupon}"
+                            visible="{= !!${checkout>/data/CouponCode} }"
+                            press=".onRemoveCoupon"
+                        />
+                    </HBox>
+                    <ObjectStatus
+                        text="{checkout>/quote/CouponMessage}"
+                        state="{path: 'checkout>/quote/CouponStatus', formatter: '.formatCouponState'}"
+                        visible="{= !!${checkout>/quote/CouponMessage} }"
+                        class="sapUiSmallMarginBottom"
+                    />
+
+                    <List
+                        items="{checkout>/quote/Promotions}"
+                        visible="{= !!${checkout>/quote/Promotions} &amp;&amp; ${checkout>/quote/Promotions}.length > 0 }"
+                        headerText="{i18n>appliedPromotions}"
+                        showSeparators="None"
+                        class="blPromotionList"
+                    >
+                        <StandardListItem
+                            icon="{= ${checkout>RewardType} === 'GIFT' ? 'sap-icon://gift' : 'sap-icon://lead' }"
+                            title="{checkout>PromotionName}"
+                            description="{checkout>GiftDescription}"
+                            info="{path: 'checkout>DiscountAmount', formatter: '.formatter.negativeAmount'}"
+                            infoState="Success"
+                        />
+                    </List>
+
+                    <HBox justifyContent="End" alignItems="Center" visible="{= ${checkout>/quote/DiscountAmount} > 0 }">
+                        <Text text="{i18n>subtotal}" class="sapUiSmallMarginEnd" />
+                        <Text text="{path: 'checkout>/quote/SubtotalAmount', formatter: '.formatter.currency'}" />
+                    </HBox>
+                    <HBox justifyContent="End" alignItems="Center" visible="{= ${checkout>/quote/DiscountAmount} > 0 }">
+                        <Text text="{i18n>discount}" class="sapUiSmallMarginEnd" />
+                        <ObjectStatus text="{path: 'checkout>/quote/DiscountAmount', formatter: '.formatter.negativeAmount'}" state="Success" />
+                    </HBox>
+                    <HBox justifyContent="End" alignItems="Center" class="blCartTotal">
+                        <Text text="{i18n>total}" class="sapUiSmallMarginEnd" />
+                        <Text
+                            text="{parts: ['checkout>/quote/TotalAmount', 'cart>/total'], formatter: '.formatter.firstAmount'}"
+                            class="blDetailPrice"
+                        />
+                    </HBox>
+                </VBox>
 
                 <MessageStrip
                     text="{i18n>checkoutInfo}"
@@ -79,49 +133,149 @@
                 >
                     <Label text="{i18n>customerName}" required="true" />
                     <Input
-                        value="{contact>/data/CustomerName}"
-                        valueState="{contact>/states/CustomerName}"
+                        value="{checkout>/data/CustomerName}"
+                        valueState="{checkout>/states/CustomerName}"
                         valueStateText="{i18n>customerNameInvalid}"
                         maxLength="120"
+                        change=".onContactChange"
                     />
                     <Label text="{i18n>customerPhone}" required="true" />
                     <Input
-                        value="{contact>/data/CustomerPhone}"
-                        valueState="{contact>/states/CustomerPhone}"
+                        value="{checkout>/data/CustomerPhone}"
+                        valueState="{checkout>/states/CustomerPhone}"
                         valueStateText="{i18n>customerPhoneInvalid}"
                         placeholder="{i18n>customerPhonePlaceholder}"
                         type="Tel"
                         maxLength="20"
+                        change=".onContactChange"
                     />
                     <Label text="{i18n>customerEmail}" required="true" />
                     <Input
-                        value="{contact>/data/CustomerEmail}"
-                        valueState="{contact>/states/CustomerEmail}"
+                        value="{checkout>/data/CustomerEmail}"
+                        valueState="{checkout>/states/CustomerEmail}"
                         valueStateText="{i18n>customerEmailInvalid}"
                         type="Email"
                         maxLength="120"
+                        change=".onContactChange"
                     />
-                    <Label text="{i18n>zipCode}" />
-                    <Input value="{contact>/data/ZipCode}" maxLength="10" />
-                    <Label text="{i18n>address}" />
-                    <Input value="{contact>/data/Address}" maxLength="200" />
-                    <Label text="{i18n>district}" />
-                    <Input value="{contact>/data/District}" maxLength="80" />
-                    <Label text="{i18n>city}" />
-                    <Input value="{contact>/data/City}" maxLength="80" />
                     <Label text="{i18n>notes}" />
-                    <TextArea value="{contact>/data/Notes}" maxLength="500" rows="3" growing="true" />
+                    <TextArea value="{checkout>/data/Notes}" maxLength="500" rows="2" growing="true" />
                 </form:SimpleForm>
 
-                <HBox justifyContent="End" class="sapUiMediumMarginTop">
-                    <Button text="{i18n>continueShopping}" press=".onContinueShopping" class="sapUiSmallMarginEnd" />
-                    <Button
-                        text="{i18n>submitOrder}"
-                        icon="sap-icon://paper-plane"
-                        type="Emphasized"
-                        press=".onSubmitOrder"
-                        class="blPrimaryButton"
+                <form:SimpleForm
+                    editable="true"
+                    layout="ColumnLayout"
+                    columnsM="2"
+                    columnsL="2"
+                    columnsXL="2"
+                    title="{i18n>fulfillmentTitle}"
+                    class="blForm sapUiSmallMarginTop"
+                >
+                    <Label text="{i18n>fulfillmentType}" />
+                    <SegmentedButton selectedKey="{checkout>/data/FulfillmentType}" selectionChange=".onFulfillmentChange">
+                        <items>
+                            <SegmentedButtonItem key="DELIVERY" text="{i18n>fulfillment.DELIVERY}" icon="sap-icon://shipping-status" />
+                            <SegmentedButtonItem key="PICKUP" text="{i18n>fulfillment.PICKUP}" icon="sap-icon://retail-store" />
+                        </items>
+                    </SegmentedButton>
+
+                    <Label text="{i18n>pickupAddress}" visible="{= ${checkout>/data/FulfillmentType} === 'PICKUP' }" />
+                    <Text
+                        text="{= ${store>/PickupAddress} || ${i18n>pickupAddressToConfirm} }"
+                        visible="{= ${checkout>/data/FulfillmentType} === 'PICKUP' }"
                     />
+
+                    <Label text="{i18n>zipCode}" required="true" visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }" />
+                    <MaskInput
+                        value="{checkout>/data/ZipCode}"
+                        mask="99999-999"
+                        placeholderSymbol="_"
+                        valueState="{checkout>/states/ZipCode}"
+                        valueStateText="{i18n>zipCodeInvalid}"
+                        busy="{checkout>/zipLoading}"
+                        busyIndicatorDelay="0"
+                        change=".onZipCodeChange"
+                        visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }"
+                    />
+                    <Link
+                        text="{i18n>zipCodeHelp}"
+                        href="https://buscacepinter.correios.com.br/"
+                        target="_blank"
+                        visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }"
+                    />
+                    <Label text="{i18n>address}" required="true" visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }" />
+                    <Input
+                        value="{checkout>/data/Address}"
+                        editable="{= !${checkout>/locks/Address} }"
+                        valueState="{checkout>/states/Address}"
+                        maxLength="200"
+                        change=".onContactChange"
+                        visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }"
+                    />
+                    <Label text="{i18n>addressNumber}" required="true" visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }" />
+                    <Input
+                        value="{checkout>/data/AddressNumber}"
+                        valueState="{checkout>/states/AddressNumber}"
+                        valueStateText="{i18n>addressNumberInvalid}"
+                        maxLength="20"
+                        change=".onContactChange"
+                        visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }"
+                    />
+                    <Label text="{i18n>complement}" visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }" />
+                    <Input
+                        value="{checkout>/data/Complement}"
+                        placeholder="{i18n>complementPlaceholder}"
+                        maxLength="80"
+                        change=".onContactChange"
+                        visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }"
+                    />
+                    <Label text="{i18n>district}" required="true" visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }" />
+                    <Input
+                        value="{checkout>/data/District}"
+                        editable="{= !${checkout>/locks/District} }"
+                        valueState="{checkout>/states/District}"
+                        maxLength="80"
+                        change=".onContactChange"
+                        visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }"
+                    />
+                    <Label text="{i18n>city}" required="true" visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }" />
+                    <Input
+                        value="{checkout>/data/City}"
+                        editable="{= !${checkout>/locks/City} }"
+                        valueState="{checkout>/states/City}"
+                        maxLength="80"
+                        change=".onContactChange"
+                        visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }"
+                    />
+                    <Label text="{i18n>state}" required="true" visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }" />
+                    <Input
+                        value="{checkout>/data/State}"
+                        editable="{= !${checkout>/locks/State} }"
+                        valueState="{checkout>/states/State}"
+                        placeholder="{i18n>statePlaceholder}"
+                        maxLength="2"
+                        change=".onContactChange"
+                        visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }"
+                    />
+                </form:SimpleForm>
+
+                <HBox justifyContent="SpaceBetween" alignItems="Center" wrap="Wrap" class="sapUiMediumMarginTop">
+                    <Link
+                        text="{i18n>forgetMyData}"
+                        visible="{checkout>/hasRememberedData}"
+                        press=".onForgetContact"
+                        class="sapUiSmallMarginBottom"
+                    />
+                    <HBox>
+                        <Button text="{i18n>continueShopping}" press=".onContinueShopping" class="sapUiSmallMarginEnd" />
+                        <Button
+                            text="{i18n>submitOrder}"
+                            icon="sap-icon://paper-plane"
+                            type="Emphasized"
+                            press=".onSubmitOrder"
+                            class="blPrimaryButton"
+                        />
+                    </HBox>
                 </HBox>
             </VBox>
         </content>

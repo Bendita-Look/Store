@@ -44,6 +44,37 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
     formatDeliveryType: function _formatDeliveryType(deliveryType) {
       return deliveryType ? this.getText(`deliveryType.${deliveryType}`) : "";
     },
+    formatChannel: function _formatChannel(channel) {
+      return channel ? this.getText(`channel.${channel}`) : "";
+    },
+    formatFulfillment: function _formatFulfillment(fulfillment) {
+      return fulfillment ? this.getText(`fulfillment.${fulfillment}`) : "";
+    },
+    formatReward: function _formatReward(rewardType, rewardValue, gift) {
+      if (!rewardType) {
+        return "";
+      }
+      const value = Number(rewardValue ?? 0);
+      const details = {
+        PERCENT: this.getText("rewardSummary.PERCENT", [value]),
+        FIXED: this.getText("rewardSummary.FIXED", [this.formatter.currency(value)]),
+        GIFT: this.getText("rewardSummary.GIFT", [gift ?? ""]),
+        CHEAPEST_FREE: this.getText("rewardSummary.CHEAPEST_FREE")
+      };
+      return details[rewardType] ?? "";
+    },
+    formatCouponUsage: function _formatCouponUsage(couponCode, usedCount, maxUses) {
+      if (!couponCode) {
+        return this.getText("automaticPromotion");
+      }
+      return maxUses ? this.getText("couponUsageLimited", [couponCode, usedCount ?? 0, maxUses]) : this.getText("couponUsage", [couponCode, usedCount ?? 0]);
+    },
+    formatPeriod: function _formatPeriod(startDate, endDate) {
+      if (!startDate && !endDate) {
+        return this.getText("noPeriod");
+      }
+      return this.getText("periodRange", [this.formatter.date(startDate) || "...", this.formatter.date(endDate) || "..."]);
+    },
     refreshStoreInfo: function _refreshStoreInfo() {
       return this.getAppComponent().refreshStoreInfo();
     },

@@ -51,7 +51,7 @@ export default class OrdersSection {
         const context = (event.getSource() as Control).getBindingContext() as Context;
         const dialog = await this.getDialog();
 
-        dialog.bindElement({ path: context.getPath(), parameters: { $expand: "Items" } });
+        dialog.bindElement({ path: context.getPath(), parameters: { $expand: "Items,Promotions" } });
         dialog.open();
     };
 

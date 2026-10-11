@@ -52,6 +52,12 @@
                     <Text text="{tracking>/order/DeliveryNotes}" visible="{= !!${tracking>/order/DeliveryNotes} }" class="blMuted" />
                 </VBox>
 
+                <VBox visible="{tracking>/isPickup}" class="blDeliveryCard sapUiSmallMarginBottom">
+                    <Title text="{i18n>fulfillment.PICKUP}" level="H3" class="sapUiTinyMarginBottom" />
+                    <Text text="{i18n>pickupTrackingInfo}" />
+                    <Text text="{store>/PickupAddress}" visible="{= !!${store>/PickupAddress} }" class="blProductName sapUiTinyMarginTop" />
+                </VBox>
+
                 <Text text="{i18n>trackingInfo}" class="sapUiSmallMarginBottom" />
 
                 <Table items="{tracking>/order/Items}" class="blTable">
@@ -81,6 +87,30 @@
                     </items>
                 </Table>
 
+                <List
+                    items="{tracking>/order/Promotions}"
+                    visible="{= !!${tracking>/order/Promotions} &amp;&amp; ${tracking>/order/Promotions}.length > 0 }"
+                    headerText="{i18n>appliedPromotions}"
+                    showSeparators="None"
+                    class="blPromotionList sapUiSmallMarginTop"
+                >
+                    <StandardListItem
+                        icon="{= ${tracking>RewardType} === 'GIFT' ? 'sap-icon://gift' : 'sap-icon://lead' }"
+                        title="{tracking>PromotionName}"
+                        description="{tracking>GiftDescription}"
+                        info="{path: 'tracking>DiscountAmount', formatter: '.formatter.negativeAmount'}"
+                        infoState="Success"
+                    />
+                </List>
+
+                <HBox justifyContent="End" alignItems="Center" visible="{= ${tracking>/order/DiscountAmount} > 0 }" class="sapUiSmallMarginTop">
+                    <Text text="{i18n>subtotal}" class="sapUiSmallMarginEnd" />
+                    <Text text="{path: 'tracking>/order/SubtotalAmount', formatter: '.formatter.currency'}" />
+                </HBox>
+                <HBox justifyContent="End" alignItems="Center" visible="{= ${tracking>/order/DiscountAmount} > 0 }">
+                    <Text text="{i18n>discount}" class="sapUiSmallMarginEnd" />
+                    <ObjectStatus text="{path: 'tracking>/order/DiscountAmount', formatter: '.formatter.negativeAmount'}" state="Success" />
+                </HBox>
                 <HBox justifyContent="End" alignItems="Center" class="blCartTotal">
                     <Text text="{i18n>total}" class="sapUiSmallMarginEnd" />
                     <Text text="{path: 'tracking>/order/TotalAmount', targetType: 'any', formatter: '.formatter.currency'}" class="blDetailPrice" />

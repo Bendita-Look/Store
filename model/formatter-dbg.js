@@ -25,6 +25,12 @@ sap.ui.define(["sap/base/strings/formatMessage", "sap/base/i18n/Localization", "
   function languageTag() {
     return Localization.getLanguageTag().toString();
   }
+  function formatCurrency(value) {
+    return new Intl.NumberFormat(languageTag(), {
+      style: "currency",
+      currency: CURRENCY
+    }).format(Number(value ?? 0));
+  }
   function catalogImageUrl(imageId) {
     return imageId ? `${XsuaaAuthHelper.getConfig().catalogService}ProductImages(${imageId})/Image` : PLACEHOLDER_IMAGE;
   }
@@ -38,11 +44,14 @@ sap.ui.define(["sap/base/strings/formatMessage", "sap/base/i18n/Localization", "
     return `https://wa.me/${fullNumber}${text}`;
   }
   var __exports = {
-    currency(value) {
-      return new Intl.NumberFormat(languageTag(), {
-        style: "currency",
-        currency: CURRENCY
-      }).format(Number(value ?? 0));
+    currency: formatCurrency,
+    negativeAmount(value) {
+      const amount = Number(value ?? 0);
+      return amount > 0 ? `- ${formatCurrency(amount)}` : "";
+    },
+    firstAmount(...values) {
+      const amount = values.find(value => value !== null && value !== undefined && value !== "");
+      return formatCurrency(amount);
     },
     message(pattern, ...values) {
       return formatMessage(pattern, values);
@@ -52,6 +61,20 @@ sap.ui.define(["sap/base/strings/formatMessage", "sap/base/i18n/Localization", "
     },
     variantDescription(...parts) {
       return parts.filter(Boolean).join(" / ");
+    },
+    date(value) {
+      return value ? new Intl.DateTimeFormat(languageTag(), {
+        dateStyle: "short",
+        timeZone: "UTC"
+      }).format(new Date(value)) : "";
+    },
+    firstText(...values) {
+      return values.find(value => Boolean(value?.trim())) ?? "";
+    },
+    fullAddress(street, number, complement, district, city, state, zipCode) {
+      const streetLine = [street, number].filter(Boolean).join(", ");
+      const cityLine = [city, state].filter(Boolean).join("/");
+      return [streetLine, complement, district, cityLine, zipCode].filter(Boolean).join(" - ");
     },
     dateTime(value) {
       return value ? new Intl.DateTimeFormat(languageTag(), {
