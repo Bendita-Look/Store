@@ -58,6 +58,48 @@ export default abstract class BaseController extends Controller {
         return deliveryType ? this.getText(`deliveryType.${deliveryType}`) : "";
     }
 
+    public formatChannel(channel: string | null | undefined): string {
+        return channel ? this.getText(`channel.${channel}`) : "";
+    }
+
+    public formatFulfillment(fulfillment: string | null | undefined): string {
+        return fulfillment ? this.getText(`fulfillment.${fulfillment}`) : "";
+    }
+
+    public formatReward(rewardType: string | null | undefined, rewardValue: number | string | null | undefined, gift: string | null | undefined): string {
+        if (!rewardType) {
+            return "";
+        }
+
+        const value = Number(rewardValue ?? 0);
+        const details: Record<string, string> = {
+            PERCENT: this.getText("rewardSummary.PERCENT", [value]),
+            FIXED: this.getText("rewardSummary.FIXED", [this.formatter.currency(value)]),
+            GIFT: this.getText("rewardSummary.GIFT", [gift ?? ""]),
+            CHEAPEST_FREE: this.getText("rewardSummary.CHEAPEST_FREE")
+        };
+
+        return details[rewardType] ?? "";
+    }
+
+    public formatCouponUsage(couponCode: string | null | undefined, usedCount: number | null | undefined, maxUses: number | null | undefined): string {
+        if (!couponCode) {
+            return this.getText("automaticPromotion");
+        }
+
+        return maxUses
+            ? this.getText("couponUsageLimited", [couponCode, usedCount ?? 0, maxUses])
+            : this.getText("couponUsage", [couponCode, usedCount ?? 0]);
+    }
+
+    public formatPeriod(startDate: string | null | undefined, endDate: string | null | undefined): string {
+        if (!startDate && !endDate) {
+            return this.getText("noPeriod");
+        }
+
+        return this.getText("periodRange", [this.formatter.date(startDate) || "...", this.formatter.date(endDate) || "..."]);
+    }
+
     public refreshStoreInfo(): Promise<void> {
         return this.getAppComponent().refreshStoreInfo();
     }
@@ -67,7 +109,7 @@ export default abstract class BaseController extends Controller {
         return bundle.getText(key, parameters) ?? key;
     }
 
-    protected getCatalogModel(): ODataModel {
+    public getCatalogModel(): ODataModel {
         return this.getAppComponent().getModel("catalog") as ODataModel;
     }
 

@@ -8,6 +8,8 @@ import CategoriesSection from "./admin/CategoriesSection";
 import BackupSection from "./admin/BackupSection";
 import ReportsSection from "./admin/ReportsSection";
 import SettingsSection from "./admin/SettingsSection";
+import PromotionsSection from "./admin/PromotionsSection";
+import StoreSaleSection from "./admin/StoreSaleSection";
 import { AuthenticationService } from "../auth/AuthenticationService";
 
 const DEFAULT_TAB = "orders";
@@ -30,6 +32,10 @@ export default class Admin extends BaseController {
     public readonly reports = new ReportsSection(this);
 
     public readonly settings = new SettingsSection(this);
+
+    public readonly promotions = new PromotionsSection(this);
+
+    public readonly storeSale = new StoreSaleSection(this);
 
     private viewModel: JSONModel;
 
@@ -74,6 +80,7 @@ export default class Admin extends BaseController {
         this.viewModel.setProperty("/userName", AuthenticationService.getSession()?.userName ?? "");
         this.orders.refresh();
         this.products.refresh();
+        this.promotions.refresh();
 
         if (selectedTab === REPORTS_TAB) {
             await this.reports.load();

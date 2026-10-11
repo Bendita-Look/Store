@@ -12,7 +12,7 @@
                 <contentLeft>
                     <HBox alignItems="Center" class="blBrand">
                         <Image
-                            src="img/logo.svg"
+                            src="img/logo.jpg"
                             width="2rem"
                             height="2rem"
                             alt="{i18n>appTitle}"
@@ -45,6 +45,22 @@
                 <Title text="{i18n>heroTitle}" level="H1" titleStyle="H1" wrapping="true" textAlign="Center" class="blHeroTitle" />
                 <Text text="{i18n>heroSubtitle}" textAlign="Center" class="blHeroSubtitle" />
             </VBox>
+
+            <HBox
+                items="{catalogView>/promotions}"
+                visible="{= ${catalogView>/promotions}.length > 0 }"
+                justifyContent="Center"
+                wrap="Wrap"
+                class="blPromotionStrip"
+            >
+                <HBox alignItems="Center" class="blPromotionBadge">
+                    <core:Icon src="sap-icon://lead" class="sapUiTinyMarginEnd" />
+                    <VBox>
+                        <Text text="{catalogView>Name}" class="blProductName" />
+                        <Text text="{catalogView>Description}" visible="{= !!${catalogView>Description} }" class="blMuted" />
+                    </VBox>
+                </HBox>
+            </HBox>
 
             <VBox class="blContainer">
                 <SearchField

@@ -1,7 +1,7 @@
 import JSONModel from "sap/ui/model/json/JSONModel";
 import type { Route$PatternMatchedEvent } from "sap/ui/core/routing/Route";
 import BaseController from "./BaseController";
-import OrderService from "../service/OrderService";
+import OrderService, { FulfillmentType } from "../service/OrderService";
 import formatter, { OrderStatus } from "../model/formatter";
 
 interface TrackingStep {
@@ -48,17 +48,19 @@ export default class OrderTracking extends BaseController {
                 loaded: true,
                 order,
                 cancelled: order.Status === OrderStatus.Cancelled,
+                isPickup: order.FulfillmentType === FulfillmentType.Pickup,
                 hasDelivery: !!order.DeliveryType,
                 deliveryTypeText: this.formatDeliveryType(order.DeliveryType),
-                steps: this.buildSteps(order.Status as OrderStatus, !!order.DeliveryType)
+                steps: this.buildSteps(order.Status as OrderStatus, !!order.DeliveryType, order.FulfillmentType === FulfillmentType.Pickup)
             });
         } catch (error) {
             this.handleError(error, "orderNotFound");
         }
     }
 
-    private buildSteps(status: OrderStatus, hasDelivery: boolean): TrackingStep[] {
-        const steps = STEPS.filter((step) => step !== OrderStatus.OutForDelivery || hasDelivery || status !== OrderStatus.Completed);
+    private buildSteps(status: OrderStatus, hasDelivery: boolean, isPickup: boolean): TrackingStep[] {
+        const showDeliveryStep = !isPickup && (hasDelivery || status !== OrderStatus.Completed);
+        const steps = STEPS.filter((step) => step !== OrderStatus.OutForDelivery || showDeliveryStep);
         const currentIndex = steps.indexOf(status);
 
         return steps.map((step, index) => ({

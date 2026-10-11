@@ -1,0 +1,101 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+>
+    <Dialog
+        id="promotionDialog"
+        title="{= ${path: 'HasActiveEntity', targetType: 'any'} ? ${i18n>editPromotion} : ${i18n>newPromotion} }"
+        contentWidth="38rem"
+        class="blDialog"
+        escapeHandler=".promotions.onCancelPromotion"
+    >
+        <content>
+            <MessageStrip text="{i18n>promotionHelp}" type="Information" showIcon="true" class="sapUiSmallMargin" />
+            <form:SimpleForm editable="true" layout="ColumnLayout" columnsM="2" columnsL="2" columnsXL="2" title="{i18n>promotionData}">
+                <Label text="{i18n>promotionName}" required="true" />
+                <Input value="{Name}" maxLength="120" placeholder="{i18n>promotionNamePlaceholder}" />
+                <Label text="{i18n>description}" />
+                <TextArea value="{Description}" maxLength="500" rows="2" placeholder="{i18n>promotionDescriptionPlaceholder}" />
+                <Label text="{i18n>activeInStore}" />
+                <Switch state="{Active}" customTextOn="{i18n>yes}" customTextOff="{i18n>no}" />
+                <Label text="{i18n>startDate}" />
+                <DatePicker value="{StartDate}" />
+                <Label text="{i18n>endDate}" />
+                <DatePicker value="{EndDate}" />
+            </form:SimpleForm>
+
+            <form:SimpleForm editable="true" layout="ColumnLayout" columnsM="2" columnsL="2" columnsXL="2" title="{i18n>promotionReward}">
+                <Label text="{i18n>rewardType}" required="true" />
+                <Select selectedKey="{RewardType}" width="100%">
+                    <core:Item key="PERCENT" text="{i18n>reward.PERCENT}" />
+                    <core:Item key="FIXED" text="{i18n>reward.FIXED}" />
+                    <core:Item key="CHEAPEST_FREE" text="{i18n>reward.CHEAPEST_FREE}" />
+                    <core:Item key="GIFT" text="{i18n>reward.GIFT}" />
+                </Select>
+                <Label
+                    text="{= ${path: 'RewardType', targetType: 'any'} === 'PERCENT' ? ${i18n>rewardPercent} : ${i18n>rewardAmount} }"
+                    required="true"
+                    visible="{= ${path: 'RewardType', targetType: 'any'} === 'PERCENT' || ${path: 'RewardType', targetType: 'any'} === 'FIXED' }"
+                />
+                <Input
+                    value="{RewardValue}"
+                    description="{= ${path: 'RewardType', targetType: 'any'} === 'PERCENT' ? '%' : ${i18n>currencySymbol} }"
+                    visible="{= ${path: 'RewardType', targetType: 'any'} === 'PERCENT' || ${path: 'RewardType', targetType: 'any'} === 'FIXED' }"
+                />
+                <Label text="{i18n>giftDescription}" required="true" visible="{= ${path: 'RewardType', targetType: 'any'} === 'GIFT' }" />
+                <Input
+                    value="{GiftDescription}"
+                    maxLength="255"
+                    placeholder="{i18n>giftDescriptionPlaceholder}"
+                    visible="{= ${path: 'RewardType', targetType: 'any'} === 'GIFT' }"
+                />
+            </form:SimpleForm>
+
+            <form:SimpleForm editable="true" layout="ColumnLayout" columnsM="2" columnsL="2" columnsXL="2" title="{i18n>promotionConditions}">
+                <Label text="{i18n>promotionScope}" />
+                <Select selectedKey="{Scope}" width="100%">
+                    <core:Item key="ALL" text="{i18n>scope.ALL}" />
+                    <core:Item key="CATEGORY" text="{i18n>scope.CATEGORY}" />
+                    <core:Item key="PRODUCT" text="{i18n>scope.PRODUCT}" />
+                </Select>
+                <Label text="{i18n>category}" required="true" visible="{= ${path: 'Scope', targetType: 'any'} === 'CATEGORY' }" />
+                <Select
+                    selectedKey="{Category_ID}"
+                    forceSelection="false"
+                    width="100%"
+                    visible="{= ${path: 'Scope', targetType: 'any'} === 'CATEGORY' }"
+                    items="{path: '/Categories', parameters: {$select: 'ID,Name', $filter: 'IsActiveEntity eq true'}, sorter: {path: 'Name'}, templateShareable: false}"
+                >
+                    <core:Item key="{ID}" text="{Name}" />
+                </Select>
+                <Label text="{i18n>product}" required="true" visible="{= ${path: 'Scope', targetType: 'any'} === 'PRODUCT' }" />
+                <ComboBox
+                    selectedKey="{Product_ID}"
+                    width="100%"
+                    visible="{= ${path: 'Scope', targetType: 'any'} === 'PRODUCT' }"
+                    items="{path: '/Products', parameters: {$select: 'ID,Name', $filter: 'IsActiveEntity eq true'}, sorter: {path: 'Name'}, templateShareable: false}"
+                >
+                    <core:Item key="{ID}" text="{Name}" />
+                </ComboBox>
+                <Label text="{i18n>minQuantity}" />
+                <StepInput value="{MinQuantity}" min="1" max="99" width="8rem" />
+                <Label text="{i18n>minAmount}" />
+                <Input value="{MinAmount}" description="{i18n>currencySymbol}" placeholder="{i18n>optional}" />
+            </form:SimpleForm>
+
+            <form:SimpleForm editable="true" layout="ColumnLayout" columnsM="2" columnsL="2" columnsXL="2" title="{i18n>couponSection}">
+                <Label text="{i18n>couponCode}" />
+                <Input value="{CouponCode}" maxLength="20" placeholder="{i18n>couponCodePlaceholder}" change=".promotions.onCouponChange" />
+                <Label text="{i18n>maxUses}" />
+                <Input value="{MaxUses}" placeholder="{i18n>unlimited}" />
+                <Label text="{i18n>usedCount}" />
+                <Text text="{UsedCount}" />
+            </form:SimpleForm>
+        </content>
+        <buttons>
+            <Button text="{i18n>save}" type="Emphasized" press=".promotions.onSavePromotion" />
+            <Button text="{i18n>cancel}" press=".promotions.onCancelPromotion" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

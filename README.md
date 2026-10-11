@@ -6,12 +6,12 @@ App UI5 (TypeScript, MVC) da loja Bendita Look, separado do backend [SAP-CAP-Ben
 
 | Rota | Acesso | Conteúdo |
 |---|---|---|
-| `#/` | Público | Vitrine com busca e filtro por categoria |
+| `#/` | Público | Vitrine com busca, filtro por categoria e faixa de promoções ativas |
 | `#/product/{id}` | Público | Fotos por cor, seleção de cor/tamanho, estoque e adicionar ao carrinho |
-| `#/cart` | Público | Carrinho (salvo no navegador) e formulário de contato para enviar o pedido |
+| `#/cart` | Público | Carrinho (salvo no navegador), cupom, promoções aplicadas, entrega com CEP via ViaCEP ou retirada na loja; os dados de contato ficam lembrados no dispositivo |
 | `#/order/{número}/{código}` | Público (link do email) | Acompanhamento do pedido |
 | `#/login` | - | Login da área administrativa (XSUAA) |
-| `#/admin/:aba:` | Role `Admin` | Pedidos (status, entrega e WhatsApp), produtos, categorias, relatórios, configurações da loja e backup |
+| `#/admin/:aba:` | Role `Admin` | Pedidos (status, entrega, WhatsApp e registro de venda na loja), produtos, promoções e cupons, categorias, relatórios, configurações da loja e backup |
 | `#/admin/product/{id}` | Role `Admin` | Editor do produto em draft: dados, cores, tamanhos/estoque e fotos |
 
 ## Estrutura

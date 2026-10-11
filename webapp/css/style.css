@@ -126,6 +126,38 @@
     background: var(--bl-accent);
 }
 
+.blBrand .sapMImg,
+.blLoginCard .sapMImg {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.blSummary {
+    padding: 1rem;
+    border-radius: var(--bl-radius);
+    background: #ffffff;
+}
+
+.blPromotionList {
+    background: transparent;
+}
+
+.blPromotionStrip {
+    gap: 0.75rem;
+    padding: 0.75rem 1rem 0;
+}
+
+.blPromotionBadge {
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    background: #ffffff;
+    border: 1px dashed var(--bl-accent);
+}
+
+.blGrow {
+    flex: 1 1 16rem;
+}
+
 .blMuted {
     color: var(--bl-muted);
 }
