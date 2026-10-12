@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/core/routing/History", "sap/m/MessageBox", "sap/m/MessageToast", "../model/formatter", "../util/feedback", "../util/http"], function (Controller, UIComponent, History, MessageBox, MessageToast, __formatter, ___util_feedback, ___util_http) {
+sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/core/routing/History", "sap/m/MessageBox", "sap/m/MessageToast", "sap/m/InstanceManager", "../model/formatter", "../util/feedback", "../util/http"], function (Controller, UIComponent, History, MessageBox, MessageToast, InstanceManager, __formatter, ___util_feedback, ___util_http) {
   "use strict";
 
   function _interopRequireDefault(obj) {
@@ -50,7 +50,7 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
     formatFulfillment: function _formatFulfillment(fulfillment) {
       return fulfillment ? this.getText(`fulfillment.${fulfillment}`) : "";
     },
-    formatReward: function _formatReward(rewardType, rewardValue, gift) {
+    formatReward: function _formatReward(rewardType, rewardValue, gift, maxDiscount) {
       if (!rewardType) {
         return "";
       }
@@ -61,7 +61,8 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
         GIFT: this.getText("rewardSummary.GIFT", [gift ?? ""]),
         CHEAPEST_FREE: this.getText("rewardSummary.CHEAPEST_FREE")
       };
-      return details[rewardType] ?? "";
+      const summary = details[rewardType] ?? "";
+      return maxDiscount ? this.getText("rewardSummaryLimit", [summary, this.formatter.currency(Number(maxDiscount))]) : summary;
     },
     formatCouponUsage: function _formatCouponUsage(couponCode, usedCount, maxUses) {
       if (!couponCode) {
@@ -112,7 +113,7 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
         return;
       }
       if (isBackendUnavailableError(error)) {
-        MessageBox.error(this.getText("backendUnavailable"));
+        this.getAppComponent().notifyBackendUnavailable();
         return;
       }
       const detail = getBackendErrorMessage(error);
@@ -120,12 +121,12 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
       MessageBox.error(detail ? `${message}\n\n${detail}` : message);
     },
     runBusy: async function _runBusy(action) {
-      const view = this.getView();
-      view?.setBusy(true);
+      const controls = [this.getView(), ...InstanceManager.getOpenDialogs()];
+      controls.forEach(control => control?.setBusy(true));
       try {
         return await action();
       } finally {
-        view?.setBusy(false);
+        controls.forEach(control => control?.setBusy(false));
       }
     }
   });

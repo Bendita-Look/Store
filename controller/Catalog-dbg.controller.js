@@ -18,7 +18,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/mod
         promotions: []
       });
       this.getView()?.setModel(this.viewModel, "catalogView");
-      this.getRouter().getRoute("catalog")?.attachPatternMatched(() => void this.loadPromotions());
+      this.getRouter().getRoute("catalog")?.attachPatternMatched(() => this.onRouteMatched());
     },
     onCategoryPress: function _onCategoryPress(event) {
       const context = event.getSource().getBindingContext("catalog");
@@ -47,6 +47,16 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/mod
     onOpenInstagram: function _onOpenInstagram() {
       window.open(formatter.instagramUrl(this.getStoreModel().getProperty("/Instagram")), "_blank");
     },
+    onRouteMatched: function _onRouteMatched() {
+      const products = this.getProductsBinding();
+      if (products && !products.isSuspended() && products.getLength() > 0) {
+        products.refresh();
+      }
+      void this.loadPromotions();
+    },
+    getProductsBinding: function _getProductsBinding() {
+      return this.byId("productGrid")?.getBinding("items");
+    },
     loadPromotions: async function _loadPromotions() {
       try {
         this.viewModel.setProperty("/promotions", await new OrderService(this.getCatalogModel()).activePromotions());
@@ -71,7 +81,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/mod
           caseSensitive: false
         }));
       }
-      this.byId("productGrid")?.getBinding("items")?.filter(filters);
+      this.getProductsBinding()?.filter(filters);
     }
   });
   return Catalog;

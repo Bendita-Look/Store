@@ -11,6 +11,7 @@ sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "s
   const XsuaaAuthHelper = ___auth_providers_XsuaaAuthHelper["XsuaaAuthHelper"];
   const SessionStorage = ___auth_storage_SessionStorage["SessionStorage"];
   const Environment = _interopRequireDefault(__Environment);
+  const isAuthorizationError = ___util_http["isAuthorizationError"];
   const isBackendUnavailableError = ___util_http["isBackendUnavailableError"];
   const isSessionExpiredError = ___util_http["isSessionExpiredError"];
   const getBackendErrorMessage = ___util_feedback["getBackendErrorMessage"];
@@ -26,6 +27,7 @@ sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "s
       BaseComponent.prototype.constructor.apply(this, arguments);
       this.sessionExpiredShown = false;
       this.unexpectedErrorShown = false;
+      this.backendUnavailableShown = false;
     },
     metadata: {
       manifest: "json",
@@ -46,7 +48,9 @@ sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "s
       this.setModel(new JSONModel({}), "store");
       this.setModel(this.createODataModel(XsuaaAuthHelper.getConfig().catalogService), "catalog");
       void this.refreshStoreInfo();
-      this.getRouter().initialize();
+      const router = this.getRouter();
+      router.getTargetHandler().setCloseDialogs(false);
+      router.initialize();
       await this.completeLoginRedirect();
     },
     ensureAdminModel: async function _ensureAdminModel() {
@@ -68,8 +72,27 @@ sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "s
         const storeInfo = await new StoreService(this.getModel("catalog")).storeInfo();
         this.getModel("store").setData(storeInfo);
       } catch (error) {
-        console.error(error);
+        if (isBackendUnavailableError(error)) {
+          this.notifyBackendUnavailable();
+        }
       }
+    },
+    notifyBackendUnavailable: function _notifyBackendUnavailable() {
+      if (this.backendUnavailableShown) {
+        return;
+      }
+      this.backendUnavailableShown = true;
+      const retry = this.getText("retry");
+      MessageBox.error(this.getText("backendUnavailable"), {
+        actions: [retry, MessageBox.Action.CLOSE],
+        emphasizedAction: retry,
+        onClose: action => {
+          this.backendUnavailableShown = false;
+          if (action === retry) {
+            window.location.reload();
+          }
+        }
+      });
     },
     handleUnexpectedError: function _handleUnexpectedError(reason) {
       if (!reason || isSessionExpiredError(reason) || isBackendUnavailableError(reason) || this.unexpectedErrorShown) {
@@ -114,6 +137,11 @@ sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "s
         earlyRequests: true
       });
       model.attachSessionTimeout(() => AuthenticationService.notifySessionExpired());
+      model.getMetaModel().requestObject("/").catch(error => {
+        if (!isAuthorizationError(error)) {
+          this.notifyBackendUnavailable();
+        }
+      });
       return model;
     },
     authorizationHeader: function _authorizationHeader(accessToken) {

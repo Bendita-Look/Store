@@ -1,6 +1,9 @@
 import { AuthenticationService } from "../auth/AuthenticationService";
 import { XsuaaAuthHelper } from "../auth/providers/XsuaaAuthHelper";
 
+const UNAVAILABLE_STATUSES = [0, 502, 503, 504];
+const AUTHORIZATION_STATUSES = [401, 403];
+
 export class BackendUnavailableError extends Error {
     public constructor() {
         super("Backend unavailable");
@@ -66,10 +69,27 @@ async function readErrorMessage(response: Response): Promise<string> {
     }
 }
 
+export function isAuthorizationError(error: unknown): boolean {
+    return AUTHORIZATION_STATUSES.includes((error as { status?: number } | undefined)?.status ?? -1);
+}
+
 export function isSessionExpiredError(error: unknown): boolean {
     return error instanceof SessionExpiredError;
 }
 
 export function isBackendUnavailableError(error: unknown): boolean {
-    return error instanceof BackendUnavailableError;
+    const visited = new Set<unknown>();
+    let current: unknown = error;
+
+    while (current && typeof current === "object" && !visited.has(current)) {
+        visited.add(current);
+
+        if (current instanceof BackendUnavailableError || UNAVAILABLE_STATUSES.includes((current as { status?: number }).status ?? -1)) {
+            return true;
+        }
+
+        current = (current as { cause?: unknown }).cause;
+    }
+
+    return false;
 }

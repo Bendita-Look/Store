@@ -43,6 +43,16 @@
                     description="{= ${path: 'RewardType', targetType: 'any'} === 'PERCENT' ? '%' : ${i18n>currencySymbol} }"
                     visible="{= ${path: 'RewardType', targetType: 'any'} === 'PERCENT' || ${path: 'RewardType', targetType: 'any'} === 'FIXED' }"
                 />
+                <Label
+                    text="{i18n>maxDiscount}"
+                    visible="{= ${path: 'RewardType', targetType: 'any'} === 'PERCENT' || ${path: 'RewardType', targetType: 'any'} === 'CHEAPEST_FREE' }"
+                />
+                <Input
+                    value="{MaxDiscount}"
+                    placeholder="{i18n>optional}"
+                    description="{i18n>currencySymbol}"
+                    visible="{= ${path: 'RewardType', targetType: 'any'} === 'PERCENT' || ${path: 'RewardType', targetType: 'any'} === 'CHEAPEST_FREE' }"
+                />
                 <Label text="{i18n>giftDescription}" required="true" visible="{= ${path: 'RewardType', targetType: 'any'} === 'GIFT' }" />
                 <Input
                     value="{GiftDescription}"

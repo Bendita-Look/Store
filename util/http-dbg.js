@@ -3,6 +3,8 @@ sap.ui.define(["../auth/AuthenticationService", "../auth/providers/XsuaaAuthHelp
 
   const AuthenticationService = ___auth_AuthenticationService["AuthenticationService"];
   const XsuaaAuthHelper = ___auth_providers_XsuaaAuthHelper["XsuaaAuthHelper"];
+  const UNAVAILABLE_STATUSES = [0, 502, 503, 504];
+  const AUTHORIZATION_STATUSES = [401, 403];
   class BackendUnavailableError extends Error {
     constructor() {
       super("Backend unavailable");
@@ -57,11 +59,23 @@ sap.ui.define(["../auth/AuthenticationService", "../auth/providers/XsuaaAuthHelp
       return response.statusText;
     }
   }
+  function isAuthorizationError(error) {
+    return AUTHORIZATION_STATUSES.includes(error?.status ?? -1);
+  }
   function isSessionExpiredError(error) {
     return error instanceof SessionExpiredError;
   }
   function isBackendUnavailableError(error) {
-    return error instanceof BackendUnavailableError;
+    const visited = new Set();
+    let current = error;
+    while (current && typeof current === "object" && !visited.has(current)) {
+      visited.add(current);
+      if (current instanceof BackendUnavailableError || UNAVAILABLE_STATUSES.includes(current.status ?? -1)) {
+        return true;
+      }
+      current = current.cause;
+    }
+    return false;
   }
   var __exports = {
     __esModule: true
@@ -71,6 +85,7 @@ sap.ui.define(["../auth/AuthenticationService", "../auth/providers/XsuaaAuthHelp
   __exports.RequestFailedError = RequestFailedError;
   __exports.buildAuthHeaders = buildAuthHeaders;
   __exports.adminRequest = adminRequest;
+  __exports.isAuthorizationError = isAuthorizationError;
   __exports.isSessionExpiredError = isSessionExpiredError;
   __exports.isBackendUnavailableError = isBackendUnavailableError;
   return __exports;

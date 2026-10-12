@@ -3,7 +3,7 @@ import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import type Event from "sap/ui/base/Event";
 import type Control from "sap/ui/core/Control";
-import type ListBinding from "sap/ui/model/ListBinding";
+import type ODataListBinding from "sap/ui/model/odata/v4/ODataListBinding";
 import type { SearchField$SearchEvent } from "sap/m/SearchField";
 import BaseController from "./BaseController";
 import formatter from "../model/formatter";
@@ -24,7 +24,7 @@ export default class Catalog extends BaseController {
     public onInit(): void {
         this.viewModel = new JSONModel({ categoryId: "", search: "", promotions: [] });
         this.getView()?.setModel(this.viewModel, "catalogView");
-        this.getRouter().getRoute("catalog")?.attachPatternMatched(() => void this.loadPromotions());
+        this.getRouter().getRoute("catalog")?.attachPatternMatched(() => this.onRouteMatched());
     }
 
     public onCategoryPress(event: Event): void {
@@ -61,6 +61,20 @@ export default class Catalog extends BaseController {
         window.open(formatter.instagramUrl(this.getStoreModel().getProperty("/Instagram") as string), "_blank");
     }
 
+    private onRouteMatched(): void {
+        const products = this.getProductsBinding();
+
+        if (products && !products.isSuspended() && products.getLength() > 0) {
+            products.refresh();
+        }
+
+        void this.loadPromotions();
+    }
+
+    private getProductsBinding(): ODataListBinding | undefined {
+        return this.byId("productGrid")?.getBinding("items") as ODataListBinding | undefined;
+    }
+
     private async loadPromotions(): Promise<void> {
         try {
             this.viewModel.setProperty("/promotions", await new OrderService(this.getCatalogModel()).activePromotions());
@@ -81,7 +95,7 @@ export default class Catalog extends BaseController {
             filters.push(new Filter({ path: "Name", operator: FilterOperator.Contains, value1: search.trim(), caseSensitive: false }));
         }
 
-        (this.byId("productGrid")?.getBinding("items") as ListBinding | undefined)?.filter(filters);
+        this.getProductsBinding()?.filter(filters);
     }
 
 }

@@ -1,6 +1,7 @@
 import BaseComponent from "sap/ui/core/UIComponent";
 import ODataModel from "sap/ui/model/odata/v4/ODataModel";
 import JSONModel from "sap/ui/model/json/JSONModel";
+import type MobileRouter from "sap/m/routing/Router";
 import MessageBox from "sap/m/MessageBox";
 import type ResourceModel from "sap/ui/model/resource/ResourceModel";
 import type ResourceBundle from "sap/base/i18n/ResourceBundle";
@@ -11,7 +12,7 @@ import { AuthenticatedProviderFactory } from "./auth/providers/AuthenticatedProv
 import { XsuaaAuthHelper } from "./auth/providers/XsuaaAuthHelper";
 import { SessionStorage } from "./auth/storage/SessionStorage";
 import Environment from "./util/Environment";
-import { isBackendUnavailableError, isSessionExpiredError } from "./util/http";
+import { isAuthorizationError, isBackendUnavailableError, isSessionExpiredError } from "./util/http";
 import { getBackendErrorMessage } from "./util/feedback";
 import StoreService from "./service/StoreService";
 
@@ -33,6 +34,8 @@ export default class Component extends BaseComponent {
     private sessionExpiredShown = false;
 
     private unexpectedErrorShown = false;
+
+    private backendUnavailableShown = false;
 
     public init(): void {
         super.init();
@@ -56,7 +59,10 @@ export default class Component extends BaseComponent {
 
         void this.refreshStoreInfo();
 
-        this.getRouter().initialize();
+        const router = this.getRouter() as MobileRouter;
+
+        router.getTargetHandler().setCloseDialogs(false);
+        router.initialize();
 
         await this.completeLoginRedirect();
     }
@@ -85,8 +91,32 @@ export default class Component extends BaseComponent {
             const storeInfo = await new StoreService(this.getModel("catalog") as ODataModel).storeInfo();
             (this.getModel("store") as JSONModel).setData(storeInfo);
         } catch (error) {
-            console.error(error);
+            if (isBackendUnavailableError(error)) {
+                this.notifyBackendUnavailable();
+            }
         }
+    }
+
+    public notifyBackendUnavailable(): void {
+        if (this.backendUnavailableShown) {
+            return;
+        }
+
+        this.backendUnavailableShown = true;
+
+        const retry = this.getText("retry");
+
+        MessageBox.error(this.getText("backendUnavailable"), {
+            actions: [retry, MessageBox.Action.CLOSE],
+            emphasizedAction: retry,
+            onClose: (action: string | null) => {
+                this.backendUnavailableShown = false;
+
+                if (action === retry) {
+                    window.location.reload();
+                }
+            }
+        });
     }
 
     public handleUnexpectedError(reason: unknown): void {
@@ -139,6 +169,11 @@ export default class Component extends BaseComponent {
         });
 
         model.attachSessionTimeout(() => AuthenticationService.notifySessionExpired());
+        model.getMetaModel().requestObject("/").catch((error: unknown) => {
+            if (!isAuthorizationError(error)) {
+                this.notifyBackendUnavailable();
+            }
+        });
 
         return model;
     }
