@@ -62,6 +62,9 @@ sap.ui.define(["../auth/AuthenticationService", "../auth/providers/XsuaaAuthHelp
   function isAuthorizationError(error) {
     return AUTHORIZATION_STATUSES.includes(error?.status ?? -1);
   }
+  function isAuthenticationError(error) {
+    return error?.status === 401;
+  }
   function isSessionExpiredError(error) {
     return error instanceof SessionExpiredError;
   }
@@ -86,6 +89,7 @@ sap.ui.define(["../auth/AuthenticationService", "../auth/providers/XsuaaAuthHelp
   __exports.buildAuthHeaders = buildAuthHeaders;
   __exports.adminRequest = adminRequest;
   __exports.isAuthorizationError = isAuthorizationError;
+  __exports.isAuthenticationError = isAuthenticationError;
   __exports.isSessionExpiredError = isSessionExpiredError;
   __exports.isBackendUnavailableError = isBackendUnavailableError;
   return __exports;

@@ -96,12 +96,10 @@ export default class ProductEditor extends BaseController {
             await this.runBusy(async () => {
                 const content = await ImageCompressor.compress(file);
                 const imagesBinding = this.getListBinding("imagesTable");
-                const imageContext = imagesBinding.create({
+                const imageContext = await this.draftService().createDraft(imagesBinding, {
                     ImageType: ImageCompressor.outputType,
                     SortOrder: imagesBinding.getLength() ?? 0
-                }, true);
-
-                await imageContext.created();
+                });
 
                 const imageId = imageContext.getProperty("ID") as string;
 

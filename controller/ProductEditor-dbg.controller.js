@@ -72,11 +72,10 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/unified/ColorPickerPopover
         await this.runBusy(async () => {
           const content = await ImageCompressor.compress(file);
           const imagesBinding = this.getListBinding("imagesTable");
-          const imageContext = imagesBinding.create({
+          const imageContext = await this.draftService().createDraft(imagesBinding, {
             ImageType: ImageCompressor.outputType,
             SortOrder: imagesBinding.getLength() ?? 0
-          }, true);
-          await imageContext.created();
+          });
           const imageId = imageContext.getProperty("ID");
           await MediaService.uploadDraftImage(imageId, content, ImageCompressor.outputType);
           this.setImageUrl(imageId, await MediaService.loadDraftImage(imageId));

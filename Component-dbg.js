@@ -11,6 +11,7 @@ sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "s
   const XsuaaAuthHelper = ___auth_providers_XsuaaAuthHelper["XsuaaAuthHelper"];
   const SessionStorage = ___auth_storage_SessionStorage["SessionStorage"];
   const Environment = _interopRequireDefault(__Environment);
+  const isAuthenticationError = ___util_http["isAuthenticationError"];
   const isAuthorizationError = ___util_http["isAuthorizationError"];
   const isBackendUnavailableError = ___util_http["isBackendUnavailableError"];
   const isSessionExpiredError = ___util_http["isSessionExpiredError"];
@@ -138,7 +139,9 @@ sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "s
       });
       model.attachSessionTimeout(() => AuthenticationService.notifySessionExpired());
       model.getMetaModel().requestObject("/").catch(error => {
-        if (!isAuthorizationError(error)) {
+        if (accessToken && isAuthenticationError(error)) {
+          AuthenticationService.notifySessionExpired();
+        } else if (!isAuthorizationError(error)) {
           this.notifyBackendUnavailable();
         }
       });

@@ -27,7 +27,7 @@
 
             <form:SimpleForm editable="true" layout="ColumnLayout" columnsM="2" columnsL="2" columnsXL="2" title="{i18n>promotionReward}">
                 <Label text="{i18n>rewardType}" required="true" />
-                <Select selectedKey="{RewardType}" width="100%">
+                <Select forceSelection="false" selectedKey="{RewardType}" width="100%">
                     <core:Item key="PERCENT" text="{i18n>reward.PERCENT}" />
                     <core:Item key="FIXED" text="{i18n>reward.FIXED}" />
                     <core:Item key="CHEAPEST_FREE" text="{i18n>reward.CHEAPEST_FREE}" />
@@ -64,7 +64,7 @@
 
             <form:SimpleForm editable="true" layout="ColumnLayout" columnsM="2" columnsL="2" columnsXL="2" title="{i18n>promotionConditions}">
                 <Label text="{i18n>promotionScope}" />
-                <Select selectedKey="{Scope}" width="100%">
+                <Select forceSelection="false" selectedKey="{Scope}" width="100%">
                     <core:Item key="ALL" text="{i18n>scope.ALL}" />
                     <core:Item key="CATEGORY" text="{i18n>scope.CATEGORY}" />
                     <core:Item key="PRODUCT" text="{i18n>scope.PRODUCT}" />

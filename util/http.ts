@@ -73,6 +73,10 @@ export function isAuthorizationError(error: unknown): boolean {
     return AUTHORIZATION_STATUSES.includes((error as { status?: number } | undefined)?.status ?? -1);
 }
 
+export function isAuthenticationError(error: unknown): boolean {
+    return (error as { status?: number } | undefined)?.status === 401;
+}
+
 export function isSessionExpiredError(error: unknown): boolean {
     return error instanceof SessionExpiredError;
 }

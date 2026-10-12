@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/core/routing/History", "sap/m/MessageBox", "sap/m/MessageToast", "sap/m/InstanceManager", "../model/formatter", "../util/feedback", "../util/http"], function (Controller, UIComponent, History, MessageBox, MessageToast, InstanceManager, __formatter, ___util_feedback, ___util_http) {
+sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/core/routing/History", "sap/m/MessageBox", "sap/m/MessageToast", "sap/m/InstanceManager", "../model/formatter", "../util/feedback", "../util/http", "../auth/AuthenticationService"], function (Controller, UIComponent, History, MessageBox, MessageToast, InstanceManager, __formatter, ___util_feedback, ___util_http, ___auth_AuthenticationService) {
   "use strict";
 
   function _interopRequireDefault(obj) {
@@ -6,8 +6,10 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
   }
   const formatter = _interopRequireDefault(__formatter);
   const getBackendErrorMessage = ___util_feedback["getBackendErrorMessage"];
+  const isAuthenticationError = ___util_http["isAuthenticationError"];
   const isBackendUnavailableError = ___util_http["isBackendUnavailableError"];
   const isSessionExpiredError = ___util_http["isSessionExpiredError"];
+  const AuthenticationService = ___auth_AuthenticationService["AuthenticationService"];
   /**
    * @namespace apps.dflc.benditalook.controller
    */
@@ -110,6 +112,10 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
     },
     handleError: function _handleError(error, key) {
       if (isSessionExpiredError(error)) {
+        return;
+      }
+      if (isAuthenticationError(error)) {
+        AuthenticationService.notifySessionExpired();
         return;
       }
       if (isBackendUnavailableError(error)) {
