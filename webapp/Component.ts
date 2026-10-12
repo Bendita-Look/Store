@@ -12,7 +12,7 @@ import { AuthenticatedProviderFactory } from "./auth/providers/AuthenticatedProv
 import { XsuaaAuthHelper } from "./auth/providers/XsuaaAuthHelper";
 import { SessionStorage } from "./auth/storage/SessionStorage";
 import Environment from "./util/Environment";
-import { isAuthorizationError, isBackendUnavailableError, isSessionExpiredError } from "./util/http";
+import { isAuthenticationError, isAuthorizationError, isBackendUnavailableError, isSessionExpiredError } from "./util/http";
 import { getBackendErrorMessage } from "./util/feedback";
 import StoreService from "./service/StoreService";
 
@@ -170,7 +170,9 @@ export default class Component extends BaseComponent {
 
         model.attachSessionTimeout(() => AuthenticationService.notifySessionExpired());
         model.getMetaModel().requestObject("/").catch((error: unknown) => {
-            if (!isAuthorizationError(error)) {
+            if (accessToken && isAuthenticationError(error)) {
+                AuthenticationService.notifySessionExpired();
+            } else if (!isAuthorizationError(error)) {
                 this.notifyBackendUnavailable();
             }
         });

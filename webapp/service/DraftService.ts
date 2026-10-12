@@ -1,8 +1,18 @@
 import type Context from "sap/ui/model/odata/v4/Context";
 import type ODataListBinding from "sap/ui/model/odata/v4/ODataListBinding";
+import type { ODataListBinding$CreateCompletedEvent } from "sap/ui/model/odata/v4/ODataListBinding";
+import Messaging from "sap/ui/core/Messaging";
+import type Message from "sap/ui/core/message/Message";
 import type ODataModel from "sap/ui/model/odata/v4/ODataModel";
 
 const SERVICE_NAMESPACE = "BenditaLook";
+
+export class CreationFailedError extends Error {
+    public constructor(message: string, public readonly status?: number) {
+        super(message);
+        this.name = "CreationFailedError";
+    }
+}
 
 export default class DraftService {
 
@@ -11,7 +21,7 @@ export default class DraftService {
     public async createDraft(listBinding: ODataListBinding, data: object): Promise<Context> {
         const draftContext = listBinding.create(data, true);
 
-        await draftContext.created();
+        await Promise.race([draftContext.created(), this.creationFailure(listBinding, draftContext)]);
 
         return draftContext;
     }
@@ -40,6 +50,35 @@ export default class DraftService {
         this.adminModel.resetChanges();
 
         await draftContext.delete();
+    }
+
+    private creationFailure(listBinding: ODataListBinding, context: Context): Promise<never> {
+        return new Promise((_resolve, reject) => {
+            const onCreateCompleted = (event: ODataListBinding$CreateCompletedEvent): void => {
+                if (event.getParameter("context") !== context) {
+                    return;
+                }
+
+                listBinding.detachCreateCompleted(onCreateCompleted);
+
+                if (!event.getParameter("success")) {
+                    setTimeout(() => {
+                        reject(this.lastRequestError());
+                        context.delete().catch(() => undefined);
+                    });
+                }
+            };
+
+            listBinding.attachCreateCompleted(onCreateCompleted);
+        });
+    }
+
+    private lastRequestError(): CreationFailedError {
+        const messages = (Messaging.getMessageModel().getData() as Message[]).filter((message) => message.getTechnical());
+        const lastMessage = messages[messages.length - 1];
+        const details = lastMessage?.getTechnicalDetails() as { httpStatus?: number } | undefined;
+
+        return new CreationFailedError(lastMessage?.getMessage() ?? "", details?.httpStatus);
     }
 
     public async submitPendingChanges(): Promise<void> {

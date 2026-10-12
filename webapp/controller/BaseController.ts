@@ -13,7 +13,8 @@ import formatter from "../model/formatter";
 import type CartModel from "../model/CartModel";
 import type Component from "../Component";
 import { getBackendErrorMessage } from "../util/feedback";
-import { isBackendUnavailableError, isSessionExpiredError } from "../util/http";
+import { isAuthenticationError, isBackendUnavailableError, isSessionExpiredError } from "../util/http";
+import { AuthenticationService } from "../auth/AuthenticationService";
 
 /**
  * @namespace apps.dflc.benditalook.controller
@@ -153,6 +154,11 @@ export default abstract class BaseController extends Controller {
 
     public handleError(error: unknown, key: string): void {
         if (isSessionExpiredError(error)) {
+            return;
+        }
+
+        if (isAuthenticationError(error)) {
+            AuthenticationService.notifySessionExpired();
             return;
         }
 
