@@ -254,7 +254,7 @@
                                 <ColumnListItem>
                                     <cells>
                                         <ObjectIdentifier title="{Name}" text="{= ${path: 'IsActiveEntity', targetType: 'any'} ? ${Description} : ${i18n>draft} }" />
-                                        <Text text="{parts: ['RewardType', {path: 'RewardValue', targetType: 'any'}, 'GiftDescription'], formatter: '.formatReward'}" />
+                                        <Text text="{parts: ['RewardType', {path: 'RewardValue', targetType: 'any'}, 'GiftDescription', {path: 'MaxDiscount', targetType: 'any'}], formatter: '.formatReward'}" />
                                         <Text text="{parts: ['CouponCode', {path: 'UsedCount', targetType: 'any'}, {path: 'MaxUses', targetType: 'any'}], formatter: '.formatCouponUsage'}" />
                                         <Text text="{parts: [{path: 'StartDate', targetType: 'any'}, {path: 'EndDate', targetType: 'any'}], formatter: '.formatPeriod'}" />
                                         <ObjectStatus

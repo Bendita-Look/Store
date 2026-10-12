@@ -8,6 +8,7 @@ import type ODataModel from "sap/ui/model/odata/v4/ODataModel";
 import type JSONModel from "sap/ui/model/json/JSONModel";
 import MessageBox from "sap/m/MessageBox";
 import MessageToast from "sap/m/MessageToast";
+import InstanceManager from "sap/m/InstanceManager";
 import formatter from "../model/formatter";
 import type CartModel from "../model/CartModel";
 import type Component from "../Component";
@@ -66,7 +67,12 @@ export default abstract class BaseController extends Controller {
         return fulfillment ? this.getText(`fulfillment.${fulfillment}`) : "";
     }
 
-    public formatReward(rewardType: string | null | undefined, rewardValue: number | string | null | undefined, gift: string | null | undefined): string {
+    public formatReward(
+        rewardType: string | null | undefined,
+        rewardValue: number | string | null | undefined,
+        gift: string | null | undefined,
+        maxDiscount?: number | string | null
+    ): string {
         if (!rewardType) {
             return "";
         }
@@ -79,7 +85,11 @@ export default abstract class BaseController extends Controller {
             CHEAPEST_FREE: this.getText("rewardSummary.CHEAPEST_FREE")
         };
 
-        return details[rewardType] ?? "";
+        const summary = details[rewardType] ?? "";
+
+        return maxDiscount
+            ? this.getText("rewardSummaryLimit", [summary, this.formatter.currency(Number(maxDiscount))])
+            : summary;
     }
 
     public formatCouponUsage(couponCode: string | null | undefined, usedCount: number | null | undefined, maxUses: number | null | undefined): string {
@@ -147,7 +157,7 @@ export default abstract class BaseController extends Controller {
         }
 
         if (isBackendUnavailableError(error)) {
-            MessageBox.error(this.getText("backendUnavailable"));
+            this.getAppComponent().notifyBackendUnavailable();
             return;
         }
 
@@ -158,14 +168,14 @@ export default abstract class BaseController extends Controller {
     }
 
     public async runBusy<Result>(action: () => Promise<Result>): Promise<Result> {
-        const view = this.getView();
+        const controls = [this.getView(), ...InstanceManager.getOpenDialogs()];
 
-        view?.setBusy(true);
+        controls.forEach((control) => control?.setBusy(true));
 
         try {
             return await action();
         } finally {
-            view?.setBusy(false);
+            controls.forEach((control) => control?.setBusy(false));
         }
     }
 
