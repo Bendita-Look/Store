@@ -6,6 +6,7 @@ import type Message from "sap/ui/core/message/Message";
 import type ODataModel from "sap/ui/model/odata/v4/ODataModel";
 
 const SERVICE_NAMESPACE = "BenditaLook";
+const NETWORK_FAILURE_STATUS = 0;
 
 export class CreationFailedError extends Error {
     public constructor(message: string, public readonly status?: number) {
@@ -19,9 +20,10 @@ export default class DraftService {
     constructor(private readonly adminModel: ODataModel) { }
 
     public async createDraft(listBinding: ODataListBinding, data: object): Promise<Context> {
+        const knownMessages = this.technicalMessages().length;
         const draftContext = listBinding.create(data, true);
 
-        await Promise.race([draftContext.created(), this.creationFailure(listBinding, draftContext)]);
+        await Promise.race([draftContext.created(), this.creationFailure(listBinding, draftContext, knownMessages)]);
 
         return draftContext;
     }
@@ -52,7 +54,7 @@ export default class DraftService {
         await draftContext.delete();
     }
 
-    private creationFailure(listBinding: ODataListBinding, context: Context): Promise<never> {
+    private creationFailure(listBinding: ODataListBinding, context: Context, knownMessages: number): Promise<never> {
         return new Promise((_resolve, reject) => {
             const onCreateCompleted = (event: ODataListBinding$CreateCompletedEvent): void => {
                 if (event.getParameter("context") !== context) {
@@ -63,7 +65,7 @@ export default class DraftService {
 
                 if (!event.getParameter("success")) {
                     setTimeout(() => {
-                        reject(this.lastRequestError());
+                        reject(this.lastRequestError(knownMessages));
                         context.delete().catch(() => undefined);
                     });
                 }
@@ -73,12 +75,16 @@ export default class DraftService {
         });
     }
 
-    private lastRequestError(): CreationFailedError {
-        const messages = (Messaging.getMessageModel().getData() as Message[]).filter((message) => message.getTechnical());
-        const lastMessage = messages[messages.length - 1];
+    private lastRequestError(knownMessages: number): CreationFailedError {
+        const newMessages = this.technicalMessages().slice(knownMessages);
+        const lastMessage = newMessages[newMessages.length - 1];
         const details = lastMessage?.getTechnicalDetails() as { httpStatus?: number } | undefined;
 
-        return new CreationFailedError(lastMessage?.getMessage() ?? "", details?.httpStatus);
+        return new CreationFailedError(lastMessage?.getMessage() ?? "", details?.httpStatus ?? NETWORK_FAILURE_STATUS);
+    }
+
+    private technicalMessages(): Message[] {
+        return (Messaging.getMessageModel().getData() as Message[]).filter((message) => message.getTechnical());
     }
 
     public async submitPendingChanges(): Promise<void> {
