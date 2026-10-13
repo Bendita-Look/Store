@@ -60,12 +60,12 @@
 
                 <Text text="{i18n>trackingInfo}" class="sapUiSmallMarginBottom" />
 
-                <Table items="{tracking>/order/Items}" class="blTable">
+                <Table items="{tracking>/order/Items}" popinLayout="GridSmall" class="blTable">
                     <columns>
                         <Column>
                             <Text text="{i18n>product}" />
                         </Column>
-                        <Column hAlign="Center" width="7rem">
+                        <Column hAlign="Center" width="7rem" minScreenWidth="Tablet" demandPopin="true">
                             <Text text="{i18n>quantity}" />
                         </Column>
                         <Column hAlign="End" minScreenWidth="Tablet" demandPopin="true">
@@ -90,7 +90,7 @@
                                 </HBox>
                                 <Text text="{tracking>Quantity}" />
                                 <Text text="{path: 'tracking>UnitPrice', targetType: 'any', formatter: '.formatter.currency'}" />
-                                <Text text="{path: 'tracking>TotalPrice', targetType: 'any', formatter: '.formatter.currency'}" />
+                                <Text text="{path: 'tracking>TotalPrice', targetType: 'any', formatter: '.formatter.currency'}" class="blNoWrap" />
                             </cells>
                         </ColumnListItem>
                     </items>

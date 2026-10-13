@@ -14,6 +14,7 @@ import AdminOrderService, { DeliveryInput, DeliveryType } from "../../service/Ad
 import formatter, { OrderStatus } from "../../model/formatter";
 
 const ALL_STATUSES = "ALL";
+const FULL_SCREEN_MAX_WIDTH = 600;
 
 interface DialogOrder {
     ID: string;
@@ -55,6 +56,7 @@ export default class OrdersSection {
         const dialog = await this.getDialog();
 
         dialog.bindElement({ path: context.getPath(), parameters: { $expand: "Items,Promotions" } });
+        dialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
         dialog.open();
     };
 

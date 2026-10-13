@@ -501,6 +501,23 @@
     color: var(--bl-gold-dark);
 }
 
+.blTable .sapMListTblCell .sapMHBox > .sapMFlexItem:last-child {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.blNoWrap.sapMText {
+    white-space: nowrap;
+}
+
+.blOrderActions {
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: var(--bl-radius);
+    background: var(--bl-blush-soft);
+}
+
 .blBannerEditor {
     margin-top: 1.5rem;
     padding: 1.25rem;
