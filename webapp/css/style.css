@@ -29,6 +29,65 @@
     --sapLinkColor: var(--bl-gold-dark);
     --sapLink_Hover_Color: var(--bl-rose);
     --sapContent_FocusColor: var(--bl-gold);
+    --bl-gold-deep: #6e532f;
+    --bl-gold-soft: #f7efe5;
+    --bl-gold-softer: #fbf6f0;
+    --sapContent_BusyColor: var(--bl-gold);
+    --sapContent_DragAndDropActiveColor: var(--bl-gold);
+    --sapContent_Selected_ForegroundColor: var(--bl-gold-dark);
+    --sapContent_Selected_Hover_Background: var(--bl-gold-soft);
+    --sapContent_Selected_MeasureIndicatorColor: var(--bl-gold);
+    --sapContent_Selected_TextColor: var(--bl-gold-dark);
+    --sapButton_Active_BorderColor: var(--bl-gold-dark);
+    --sapButton_Active_TextColor: var(--bl-gold-deep);
+    --sapButton_Emphasized_Active_BorderColor: var(--bl-gold-dark);
+    --sapButton_Emphasized_Active_TextColor: var(--bl-gold-dark);
+    --sapButton_Handle_Selected_Background: var(--bl-gold-soft);
+    --sapButton_Handle_Selected_BorderColor: var(--bl-gold-soft);
+    --sapButton_Handle_Selected_Hover_Background: var(--bl-gold-soft);
+    --sapButton_Handle_Selected_TextColor: var(--bl-gold-dark);
+    --sapButton_Hover_TextColor: var(--bl-gold-deep);
+    --sapButton_Hover_Background: var(--bl-gold-softer);
+    --sapButton_IconColor: var(--bl-gold-dark);
+    --sapButton_Lite_Active_BorderColor: var(--bl-gold);
+    --sapButton_Lite_Hover_TextColor: var(--bl-gold-deep);
+    --sapButton_Lite_Hover_Background: var(--bl-gold-softer);
+    --sapButton_Neutral_Active_BorderColor: var(--bl-gold-dark);
+    --sapButton_Neutral_Active_TextColor: var(--bl-gold-dark);
+    --sapButton_Neutral_Background: var(--bl-gold-softer);
+    --sapButton_Neutral_BorderColor: #e6d5c3;
+    --sapButton_Neutral_Hover_Background: var(--bl-gold-soft);
+    --sapButton_Neutral_Hover_BorderColor: #e6d5c3;
+    --sapButton_Neutral_Hover_TextColor: var(--bl-gold-dark);
+    --sapButton_Neutral_TextColor: var(--bl-gold-dark);
+    --sapButton_Selected_Hover_Background: #ffdbe3;
+    --sapButton_Selected_Hover_BorderColor: var(--bl-gold);
+    --sapButton_Track_Selected_Background: var(--bl-gold);
+    --sapButton_Track_Selected_BorderColor: var(--bl-gold);
+    --sapButton_Track_Selected_Hover_Background: var(--bl-gold-dark);
+    --sapButton_Track_Selected_Hover_BorderColor: var(--bl-gold-dark);
+    --sapField_Active_BorderColor: var(--bl-gold);
+    --sapField_Focus_BorderColor: var(--bl-gold-dark);
+    --sapField_Hover_BorderColor: var(--bl-gold);
+    --sapField_Hover_BackgroundStyle: 0 100% / 100% 0.0625rem no-repeat linear-gradient(0deg, #a8814f, #a8814f) border-box;
+    --sapField_Selector_Hover_Background: var(--bl-gold-soft);
+    --sapLink_Active_Color: var(--bl-gold-deep);
+    --sapLink_Visited_Color: var(--bl-gold-dark);
+    --sapLink_InvertedColor: var(--bl-blush);
+    --sapList_Hover_SelectionBackground: #ffe3ea;
+    --sapList_SelectionBackgroundColor: #fff2f5;
+    --sapList_SelectionBorderColor: var(--bl-gold);
+    --sapSlider_Active_HandleBorderColor: var(--bl-gold);
+    --sapSlider_HandleBorderColor: #e6d5c3;
+    --sapSlider_Hover_HandleBackground: var(--bl-gold-soft);
+    --sapSlider_Hover_HandleBorderColor: #e6d5c3;
+    --sapSlider_Hover_RangeHandleBackground: var(--bl-gold-soft);
+    --sapSlider_Selected_Background: var(--bl-gold);
+    --sapSlider_Selected_BorderColor: var(--bl-gold);
+    --sapTab_ForegroundColor: var(--bl-gold-dark);
+    --sapTab_IconColor: var(--bl-gold-dark);
+    --sapTab_Selected_Background: var(--bl-gold);
+    --sapTab_Selected_TextColor: var(--bl-gold-dark);
 }
 
 .blApp .sapMPage > section,
@@ -148,8 +207,45 @@
     font-weight: 500;
 }
 
-.blHeaderAction.sapMBtn:hover .sapMBtnInner {
+.blHeaderAction.sapMBtn:hover .sapMBtnInner,
+.blHeaderAction.sapMBtn:active .sapMBtnInner {
     background: rgba(255, 255, 255, 0.45);
+    border: none;
+}
+
+.blHeaderAction.sapMBtn:hover .sapMBtnIcon,
+.blHeaderAction.sapMBtn:hover .sapMBtnContent,
+.blHeaderAction.sapMBtn:hover bdi {
+    color: var(--bl-gold-deep);
+}
+
+.blAdminHeader.sapMBar {
+    grid-template-columns: minmax(0, 1fr) 0 auto;
+}
+
+.blAdminHeader.sapMBar .sapMBarLeft {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.blAdminHeader .blBrand {
+    min-width: 0;
+}
+
+.blAdminHeader .blBrandTitle.sapMTitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--bl-text);
+}
+
+.blAdminHeader .blAdminUser.sapMText {
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 0 0.5rem;
 }
 
 /* Announcement and hero */
@@ -320,8 +416,26 @@
     border-bottom-color: var(--bl-gold);
 }
 
+.blCategoryItem.sapMBtn .sapMBtnInner:hover,
+.blCategoryItem.sapMBtn .sapMBtnInner:active,
+.blCategoryItem.sapMBtn .sapMBtnInner.sapMBtnActive {
+    background: transparent;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 2px solid var(--bl-blush);
+}
+
+.blCategoryItem.sapMBtn .sapMBtnInner.sapMBtnEmphasized,
+.blCategoryItem.sapMBtn .sapMBtnInner.sapMBtnEmphasized:hover,
+.blCategoryItem.sapMBtn .sapMBtnInner.sapMBtnEmphasized:active {
+    background: transparent;
+    border-bottom: 2px solid var(--bl-gold);
+}
+
 .blCategoryItem.sapMBtn .sapMBtnEmphasized .sapMBtnContent,
-.blCategoryItem.sapMBtn:hover .sapMBtnContent {
+.blCategoryItem.sapMBtn:hover .sapMBtnContent,
+.blCategoryItem.sapMBtn:active .sapMBtnContent {
     color: var(--bl-text);
 }
 
@@ -334,6 +448,80 @@
 .blSearch .sapMSFF {
     border-radius: 2rem;
     background: #ffffff;
+}
+
+.blSearch.sapMSF.sapMFocus .sapMSFF,
+.blSearch .sapMSFF:hover {
+    border-color: var(--bl-gold);
+    box-shadow: none;
+}
+
+.blStatusFilterScroll {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.blStatusFilter.sapMSegB {
+    width: auto !important;
+}
+
+.blStatusFilter.sapMSegB .sapMSegBBtn {
+    width: auto !important;
+    padding: 0 0.875rem;
+    white-space: nowrap;
+}
+
+.blOrdersToolbar {
+    gap: 0.5rem 0.75rem;
+    padding: 0.5rem 0;
+}
+
+.blOrdersActions {
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.sapMMsgStrip.sapMMsgStripInformation {
+    background: var(--bl-blush-soft);
+    border-color: #f5b6c3;
+    color: var(--bl-text);
+}
+
+.sapMMsgStrip.sapMMsgStripInformation .sapMMsgStripIcon,
+.sapMMsgStrip.sapMMsgStripInformation .sapUiIcon {
+    color: var(--bl-gold-dark);
+}
+
+.blBannerEditor {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    gap: 0.75rem;
+    border-radius: var(--bl-radius);
+    background: #ffffff;
+    border: 1px solid var(--bl-line);
+}
+
+.blBannerPreview,
+.blBannerPreview.sapMImg {
+    width: 100%;
+    max-width: 40rem;
+    aspect-ratio: 16 / 6;
+    object-fit: cover;
+    border-radius: var(--bl-radius);
+    background: var(--bl-blush-soft);
+}
+
+.blBannerActions {
+    gap: 0.5rem;
+}
+
+.blHeroBanner,
+.blHeroBanner.sapMImg {
+    display: block;
+    width: 100%;
+    height: clamp(14rem, 38vw, 34rem);
+    object-fit: cover;
+    cursor: pointer;
 }
 
 .blProductGrid .sapMListUl {
@@ -632,6 +820,30 @@
     border: 1px solid var(--bl-line);
 }
 
+.blTable .sapMListTblSubCnt {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem 1rem;
+    padding-top: 0.25rem;
+}
+
+.blTable .sapMListTblSubCntRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem;
+    margin: 0;
+}
+
+.blTable .sapMListTblSubCntRow .sapMListTblSubCntHdr {
+    color: var(--bl-muted);
+    font-size: 0.8rem;
+}
+
+.blTable .sapMListTblSubCntRow .sapMListTblSubCntVal {
+    font-size: 0.875rem;
+}
+
 .blCartItem {
     width: 100%;
     padding: 0.75rem 0;
@@ -852,6 +1064,20 @@
 
     .blHeaderAction.sapMBtn .sapMBtnContent {
         display: none;
+    }
+
+    .blAdminHeader .blAdminUser.sapMText {
+        display: none;
+    }
+
+    .blOrdersActions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .blHeroBanner,
+    .blHeroBanner.sapMImg {
+        height: 15rem;
     }
 
     .blHero {

@@ -189,8 +189,9 @@ export default abstract class BaseController extends Controller {
 
         const detail = getBackendErrorMessage(error);
         const message = this.getText(key);
+        const isRepeated = !!detail && message.toLowerCase().includes(detail.replace(/[.!]+$/, "").toLowerCase());
 
-        MessageBox.error(detail ? `${message}\n\n${detail}` : message);
+        MessageBox.error(detail && !isRepeated ? `${message}\n\n${detail}` : message);
     }
 
     public async runBusy<Result>(action: () => Promise<Result>): Promise<Result> {
