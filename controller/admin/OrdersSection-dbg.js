@@ -9,6 +9,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
   const formatter = _interopRequireDefault(__formatter);
   const OrderStatus = __formatter["OrderStatus"];
   const ALL_STATUSES = "ALL";
+  const FULL_SCREEN_MAX_WIDTH = 600;
   class OrdersSection {
     deliveryModel = new JSONModel(this.emptyDelivery());
     constructor(controller) {
@@ -38,6 +39,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
           $expand: "Items,Promotions"
         }
       });
+      dialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
       dialog.open();
     };
     onItemPress = event => {

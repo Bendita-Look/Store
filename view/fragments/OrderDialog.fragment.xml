@@ -26,6 +26,37 @@
                     <ObjectStatus text="{path: 'FulfillmentType', formatter: '.formatFulfillment'}" icon="sap-icon://shipping-status" />
                 </HBox>
 
+                <FlexBox
+                    wrap="Wrap"
+                    visible="{= ${path: 'Status', targetType: 'any'} !== 'COMPLETED' &amp;&amp; ${path: 'Status', targetType: 'any'} !== 'CANCELLED' }"
+                    class="blOrderActions"
+                >
+                    <Button
+                        text="{i18n>startService}"
+                        type="Emphasized"
+                        visible="{= ${path: 'Status', targetType: 'any'} === 'NEW' }"
+                        press=".orders.onStartService"
+                    />
+                    <Button
+                        text="{i18n>outForDelivery}"
+                        type="Emphasized"
+                        visible="{= ${path: 'Status', targetType: 'any'} === 'IN_SERVICE' &amp;&amp; ${path: 'FulfillmentType', targetType: 'any'} === 'DELIVERY' }"
+                        press=".orders.onOpenDeliveryDialog"
+                    />
+                    <Button
+                        text="{i18n>completeOrder}"
+                        type="Emphasized"
+                        visible="{= ${path: 'Status', targetType: 'any'} === 'IN_SERVICE' || ${path: 'Status', targetType: 'any'} === 'OUT_FOR_DELIVERY' }"
+                        press=".orders.onComplete"
+                    />
+                    <Button
+                        text="{i18n>cancelOrder}"
+                        type="Reject"
+                        visible="{= ${path: 'Status', targetType: 'any'} === 'NEW' || ${path: 'Status', targetType: 'any'} === 'IN_SERVICE' || ${path: 'Status', targetType: 'any'} === 'OUT_FOR_DELIVERY' }"
+                        press=".orders.onCancel"
+                    />
+                </FlexBox>
+
                 <form:SimpleForm editable="false" layout="ColumnLayout" title="{i18n>contactTitle}">
                     <Label text="{i18n>customerName}" />
                     <Text text="{CustomerName}" />
@@ -58,15 +89,15 @@
                     <Text text="{DeliveryNotes}" />
                 </form:SimpleForm>
 
-                <Table items="{path: 'Items', templateShareable: false}" class="blTable sapUiSmallMarginTop">
+                <Table items="{path: 'Items', templateShareable: false}" popinLayout="GridSmall" class="blTable sapUiSmallMarginTop">
                     <columns>
                         <Column>
                             <Text text="{i18n>product}" />
                         </Column>
-                        <Column hAlign="Center" width="7rem">
+                        <Column hAlign="Center" width="7rem" minScreenWidth="Tablet" demandPopin="true">
                             <Text text="{i18n>quantity}" />
                         </Column>
-                        <Column hAlign="End">
+                        <Column hAlign="End" minScreenWidth="Tablet" demandPopin="true">
                             <Text text="{i18n>total}" />
                         </Column>
                     </columns>
@@ -84,7 +115,7 @@
                                     <Text text="{parts: ['ProductName', 'ColorName', 'Size'], formatter: '.formatter.variantDescription'}" />
                                 </HBox>
                                 <Text text="{Quantity}" />
-                                <Text text="{path: 'TotalPrice', targetType: 'any', formatter: '.formatter.currency'}" />
+                                <Text text="{path: 'TotalPrice', targetType: 'any', formatter: '.formatter.currency'}" class="blNoWrap" />
                             </cells>
                         </ColumnListItem>
                     </items>
@@ -122,30 +153,6 @@
         </content>
         <buttons>
             <Button text="{i18n>whatsapp}" icon="sap-icon://discussion" type="Success" press=".orders.onWhatsapp" visible="{= !!${path: 'CustomerPhone', targetType: 'any'} }" />
-            <Button
-                text="{i18n>startService}"
-                type="Emphasized"
-                visible="{= ${path: 'Status', targetType: 'any'} === 'NEW' }"
-                press=".orders.onStartService"
-            />
-            <Button
-                text="{i18n>outForDelivery}"
-                type="Emphasized"
-                visible="{= ${path: 'Status', targetType: 'any'} === 'IN_SERVICE' &amp;&amp; ${path: 'FulfillmentType', targetType: 'any'} === 'DELIVERY' }"
-                press=".orders.onOpenDeliveryDialog"
-            />
-            <Button
-                text="{i18n>completeOrder}"
-                type="Emphasized"
-                visible="{= ${path: 'Status', targetType: 'any'} === 'IN_SERVICE' || ${path: 'Status', targetType: 'any'} === 'OUT_FOR_DELIVERY' }"
-                press=".orders.onComplete"
-            />
-            <Button
-                text="{i18n>cancelOrder}"
-                type="Reject"
-                visible="{= ${path: 'Status', targetType: 'any'} === 'NEW' || ${path: 'Status', targetType: 'any'} === 'IN_SERVICE' || ${path: 'Status', targetType: 'any'} === 'OUT_FOR_DELIVERY' }"
-                press=".orders.onCancel"
-            />
             <Button text="{i18n>close}" press=".orders.onCloseDialog" />
         </buttons>
     </Dialog>
