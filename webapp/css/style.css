@@ -457,8 +457,17 @@
 }
 
 .blStatusFilterScroll {
-    flex: 1 1 auto;
     min-width: 0;
+}
+
+.blOrdersToolbar > .sapMFlexItem:has(.blStatusFilterScroll) {
+    flex: 1 1 20rem;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.blStatusFilter {
+    min-width: max-content;
 }
 
 .blStatusFilter.sapMSegB {
