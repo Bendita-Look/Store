@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/OrderService", "../model/formatter"], function (JSONModel, __BaseController, __OrderService, __formatter) {
+sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/OrderService", "../model/formatter"], function (JSONModel, __BaseController, __OrderService, ___model_formatter) {
   "use strict";
 
   function _interopRequireDefault(obj) {
@@ -7,8 +7,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/Or
   const BaseController = _interopRequireDefault(__BaseController);
   const OrderService = _interopRequireDefault(__OrderService);
   const FulfillmentType = __OrderService["FulfillmentType"];
-  const formatter = _interopRequireDefault(__formatter);
-  const OrderStatus = __formatter["OrderStatus"];
+  const OrderStatus = ___model_formatter["OrderStatus"];
   const STEPS = [OrderStatus.New, OrderStatus.InService, OrderStatus.OutForDelivery, OrderStatus.Completed];
 
   /**
@@ -28,7 +27,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/Or
     onContactWhatsapp: function _onContactWhatsapp() {
       const orderNumber = this.trackingModel.getProperty("/order/Number");
       const message = this.getText("whatsappOrderMessage", [orderNumber]);
-      window.open(formatter.whatsappUrl(this.getStoreModel().getProperty("/Whatsapp"), message), "_blank");
+      this.openWhatsapp(message);
     },
     onItemPress: function _onItemPress(event) {
       const productId = event.getSource().getBindingContext("tracking")?.getProperty("ProductId");

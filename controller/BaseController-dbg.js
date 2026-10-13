@@ -40,6 +40,21 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
     onOpenCart: function _onOpenCart() {
       this.navTo("cart");
     },
+    onOpenAdmin: function _onOpenAdmin() {
+      this.navTo("admin");
+    },
+    onContactWhatsapp: function _onContactWhatsapp() {
+      this.openWhatsapp(this.getText("whatsappGreeting"));
+    },
+    onContactEmail: function _onContactEmail() {
+      window.open(formatter.mailtoUrl(this.getStoreModel().getProperty("/ContactEmail")), "_self");
+    },
+    onOpenInstagram: function _onOpenInstagram() {
+      window.open(formatter.instagramUrl(this.getStoreModel().getProperty("/Instagram")), "_blank");
+    },
+    openWhatsapp: function _openWhatsapp(message) {
+      window.open(formatter.whatsappUrl(this.getStoreModel().getProperty("/Whatsapp"), message), "_blank");
+    },
     formatStatus: function _formatStatus(status) {
       return status ? this.getText(`orderStatus.${status}`) : "";
     },

@@ -1,12 +1,12 @@
-sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/model/FilterOperator", "./BaseController", "../model/formatter", "../service/OrderService"], function (JSONModel, Filter, FilterOperator, __BaseController, __formatter, __OrderService) {
+sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/model/FilterOperator", "./BaseController", "../service/OrderService"], function (JSONModel, Filter, FilterOperator, __BaseController, __OrderService) {
   "use strict";
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
   }
   const BaseController = _interopRequireDefault(__BaseController);
-  const formatter = _interopRequireDefault(__formatter);
   const OrderService = _interopRequireDefault(__OrderService);
+  const SCROLL_DURATION = 400;
   /**
    * @namespace apps.dflc.benditalook.controller
    */
@@ -14,15 +14,18 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/mod
     onInit: function _onInit() {
       this.viewModel = new JSONModel({
         categoryId: "",
+        categoryName: "",
         search: "",
         promotions: []
       });
       this.getView()?.setModel(this.viewModel, "catalogView");
+      this.byId("headerBack")?.setVisible(false);
       this.getRouter().getRoute("catalog")?.attachPatternMatched(() => this.onRouteMatched());
     },
     onCategoryPress: function _onCategoryPress(event) {
       const context = event.getSource().getBindingContext("catalog");
       this.viewModel.setProperty("/categoryId", context ? context.getProperty("ID") : "");
+      this.viewModel.setProperty("/categoryName", context ? context.getProperty("Name") : "");
       this.applyFilters();
     },
     onSearch: function _onSearch(event) {
@@ -39,17 +42,8 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/mod
         productId
       });
     },
-    onOpenAdmin: function _onOpenAdmin() {
-      this.navTo("admin");
-    },
-    onContactWhatsapp: function _onContactWhatsapp() {
-      window.open(formatter.whatsappUrl(this.getStoreModel().getProperty("/Whatsapp"), this.getText("whatsappGreeting")), "_blank");
-    },
-    onContactEmail: function _onContactEmail() {
-      window.open(formatter.mailtoUrl(this.getStoreModel().getProperty("/ContactEmail")), "_self");
-    },
-    onOpenInstagram: function _onOpenInstagram() {
-      window.open(formatter.instagramUrl(this.getStoreModel().getProperty("/Instagram")), "_blank");
+    onShopNow: function _onShopNow() {
+      this.byId("catalogPage").scrollToElement(this.byId("productsSection"), SCROLL_DURATION);
     },
     onRouteMatched: function _onRouteMatched() {
       const products = this.getProductsBinding();

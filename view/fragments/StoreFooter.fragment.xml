@@ -2,36 +2,43 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
 >
-    <VBox alignItems="Center" class="blFooter">
-        <Text text="{i18n>footerText}" textAlign="Center" />
-        <HBox alignItems="Center" justifyContent="Center" wrap="Wrap" class="sapUiSmallMarginTop">
-            <Button
-                icon="sap-icon://discussion"
-                text="{i18n>talkOnWhatsapp}"
-                type="Transparent"
-                press=".onContactWhatsapp"
-                visible="{= !!${store>/Whatsapp} }"
-            />
-            <Button
-                icon="sap-icon://email"
-                text="{store>/ContactEmail}"
-                type="Transparent"
-                press=".onContactEmail"
-                visible="{= !!${store>/ContactEmail} }"
-            />
-            <Button
-                icon="sap-icon://camera"
-                text="{store>/Instagram}"
-                type="Transparent"
-                press=".onOpenInstagram"
-                visible="{= !!${store>/Instagram} }"
-            />
-            <Button
-                icon="sap-icon://employee"
-                text="{i18n>adminArea}"
-                type="Transparent"
-                press=".onOpenAdmin"
-            />
+    <VBox class="blFooter">
+        <FlexBox wrap="Wrap" justifyContent="SpaceBetween" class="blFooterContent">
+            <VBox class="blFooterColumn">
+                <Image src="img/logo.jpg" alt="{i18n>appTitle}" densityAware="false" class="blFooterLogo" />
+                <Text text="{i18n>footerText}" class="blFooterText" />
+            </VBox>
+            <VBox class="blFooterColumn">
+                <Title text="{i18n>footerContact}" level="H3" class="blFooterTitle" />
+                <Link
+                    text="{i18n>talkOnWhatsapp}"
+                    visible="{= !!${store>/Whatsapp} }"
+                    press=".onContactWhatsapp"
+                    class="blFooterLink"
+                />
+                <Link
+                    text="{store>/ContactEmail}"
+                    visible="{= !!${store>/ContactEmail} }"
+                    press=".onContactEmail"
+                    class="blFooterLink"
+                />
+                <Text text="{store>/PickupAddress}" visible="{= !!${store>/PickupAddress} }" class="blFooterText" />
+            </VBox>
+            <VBox class="blFooterColumn" visible="{= !!${store>/Instagram} }">
+                <Title text="{i18n>footerFollow}" level="H3" class="blFooterTitle" />
+                <Link text="{store>/Instagram}" press=".onOpenInstagram" class="blFooterLink" />
+            </VBox>
+        </FlexBox>
+        <HBox justifyContent="SpaceBetween" alignItems="Center" wrap="Wrap" class="blFooterBottom">
+            <Text text="{i18n>footerRights}" class="blFooterSmall" />
+            <Link text="{i18n>adminArea}" press=".onOpenAdmin" class="blFooterSmall" />
         </HBox>
     </VBox>
+    <Button
+        icon="sap-icon://discussion"
+        tooltip="{i18n>talkOnWhatsapp}"
+        visible="{= !!${store>/Whatsapp} }"
+        press=".onContactWhatsapp"
+        class="blWhatsappFab"
+    />
 </core:FragmentDefinition>

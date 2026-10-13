@@ -17,11 +17,23 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController"], function (JSO
       this.getView()?.setModel(this.productModel, "product");
       this.getRouter().getRoute("product")?.attachPatternMatched(event => this.onRouteMatched(event));
     },
-    onColorChange: function _onColorChange(event) {
-      this.selectColor(event.getParameter("item")?.getKey() ?? "");
+    onSwatchPress: function _onSwatchPress(event) {
+      this.selectColor(event.getSource().getBindingContext("product")?.getProperty("ID") ?? "");
     },
-    onSizeChange: function _onSizeChange(event) {
-      this.selectVariant(event.getParameter("item")?.getKey() ?? "");
+    onThumbnailPress: function _onThumbnailPress(event) {
+      const image = event.getSource().getBindingContext("product")?.getObject();
+      const images = this.productModel.getProperty("/images");
+      const carousel = this.byId("productCarousel");
+      const page = carousel.getPages()[images.indexOf(image)];
+      if (page) {
+        carousel.setActivePage(page);
+      }
+    },
+    onAskAboutProduct: function _onAskAboutProduct() {
+      this.openWhatsapp(this.getText("whatsappProductMessage", [this.productModel.getProperty("/product/Name")]));
+    },
+    onSizePress: function _onSizePress(event) {
+      this.selectVariant(event.getSource().getBindingContext("product")?.getProperty("key") ?? "");
     },
     onAddToCart: function _onAddToCart() {
       const product = this.productModel.getProperty("/product");
@@ -70,6 +82,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController"], function (JSO
         enabled: variant.Stock > 0
       }));
       this.productModel.setProperty("/selectedColorId", colorId);
+      this.productModel.setProperty("/selectedColorName", product.Colors.find(color => color.ID === colorId)?.Name ?? "");
       this.productModel.setProperty("/sizes", sizes);
       this.productModel.setProperty("/images", this.imagesForColor(product.Images, colorId));
       this.selectVariant(sizes.find(size => size.enabled)?.key ?? "");
@@ -108,6 +121,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController"], function (JSO
         sizes: [],
         images: [],
         selectedColorId: "",
+        selectedColorName: "",
         selectedVariantId: "",
         stock: 0,
         quantity: 1

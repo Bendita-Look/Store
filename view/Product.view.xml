@@ -39,43 +39,66 @@
                         visible="{= ${product>/images}.length === 0 }"
                         class="blDetailImage"
                     />
+                    <HBox
+                        items="{path: 'product>/images', templateShareable: false}"
+                        visible="{= ${product>/images}.length > 1 }"
+                        wrap="Wrap"
+                        class="blThumbnails"
+                    >
+                        <Image
+                            src="{path: 'product>ID', formatter: '.formatter.catalogImageUrl'}"
+                            alt="{product>/product/Name}"
+                            width="4rem"
+                            height="5.25rem"
+                            densityAware="false"
+                            press=".onThumbnailPress"
+                            class="blThumbnail"
+                        />
+                    </HBox>
                 </VBox>
 
                 <VBox class="blDetailInfo">
                     <Text text="{product>/product/Category/Name}" class="blCategoryLabel" />
-                    <Title text="{product>/product/Name}" level="H1" titleStyle="H2" wrapping="true" />
+                    <Title text="{product>/product/Name}" level="H1" wrapping="true" class="blDetailTitle" />
                     <Text
                         text="{path: 'product>/product/Price', targetType: 'any', formatter: '.formatter.currency'}"
-                        class="blDetailPrice sapUiSmallMarginTopBottom"
+                        class="blDetailPrice"
                     />
-                    <Text text="{product>/product/Description}" class="sapUiSmallMarginBottom" />
+                    <Text text="{product>/product/Description}" class="blDetailDescription" />
 
-                    <VBox visible="{= ${product>/colors}.length > 0 }" class="sapUiSmallMarginTop">
-                        <Label text="{i18n>color}" design="Bold" />
-                        <SegmentedButton
-                            selectedKey="{product>/selectedColorId}"
-                            items="{path: 'product>/colors', templateShareable: false}"
-                            selectionChange=".onColorChange"
-                            class="blSelector"
-                        >
-                            <items>
-                                <SegmentedButtonItem key="{product>ID}" text="{product>Name}" />
-                            </items>
-                        </SegmentedButton>
+                    <VBox visible="{= ${product>/colors}.length > 0 }" class="blOptionGroup">
+                        <Text text="{parts: ['i18n>colorSelected', 'product>/selectedColorName'], formatter: '.formatter.message'}" class="blOptionLabel" />
+                        <HBox items="{path: 'product>/colors', templateShareable: false}" wrap="Wrap" class="blSwatches">
+                            <core:Icon
+                                src="sap-icon://circle-task-2"
+                                color="{= ${product>HexCode} || '#d9c3b0' }"
+                                size="1.75rem"
+                                tooltip="{product>Name}"
+                                press=".onSwatchPress"
+                                class="blSwatch"
+                            >
+                                <core:customData>
+                                    <core:CustomData
+                                        key="selected"
+                                        value="{= ${product>ID} === ${product>/selectedColorId} ? 'true' : 'false' }"
+                                        writeToDom="true"
+                                    />
+                                </core:customData>
+                            </core:Icon>
+                        </HBox>
                     </VBox>
 
-                    <VBox class="sapUiSmallMarginTop">
-                        <Label text="{i18n>size}" design="Bold" />
-                        <SegmentedButton
-                            selectedKey="{product>/selectedVariantId}"
-                            items="{path: 'product>/sizes', templateShareable: false}"
-                            selectionChange=".onSizeChange"
-                            class="blSelector"
-                        >
-                            <items>
-                                <SegmentedButtonItem key="{product>key}" text="{product>text}" enabled="{product>enabled}" />
-                            </items>
-                        </SegmentedButton>
+                    <VBox class="blOptionGroup">
+                        <Text text="{i18n>size}" class="blOptionLabel" />
+                        <HBox items="{path: 'product>/sizes', templateShareable: false}" wrap="Wrap" class="blSizes">
+                            <Button
+                                text="{product>text}"
+                                type="{= ${product>key} === ${product>/selectedVariantId} ? 'Emphasized' : 'Default' }"
+                                enabled="{product>enabled}"
+                                press=".onSizePress"
+                                class="blSize"
+                            />
+                        </HBox>
                         <ObjectStatus
                             text="{parts: ['i18n>inStock', 'i18n>soldOut', 'product>/stock'], formatter: '.formatter.stockMessage'}"
                             state="{= ${product>/stock} > 0 ? 'Success' : 'Error' }"
@@ -83,28 +106,46 @@
                         />
                     </VBox>
 
-                    <HBox alignItems="End" class="sapUiMediumMarginTop blBuyBox">
-                        <VBox class="sapUiSmallMarginEnd">
-                            <Label text="{i18n>quantity}" design="Bold" />
-                            <StepInput
-                                value="{product>/quantity}"
-                                min="1"
-                                max="{= Math.max(${product>/stock}, 1) }"
-                                enabled="{= ${product>/stock} > 0 }"
-                                width="8rem"
-                            />
-                        </VBox>
+                    <HBox alignItems="End" class="blBuyBox">
+                        <StepInput
+                            value="{product>/quantity}"
+                            min="1"
+                            max="{= Math.max(${product>/stock}, 1) }"
+                            enabled="{= ${product>/stock} > 0 }"
+                            width="8rem"
+                            class="sapUiSmallMarginEnd"
+                        />
                         <Button
                             text="{i18n>addToCart}"
                             icon="sap-icon://cart-4"
                             type="Emphasized"
                             enabled="{= ${product>/stock} > 0 }"
                             press=".onAddToCart"
-                            class="blPrimaryButton"
+                            class="blPrimaryButton blBuyButton"
                         />
                     </HBox>
+
+                    <Link
+                        text="{i18n>productQuestion}"
+                        visible="{= !!${store>/Whatsapp} }"
+                        press=".onAskAboutProduct"
+                        class="blProductQuestion"
+                    />
+
+                    <VBox class="blDetailBenefits">
+                        <HBox alignItems="Center">
+                            <core:Icon src="sap-icon://retail-store" class="blDetailBenefitIcon" />
+                            <Text text="{i18n>benefitPickupText}" />
+                        </HBox>
+                        <HBox alignItems="Center">
+                            <core:Icon src="sap-icon://cart-approval" class="blDetailBenefitIcon" />
+                            <Text text="{i18n>benefitReserveText}" />
+                        </HBox>
+                    </VBox>
                 </VBox>
             </FlexBox>
+
+            <core:Fragment fragmentName="apps.dflc.benditalook.view.fragments.StoreFooter" type="XML" />
         </content>
     </Page>
 </mvc:View>

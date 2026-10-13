@@ -4,10 +4,14 @@ import FilterOperator from "sap/ui/model/FilterOperator";
 import type Event from "sap/ui/base/Event";
 import type Control from "sap/ui/core/Control";
 import type ODataListBinding from "sap/ui/model/odata/v4/ODataListBinding";
+import type Page from "sap/m/Page";
+import type Button from "sap/m/Button";
+import type VBox from "sap/m/VBox";
 import type { SearchField$SearchEvent } from "sap/m/SearchField";
 import BaseController from "./BaseController";
-import formatter from "../model/formatter";
 import OrderService from "../service/OrderService";
+
+const SCROLL_DURATION = 400;
 
 interface CatalogViewState {
     categoryId: string;
@@ -22,8 +26,9 @@ export default class Catalog extends BaseController {
     private viewModel: JSONModel;
 
     public onInit(): void {
-        this.viewModel = new JSONModel({ categoryId: "", search: "", promotions: [] });
+        this.viewModel = new JSONModel({ categoryId: "", categoryName: "", search: "", promotions: [] });
         this.getView()?.setModel(this.viewModel, "catalogView");
+        (this.byId("headerBack") as Button | undefined)?.setVisible(false);
         this.getRouter().getRoute("catalog")?.attachPatternMatched(() => this.onRouteMatched());
     }
 
@@ -31,6 +36,7 @@ export default class Catalog extends BaseController {
         const context = (event.getSource() as Control).getBindingContext("catalog");
 
         this.viewModel.setProperty("/categoryId", context ? context.getProperty("ID") as string : "");
+        this.viewModel.setProperty("/categoryName", context ? context.getProperty("Name") as string : "");
         this.applyFilters();
     }
 
@@ -50,20 +56,8 @@ export default class Catalog extends BaseController {
         this.navTo("product", { productId });
     }
 
-    public onOpenAdmin(): void {
-        this.navTo("admin");
-    }
-
-    public onContactWhatsapp(): void {
-        window.open(formatter.whatsappUrl(this.getStoreModel().getProperty("/Whatsapp") as string, this.getText("whatsappGreeting")), "_blank");
-    }
-
-    public onContactEmail(): void {
-        window.open(formatter.mailtoUrl(this.getStoreModel().getProperty("/ContactEmail") as string), "_self");
-    }
-
-    public onOpenInstagram(): void {
-        window.open(formatter.instagramUrl(this.getStoreModel().getProperty("/Instagram") as string), "_blank");
+    public onShopNow(): void {
+        (this.byId("catalogPage") as Page).scrollToElement(this.byId("productsSection") as VBox, SCROLL_DURATION);
     }
 
     private onRouteMatched(): void {

@@ -1,6 +1,8 @@
 import JSONModel from "sap/ui/model/json/JSONModel";
 import type { Route$PatternMatchedEvent } from "sap/ui/core/routing/Route";
-import type { SegmentedButton$SelectionChangeEvent } from "sap/m/SegmentedButton";
+import type Carousel from "sap/m/Carousel";
+import type Event from "sap/ui/base/Event";
+import type Control from "sap/ui/core/Control";
 import BaseController from "./BaseController";
 
 interface CatalogColor {
@@ -56,12 +58,27 @@ export default class Product extends BaseController {
         this.getRouter().getRoute("product")?.attachPatternMatched((event) => this.onRouteMatched(event));
     }
 
-    public onColorChange(event: SegmentedButton$SelectionChangeEvent): void {
-        this.selectColor(event.getParameter("item")?.getKey() ?? "");
+    public onSwatchPress(event: Event): void {
+        this.selectColor((event.getSource() as Control).getBindingContext("product")?.getProperty("ID") as string ?? "");
     }
 
-    public onSizeChange(event: SegmentedButton$SelectionChangeEvent): void {
-        this.selectVariant(event.getParameter("item")?.getKey() ?? "");
+    public onThumbnailPress(event: Event): void {
+        const image = (event.getSource() as Control).getBindingContext("product")?.getObject() as CatalogImage;
+        const images = this.productModel.getProperty("/images") as CatalogImage[];
+        const carousel = this.byId("productCarousel") as Carousel;
+        const page = carousel.getPages()[images.indexOf(image)];
+
+        if (page) {
+            carousel.setActivePage(page);
+        }
+    }
+
+    public onAskAboutProduct(): void {
+        this.openWhatsapp(this.getText("whatsappProductMessage", [this.productModel.getProperty("/product/Name")]));
+    }
+
+    public onSizePress(event: Event): void {
+        this.selectVariant((event.getSource() as Control).getBindingContext("product")?.getProperty("key") as string ?? "");
     }
 
     public onAddToCart(): void {
@@ -114,6 +131,7 @@ export default class Product extends BaseController {
         const sizes: SizeOption[] = variants.map((variant) => ({ key: variant.ID, text: variant.Size, enabled: variant.Stock > 0 }));
 
         this.productModel.setProperty("/selectedColorId", colorId);
+        this.productModel.setProperty("/selectedColorName", product.Colors.find((color) => color.ID === colorId)?.Name ?? "");
         this.productModel.setProperty("/sizes", sizes);
         this.productModel.setProperty("/images", this.imagesForColor(product.Images, colorId));
         this.selectVariant(sizes.find((size) => size.enabled)?.key ?? "");
@@ -162,6 +180,7 @@ export default class Product extends BaseController {
             sizes: [],
             images: [],
             selectedColorId: "",
+            selectedColorName: "",
             selectedVariantId: "",
             stock: 0,
             quantity: 1

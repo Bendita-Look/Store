@@ -31,7 +31,7 @@ export default class OrderTracking extends BaseController {
         const orderNumber = this.trackingModel.getProperty("/order/Number") as number;
         const message = this.getText("whatsappOrderMessage", [orderNumber]);
 
-        window.open(formatter.whatsappUrl(this.getStoreModel().getProperty("/Whatsapp") as string, message), "_blank");
+        this.openWhatsapp(message);
     }
 
     public onItemPress(event: Event): void {
