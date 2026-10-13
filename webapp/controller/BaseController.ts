@@ -52,6 +52,26 @@ export default abstract class BaseController extends Controller {
         this.navTo("cart");
     }
 
+    public onOpenAdmin(): void {
+        this.navTo("admin");
+    }
+
+    public onContactWhatsapp(): void {
+        this.openWhatsapp(this.getText("whatsappGreeting"));
+    }
+
+    public onContactEmail(): void {
+        window.open(formatter.mailtoUrl(this.getStoreModel().getProperty("/ContactEmail") as string), "_self");
+    }
+
+    public onOpenInstagram(): void {
+        window.open(formatter.instagramUrl(this.getStoreModel().getProperty("/Instagram") as string), "_blank");
+    }
+
+    protected openWhatsapp(message: string): void {
+        window.open(formatter.whatsappUrl(this.getStoreModel().getProperty("/Whatsapp") as string, message), "_blank");
+    }
+
     public formatStatus(status: string | null | undefined): string {
         return status ? this.getText(`orderStatus.${status}`) : "";
     }

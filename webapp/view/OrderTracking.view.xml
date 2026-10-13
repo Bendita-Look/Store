@@ -35,7 +35,7 @@
                         <core:Icon
                             src="{tracking>icon}"
                             size="1.75rem"
-                            color="{= ${tracking>done} ? '#8e3b5b' : '#c9a3b2' }"
+                            color="{= ${tracking>done} ? '#a8814f' : '#e3cfc0' }"
                         />
                         <Text text="{tracking>text}" textAlign="Center" class="sapUiTinyMarginTop" />
                     </VBox>

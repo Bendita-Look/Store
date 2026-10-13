@@ -5,32 +5,41 @@
     <Bar class="blHeader">
         <contentLeft>
             <Button
+                id="headerBack"
                 icon="sap-icon://nav-back"
                 type="Transparent"
                 tooltip="{i18n>back}"
                 press=".onNavBack"
+                class="blHeaderAction"
             />
         </contentLeft>
         <contentMiddle>
-            <HBox alignItems="Center" class="blBrand">
-                <Image
-                    src="img/logo.jpg"
-                    width="2rem"
-                    height="2rem"
-                    alt="{i18n>appTitle}"
-                    press=".onGoHome"
-                    class="sapUiTinyMarginEnd"
-                />
-                <Link text="{i18n>appTitle}" press=".onGoHome" class="blBrandTitle" />
-            </HBox>
+            <Image
+                src="img/logo.jpg"
+                alt="{i18n>appTitle}"
+                tooltip="{i18n>appTitle}"
+                densityAware="false"
+                press=".onGoHome"
+                class="blHeaderLogo"
+            />
         </contentMiddle>
         <contentRight>
             <Button
+                icon="sap-icon://discussion"
+                text="{i18n>headerService}"
+                type="Transparent"
+                tooltip="{i18n>talkOnWhatsapp}"
+                visible="{= !!${store>/Whatsapp} }"
+                press=".onContactWhatsapp"
+                class="blHeaderAction blHeaderService"
+            />
+            <Button
                 icon="sap-icon://cart"
+                text="{i18n>cart}"
                 type="Transparent"
                 tooltip="{i18n>cart}"
                 press=".onOpenCart"
-                class="blCartButton"
+                class="blHeaderAction blCartButton"
             >
                 <customData>
                     <BadgeCustomData

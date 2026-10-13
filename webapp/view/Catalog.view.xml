@@ -8,86 +8,98 @@
 >
     <Page id="catalogPage" class="blPage">
         <customHeader>
-            <Bar class="blHeader">
-                <contentLeft>
-                    <HBox alignItems="Center" class="blBrand">
-                        <Image
-                            src="img/logo.jpg"
-                            width="2rem"
-                            height="2rem"
-                            alt="{i18n>appTitle}"
-                            class="sapUiTinyMarginEnd"
-                        />
-                        <Title text="{i18n>appTitle}" class="blBrandTitle" />
-                    </HBox>
-                </contentLeft>
-                <contentRight>
-                    <Button
-                        icon="sap-icon://cart"
-                        type="Transparent"
-                        tooltip="{i18n>cart}"
-                        press=".onOpenCart"
-                        class="blCartButton"
-                    >
-                        <customData>
-                            <BadgeCustomData
-                                key="badge"
-                                value="{cart>/count}"
-                                visible="{= ${cart>/count} > 0 }"
-                            />
-                        </customData>
-                    </Button>
-                </contentRight>
-            </Bar>
+            <core:Fragment fragmentName="apps.dflc.benditalook.view.fragments.StoreHeader" type="XML" />
         </customHeader>
         <content>
-            <VBox class="blHero" alignItems="Center">
-                <Title text="{i18n>heroTitle}" level="H1" titleStyle="H1" wrapping="true" textAlign="Center" class="blHeroTitle" />
-                <Text text="{i18n>heroSubtitle}" textAlign="Center" class="blHeroSubtitle" />
-            </VBox>
-
             <HBox
                 items="{catalogView>/promotions}"
                 visible="{= ${catalogView>/promotions}.length > 0 }"
                 justifyContent="Center"
+                alignItems="Center"
                 wrap="Wrap"
-                class="blPromotionStrip"
+                class="blAnnouncement"
             >
-                <HBox alignItems="Center" class="blPromotionBadge">
-                    <core:Icon src="sap-icon://lead" class="sapUiTinyMarginEnd" />
-                    <VBox>
-                        <Text text="{catalogView>Name}" class="blProductName" />
-                        <Text text="{catalogView>Description}" visible="{= !!${catalogView>Description} }" class="blMuted" />
-                    </VBox>
+                <HBox alignItems="Center" class="blAnnouncementItem">
+                    <core:Icon src="sap-icon://lead" class="blAnnouncementIcon" />
+                    <Text text="{catalogView>Name}" class="blAnnouncementName" />
+                    <Text text="{catalogView>Description}" visible="{= !!${catalogView>Description} }" class="blAnnouncementText" />
                 </HBox>
             </HBox>
 
-            <VBox class="blContainer">
-                <SearchField
-                    id="searchField"
-                    placeholder="{i18n>searchPlaceholder}"
-                    search=".onSearch"
-                    class="sapUiSmallMarginBottom"
+            <FlexBox alignItems="Center" justifyContent="Center" wrap="Wrap" class="blHero">
+                <VBox class="blHeroText">
+                    <Text text="{i18n>heroEyebrow}" class="blHeroEyebrow" />
+                    <Title text="{i18n>heroTitle}" level="H1" wrapping="true" class="blHeroTitle" />
+                    <Text text="{i18n>heroSubtitle}" class="blHeroSubtitle" />
+                    <Button text="{i18n>heroAction}" type="Emphasized" press=".onShopNow" class="blPrimaryButton blHeroButton" />
+                </VBox>
+                <Image src="img/logo.jpg" alt="{i18n>appTitle}" densityAware="false" class="blHeroLogo" />
+            </FlexBox>
+
+            <FlexBox justifyContent="Center" wrap="Wrap" class="blBenefits">
+                <HBox alignItems="Center" class="blBenefit">
+                    <core:Icon src="sap-icon://discussion" class="blBenefitIcon" />
+                    <VBox>
+                        <Text text="{i18n>benefitWhatsappTitle}" class="blBenefitTitle" />
+                        <Text text="{i18n>benefitWhatsappText}" class="blBenefitText" />
+                    </VBox>
+                </HBox>
+                <HBox alignItems="Center" class="blBenefit">
+                    <core:Icon src="sap-icon://retail-store" class="blBenefitIcon" />
+                    <VBox>
+                        <Text text="{i18n>benefitPickupTitle}" class="blBenefitTitle" />
+                        <Text text="{i18n>benefitPickupText}" class="blBenefitText" />
+                    </VBox>
+                </HBox>
+                <HBox alignItems="Center" class="blBenefit">
+                    <core:Icon src="sap-icon://cart-approval" class="blBenefitIcon" />
+                    <VBox>
+                        <Text text="{i18n>benefitReserveTitle}" class="blBenefitTitle" />
+                        <Text text="{i18n>benefitReserveText}" class="blBenefitText" />
+                    </VBox>
+                </HBox>
+                <HBox alignItems="Center" class="blBenefit">
+                    <core:Icon src="sap-icon://lead" class="blBenefitIcon" />
+                    <VBox>
+                        <Text text="{i18n>benefitPromotionsTitle}" class="blBenefitTitle" />
+                        <Text text="{i18n>benefitPromotionsText}" class="blBenefitText" />
+                    </VBox>
+                </HBox>
+            </FlexBox>
+
+            <VBox id="productsSection" class="blContainer">
+                <Title
+                    text="{= ${catalogView>/categoryName} || ${i18n>sectionProducts} }"
+                    level="H2"
+                    wrapping="true"
+                    class="blSectionTitle"
                 />
 
-                <ScrollContainer horizontal="true" vertical="false" width="100%" class="blChips">
-                    <HBox>
+                <ScrollContainer horizontal="true" vertical="false" width="100%" class="blCategoryNav">
+                    <HBox justifyContent="Center" class="blCategoryNavItems">
                         <Button
                             text="{i18n>allCategories}"
-                            type="{= ${catalogView>/categoryId} === '' ? 'Emphasized' : 'Default' }"
+                            type="{= ${catalogView>/categoryId} === '' ? 'Emphasized' : 'Transparent' }"
                             press=".onCategoryPress"
-                            class="blChip"
+                            class="blCategoryItem"
                         />
                         <HBox items="{path: 'catalog>/Categories', sorter: {path: 'Name'}, templateShareable: false}">
                             <Button
                                 text="{catalog>Name}"
-                                type="{= ${catalogView>/categoryId} === ${catalog>ID} ? 'Emphasized' : 'Default' }"
+                                type="{= ${catalogView>/categoryId} === ${catalog>ID} ? 'Emphasized' : 'Transparent' }"
                                 press=".onCategoryPress"
-                                class="blChip"
+                                class="blCategoryItem"
                             />
                         </HBox>
                     </HBox>
                 </ScrollContainer>
+
+                <SearchField
+                    id="searchField"
+                    placeholder="{i18n>searchPlaceholder}"
+                    search=".onSearch"
+                    class="blSearch"
+                />
 
                 <f:GridList
                     id="productGrid"
@@ -104,7 +116,7 @@
                     }"
                 >
                     <f:customLayout>
-                        <grid:GridBoxLayout boxMinWidth="14rem" />
+                        <grid:GridBoxLayout boxMinWidth="15rem" />
                     </f:customLayout>
                     <f:GridListItem type="Active" press=".onProductPress" class="blProductCard">
                         <VBox>
@@ -116,21 +128,19 @@
                                     densityAware="false"
                                     class="blProductImage"
                                 />
+                                <Text
+                                    text="{i18n>featured}"
+                                    visible="{= ${catalog>Featured} === true }"
+                                    class="blFeaturedTag"
+                                />
+                                <Text
+                                    text="{i18n>soldOut}"
+                                    visible="{path: 'catalog>Variants', targetType: 'any', formatter: '.formatter.isSoldOut'}"
+                                    class="blSoldOutTag"
+                                />
                             </VBox>
-                            <VBox class="blProductInfo">
-                                <HBox justifyContent="SpaceBetween" alignItems="Center">
-                                    <Text
-                                        text="{i18n>featured}"
-                                        visible="{= ${catalog>Featured} === true }"
-                                        class="blFeaturedTag"
-                                    />
-                                    <ObjectStatus
-                                        text="{i18n>soldOut}"
-                                        state="Error"
-                                        visible="{path: 'catalog>Variants', targetType: 'any', formatter: '.formatter.isSoldOut'}"
-                                    />
-                                </HBox>
-                                <Text text="{catalog>Name}" maxLines="2" class="blProductName" />
+                            <VBox alignItems="Center" class="blProductInfo">
+                                <Text text="{catalog>Name}" maxLines="2" textAlign="Center" class="blProductName" />
                                 <Text text="{path: 'catalog>Price', targetType: 'any', formatter: '.formatter.currency'}" class="blProductPrice" />
                             </VBox>
                         </VBox>

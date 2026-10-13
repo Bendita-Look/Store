@@ -1,98 +1,365 @@
 :root {
-    --bl-primary: #8e3b5b;
-    --bl-primary-dark: #6f2a45;
-    --bl-accent: #d98aa6;
-    --bl-soft: #fbf4f6;
-    --bl-soft-strong: #f6e9ee;
-    --bl-text: #3b2530;
-    --bl-muted: #8a6b77;
-    --bl-radius: 1rem;
-    --sapBrandColor: var(--bl-primary);
-    --sapButton_Emphasized_Background: var(--bl-primary);
-    --sapButton_Emphasized_BorderColor: var(--bl-primary);
-    --sapButton_Emphasized_Hover_Background: var(--bl-primary-dark);
-    --sapButton_Emphasized_Hover_BorderColor: var(--bl-primary-dark);
-    --sapButton_Selected_Background: var(--bl-soft-strong);
-    --sapButton_Selected_BorderColor: var(--bl-primary);
-    --sapButton_Selected_TextColor: var(--bl-primary);
-    --sapSelectedColor: var(--bl-primary);
-    --sapHighlightColor: var(--bl-primary);
-    --sapLinkColor: var(--bl-primary);
+    --bl-blush: #ffcad4;
+    --bl-blush-soft: #ffe8ed;
+    --bl-cream: #fffafa;
+    --bl-gold: #a8814f;
+    --bl-gold-dark: #8a6a3e;
+    --bl-rose: #c0587b;
+    --bl-text: #4a3527;
+    --bl-muted: #8a7266;
+    --bl-line: #f1dfe3;
+    --bl-radius: 0.875rem;
+    --bl-font: "Montserrat", "72", "72full", Arial, Helvetica, sans-serif;
+    --sapFontFamily: var(--bl-font);
+    --sapFontHeaderFamily: var(--bl-font);
+    --sapBrandColor: var(--bl-gold);
+    --sapTextColor: var(--bl-text);
+    --sapButton_Emphasized_Background: var(--bl-gold);
+    --sapButton_Emphasized_BorderColor: var(--bl-gold);
+    --sapButton_Emphasized_Hover_Background: var(--bl-gold-dark);
+    --sapButton_Emphasized_Hover_BorderColor: var(--bl-gold-dark);
+    --sapButton_Selected_Background: var(--bl-blush-soft);
+    --sapButton_Selected_BorderColor: var(--bl-gold);
+    --sapButton_Selected_TextColor: var(--bl-gold-dark);
+    --sapButton_TextColor: var(--bl-gold-dark);
+    --sapButton_Lite_TextColor: var(--bl-gold-dark);
+    --sapContent_IconColor: var(--bl-gold-dark);
+    --sapSelectedColor: var(--bl-gold);
+    --sapHighlightColor: var(--bl-gold);
+    --sapLinkColor: var(--bl-gold-dark);
+    --sapLink_Hover_Color: var(--bl-rose);
+    --sapContent_FocusColor: var(--bl-gold);
 }
 
 .blApp .sapMPage > section,
 .blPage .sapMPageEnableScrolling {
-    background: var(--bl-soft);
-}
-
-.blHeader.sapMBar {
-    background: #ffffff;
-    border-bottom: 2px solid var(--bl-soft-strong);
-    box-shadow: none;
-}
-
-.blBrandTitle,
-.blBrandTitle.sapMLnk,
-.blBrandTitle .sapMTitle {
-    font-family: Georgia, "Times New Roman", serif;
-    font-style: italic;
-    font-size: 1.35rem;
-    color: var(--bl-primary);
+    background: var(--bl-cream);
 }
 
 .blContainer {
-    max-width: 72rem;
+    max-width: 76rem;
     margin: 0 auto;
-    padding: 1rem;
+    padding: 1.5rem 1rem;
 }
 
-.blHero {
-    padding: 2.5rem 1rem 2rem;
-    background: linear-gradient(135deg, var(--bl-soft-strong) 0%, #ffffff 100%);
-}
-
-.blHero .blHeroTitle {
-    font-family: Georgia, "Times New Roman", serif;
-    color: var(--bl-primary);
-}
-
-.blHeroSubtitle {
-    max-width: 36rem;
-    margin-top: 0.5rem;
+.blMuted {
     color: var(--bl-muted);
 }
 
-.blChips {
-    padding-bottom: 0.5rem;
+.blGrow {
+    flex: 1 1 16rem;
 }
 
-.blChip {
-    margin-right: 0.5rem;
-}
-
-.blChip .sapMBtnInner {
+.blPrimaryButton .sapMBtnInner {
+    height: 2.75rem;
+    padding: 0 1.75rem;
     border-radius: 2rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.blPrimaryButton .sapMBtnInner .sapMBtnContent,
+.blPrimaryButton .sapMBtnInner .sapMBtnIcon {
+    line-height: 2.75rem;
+}
+
+/* Header */
+
+.blHeader.sapMBar {
+    height: 4.5rem;
+    background: var(--bl-blush);
+    border-bottom: 1px solid #f5b6c3;
+    box-shadow: 0 2px 12px rgba(168, 129, 79, 0.12);
+}
+
+.blHeader.sapMBar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 0 1rem;
+    box-sizing: border-box;
+}
+
+.blHeader.sapMBar .sapMBarLeft {
+    grid-column: 1;
+    justify-self: start;
+    display: flex;
+    align-items: center;
+}
+
+.blHeader.sapMBar .sapMBarMiddle {
+    grid-column: 2;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.blHeader.sapMBar .sapMBarMiddle .sapMBarPH {
+    position: static !important;
+    left: auto !important;
+    width: auto !important;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.blHeader.sapMBar .sapMBarChild {
+    margin: 0;
+}
+
+.blHeaderLogo.sapMImg {
+    display: block;
+}
+
+.blHeader.sapMBar .sapMBarRight {
+    grid-column: 3;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    float: none;
+}
+
+.blPage.sapMPageWithHeader > section {
+    top: 4.5rem;
+}
+
+.blHeaderLogo,
+.blHeaderLogo.sapMImg {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7);
+}
+
+.blHeaderAction.sapMBtn .sapMBtnInner {
+    background: transparent;
+    border: none;
+    color: var(--bl-text);
+}
+
+.blHeaderAction.sapMBtn .sapMBtnIcon,
+.blHeaderAction.sapMBtn .sapMBtnContent {
+    color: var(--bl-text);
+    font-weight: 500;
+}
+
+.blHeaderAction.sapMBtn:hover .sapMBtnInner {
+    background: rgba(255, 255, 255, 0.45);
+}
+
+/* Announcement and hero */
+
+.blAnnouncement {
+    gap: 0.25rem 2rem;
+    padding: 0.5rem 1rem;
+    background: var(--bl-text);
+    color: #ffffff;
+}
+
+.blAnnouncementItem {
+    gap: 0.5rem;
+}
+
+.blAnnouncementIcon.sapUiIcon {
+    color: var(--bl-blush);
+}
+
+.blAnnouncement .blAnnouncementName {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.blAnnouncement .blAnnouncementText {
+    color: #f4dfe4;
+    font-size: 0.8rem;
+}
+
+.blHero {
+    gap: 2rem;
+    padding: 3rem 1.5rem;
+    background:
+        radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.85) 0, rgba(255, 255, 255, 0) 45%),
+        linear-gradient(120deg, var(--bl-blush) 0%, var(--bl-blush-soft) 55%, #fff4e8 100%);
+}
+
+.blHeroText {
+    flex: 1 1 22rem;
+    max-width: 34rem;
+    gap: 0.75rem;
+}
+
+.blHero .blHeroEyebrow {
+    color: var(--bl-gold-dark);
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+}
+
+.blHero .blHeroTitle.sapMTitle {
+    font-size: 2.6rem;
+    line-height: 1.15;
+    font-weight: 700;
+    color: var(--bl-text);
+}
+
+.blHero .blHeroSubtitle {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--bl-muted);
+}
+
+.blHeroButton {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+}
+
+.blHeroLogo,
+.blHeroLogo.sapMImg {
+    width: 15rem;
+    height: 15rem;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.55), 0 18px 40px rgba(168, 129, 79, 0.25);
+}
+
+/* Benefits */
+
+@media (min-width: 600px) and (max-width: 1100px) {
+    .blBenefits {
+        grid-template-columns: repeat(2, minmax(0, 18rem));
+    }
+}
+
+.blBenefits {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 15rem));
+    justify-content: center;
+    gap: 1rem 2rem;
+    padding: 1.5rem 1rem;
+    background: #ffffff;
+    border-bottom: 1px solid var(--bl-line);
+}
+
+.blBenefit {
+    gap: 0.75rem;
+}
+
+.blBenefitIcon.sapUiIcon {
+    width: 3rem;
+    height: 3rem;
+    line-height: 3rem;
+    font-size: 1.25rem;
+    border-radius: 50%;
+    color: var(--bl-gold-dark);
+    border: 1.5px solid var(--bl-gold);
+    flex-shrink: 0;
+}
+
+.blBenefit .blBenefitTitle {
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--bl-text);
+}
+
+.blBenefit .blBenefitText {
+    font-size: 0.85rem;
+    color: var(--bl-muted);
+}
+
+/* Catalog */
+
+.blSectionTitle.sapMTitle {
+    display: block;
+    width: 100%;
+    margin: 1rem 0 1.25rem;
+    text-align: center;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--bl-text);
+}
+
+.blCategoryNav {
+    margin-bottom: 1rem;
+}
+
+.blCategoryNavItems {
+    gap: 0.25rem;
+    min-width: max-content;
+    margin: 0 auto;
+}
+
+.blCategoryItem.sapMBtn .sapMBtnInner {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+}
+
+.blCategoryItem.sapMBtn .sapMBtnContent {
+    color: var(--bl-muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.blCategoryItem.sapMBtn .sapMBtnEmphasized {
+    border-bottom-color: var(--bl-gold);
+}
+
+.blCategoryItem.sapMBtn .sapMBtnEmphasized .sapMBtnContent,
+.blCategoryItem.sapMBtn:hover .sapMBtnContent {
+    color: var(--bl-text);
+}
+
+.blSearch.sapMSF {
+    max-width: 32rem;
+    margin: 0 auto 1.5rem;
+    display: block;
+}
+
+.blSearch .sapMSFF {
+    border-radius: 2rem;
+    background: #ffffff;
+}
+
+.blProductGrid .sapMListUl {
+    gap: 1.5rem 1.25rem;
 }
 
 .blProductGrid .sapFGridListItem,
 .blProductCard {
-    border-radius: var(--bl-radius);
     overflow: hidden;
     border: none;
-    box-shadow: 0 4px 16px rgba(120, 40, 70, 0.08);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
-.blProductCard:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(120, 40, 70, 0.14);
+.blProductCard.sapMLIBFocusable:focus {
+    outline-offset: 2px;
 }
 
 .blProductImageWrapper {
+    position: relative;
     width: 100%;
     aspect-ratio: 3 / 4;
     overflow: hidden;
-    background: var(--bl-soft-strong);
+    border-radius: var(--bl-radius);
+    background: var(--bl-blush-soft);
 }
 
 .blProductImage,
@@ -100,42 +367,244 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.blProductCard:hover .blProductImage {
+    transform: scale(1.05);
+}
+
+.blFeaturedTag,
+.blSoldOutTag {
+    position: absolute;
+    top: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.blFeaturedTag.sapMText {
+    left: 0.75rem;
+    color: #ffffff;
+    background: var(--bl-gold);
+}
+
+.blSoldOutTag.sapMText {
+    right: 0.75rem;
+    color: #ffffff;
+    background: rgba(74, 53, 39, 0.85);
 }
 
 .blProductInfo {
-    padding: 0.75rem 1rem 1rem;
-    gap: 0.25rem;
+    gap: 0.35rem;
+    padding: 0.9rem 0.5rem 1rem;
+    border-bottom: 1px solid var(--bl-line);
 }
 
 .blProductName {
-    font-weight: 600;
+    font-weight: 500;
     color: var(--bl-text);
+}
+
+.blProductInfo .blProductName {
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .blProductPrice {
     font-weight: 700;
-    color: var(--bl-primary);
+    color: var(--bl-rose);
 }
 
-.blFeaturedTag {
-    padding: 0.125rem 0.625rem;
-    border-radius: 1rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #ffffff;
-    background: var(--bl-accent);
+.blProductInfo .blProductPrice {
+    font-size: 1.15rem;
 }
 
-.blBrand .sapMImg,
-.blLoginCard .sapMImg {
-    border-radius: 50%;
+/* Product detail */
+
+.blProductDetail {
+    gap: 3rem;
+    padding-top: 2rem;
+}
+
+.blGallery {
+    flex: 1 1 22rem;
+    max-width: 32rem;
+}
+
+.blCarousel,
+.blDetailImage img {
+    border-radius: var(--bl-radius);
+    overflow: hidden;
+}
+
+.blDetailImage img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
     object-fit: cover;
 }
+
+.blThumbnails {
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.blThumbnail,
+.blThumbnail.sapMImg {
+    object-fit: cover;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.blThumbnail:hover {
+    border-color: var(--bl-gold);
+}
+
+.blDetailInfo {
+    flex: 1 1 20rem;
+    max-width: 30rem;
+    gap: 0.25rem;
+}
+
+.blCategoryLabel {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--bl-gold-dark);
+}
+
+.blDetailTitle.sapMTitle {
+    font-size: 1.9rem;
+    line-height: 1.2;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--bl-text);
+}
+
+.blDetailPrice {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--bl-rose);
+}
+
+.blDetailInfo .blDetailPrice {
+    margin: 0.75rem 0;
+}
+
+.blDetailDescription {
+    line-height: 1.6;
+    color: var(--bl-muted);
+}
+
+.blOptionGroup {
+    margin-top: 1.25rem;
+    gap: 0.5rem;
+}
+
+.blOptionLabel {
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--bl-text);
+}
+
+.blSwatches {
+    gap: 0.6rem;
+}
+
+.blSwatch.sapUiIcon {
+    width: 2.5rem;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    border-radius: 50%;
+    border: 2px solid var(--bl-line);
+    cursor: pointer;
+    background: #ffffff;
+}
+
+.blSwatch.sapUiIcon[data-selected="true"] {
+    border-color: var(--bl-gold);
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px var(--bl-gold);
+}
+
+.blSizes {
+    gap: 0.5rem;
+}
+
+.blSize.sapMBtn {
+    height: auto;
+}
+
+.blSize.sapMBtn .sapMBtnInner {
+    min-width: 3rem;
+    height: 3rem;
+    border-radius: 0.5rem;
+    border: 1.5px solid var(--bl-line);
+    background: #ffffff;
+}
+
+.blSize.sapMBtn .sapMBtnContent {
+    line-height: 2.75rem;
+    font-weight: 600;
+    color: var(--bl-text);
+}
+
+.blSize.sapMBtn .sapMBtnEmphasized {
+    border-color: var(--bl-gold);
+    background: var(--bl-blush-soft);
+}
+
+.blSize.sapMBtn.sapMBtnDisabled .sapMBtnContent {
+    text-decoration: line-through;
+}
+
+.blBuyBox {
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.blBuyButton {
+    flex: 1;
+}
+
+.blBuyButton .sapMBtnInner {
+    width: 100%;
+}
+
+.blProductQuestion.sapMLnk {
+    margin-top: 1rem;
+    font-weight: 600;
+}
+
+.blDetailBenefits {
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--bl-radius);
+    background: #ffffff;
+    border: 1px solid var(--bl-line);
+}
+
+.blDetailBenefitIcon.sapUiIcon {
+    margin-right: 0.75rem;
+    color: var(--bl-gold-dark);
+}
+
+/* Cart, tracking and shared cards */
 
 .blSummary {
     padding: 1rem;
     border-radius: var(--bl-radius);
     background: #ffffff;
+    border: 1px solid var(--bl-line);
 }
 
 .blPromotionList {
@@ -151,63 +620,7 @@
     padding: 0.5rem 1rem;
     border-radius: 2rem;
     background: #ffffff;
-    border: 1px dashed var(--bl-accent);
-}
-
-.blGrow {
-    flex: 1 1 16rem;
-}
-
-.blMuted {
-    color: var(--bl-muted);
-}
-
-.blProductDetail {
-    gap: 2rem;
-}
-
-.blGallery {
-    flex: 1 1 22rem;
-    max-width: 30rem;
-}
-
-.blCarousel,
-.blDetailImage img {
-    border-radius: var(--bl-radius);
-    overflow: hidden;
-}
-
-.blDetailImage img {
-    width: 100%;
-    aspect-ratio: 3 / 4;
-    object-fit: cover;
-}
-
-.blDetailInfo {
-    flex: 1 1 20rem;
-    max-width: 30rem;
-}
-
-.blCategoryLabel {
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.75rem;
-    color: var(--bl-muted);
-}
-
-.blDetailPrice {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--bl-primary);
-}
-
-.blSelector {
-    margin-top: 0.25rem;
-}
-
-.blPrimaryButton .sapMBtnInner {
-    border-radius: 2rem;
-    padding: 0 1.25rem;
+    border: 1px dashed var(--bl-gold);
 }
 
 .blCartList,
@@ -216,6 +629,7 @@
     border-radius: var(--bl-radius);
     overflow: hidden;
     background: #ffffff;
+    border: 1px solid var(--bl-line);
 }
 
 .blCartItem {
@@ -227,6 +641,7 @@
     flex: 1;
 }
 
+.blCartImage,
 .blCartImage img,
 .blThumb img {
     object-fit: cover;
@@ -241,12 +656,13 @@
     padding: 1rem 1.25rem;
     border-radius: var(--bl-radius);
     background: #ffffff;
-    border-left: 4px solid var(--bl-accent);
+    border-left: 4px solid var(--bl-gold);
 }
 
 .blSteps {
     background: #ffffff;
     border-radius: var(--bl-radius);
+    border: 1px solid var(--bl-line);
     padding: 1.25rem;
 }
 
@@ -254,12 +670,112 @@
     flex: 1;
 }
 
+.blContainer > .sapMTitle,
+.blContainer .sapMTitle.sapMTitleStyleH3 {
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--bl-text);
+}
+
+/* Footer */
+
 .blFooter {
-    padding: 2rem 1rem;
-    margin-top: 2rem;
+    margin-top: 3rem;
+    color: var(--bl-text);
+    background: var(--bl-blush-soft);
+    border-top: 3px solid var(--bl-gold);
+}
+
+.blFooterContent {
+    gap: 2rem;
+    max-width: 76rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2.5rem 1rem 1.5rem;
+    box-sizing: border-box;
+}
+
+.blFooterColumn {
+    flex: 1 1 14rem;
+    gap: 0.5rem;
+}
+
+.blFooterLogo,
+.blFooterLogo.sapMImg {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.blFooterTitle.sapMTitle {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bl-gold-dark);
+}
+
+.blFooterText {
     color: var(--bl-muted);
-    background: #ffffff;
-    border-top: 2px solid var(--bl-soft-strong);
+    line-height: 1.5;
+}
+
+.blFooterLink.sapMLnk {
+    color: var(--bl-text);
+}
+
+.blFooterBottom {
+    gap: 0.5rem;
+    max-width: 76rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1rem;
+    box-sizing: border-box;
+    border-top: 1px solid #f3cdd6;
+}
+
+.blFooterSmall,
+.blFooterSmall.sapMLnk {
+    font-size: 0.8rem;
+    color: var(--bl-muted);
+}
+
+.blWhatsappFab.sapMBtn {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 10;
+    height: auto;
+}
+
+.blWhatsappFab.sapMBtn .sapMBtnInner {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    border: none;
+    background: #25d366;
+    box-shadow: 0 6px 18px rgba(37, 211, 102, 0.4);
+}
+
+.blWhatsappFab.sapMBtn .sapMBtnIcon {
+    color: #ffffff;
+    font-size: 1.5rem;
+    line-height: 3.5rem;
+    width: 100%;
+    margin: 0;
+}
+
+.blWhatsappFab.sapMBtn:hover .sapMBtnInner {
+    background: #1ebe57;
+}
+
+/* Login and admin */
+
+.blBrand .sapMImg,
+.blLoginCard .sapMImg {
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .blLoginCard {
@@ -268,7 +784,7 @@
     padding: 2rem;
     border-radius: var(--bl-radius);
     background: #ffffff;
-    box-shadow: 0 8px 32px rgba(120, 40, 70, 0.12);
+    box-shadow: 0 8px 32px rgba(168, 129, 79, 0.15);
 }
 
 .blKpis {
@@ -281,7 +797,7 @@
     padding: 1rem 1.25rem;
     border-radius: var(--bl-radius);
     background: #ffffff;
-    box-shadow: 0 4px 16px rgba(120, 40, 70, 0.06);
+    border: 1px solid var(--bl-line);
 }
 
 .blKpiLabel {
@@ -292,27 +808,135 @@
 .blKpiValue {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--bl-primary);
+    color: var(--bl-gold-dark);
 }
 
 .blBar .sapMPIBar {
-    background: var(--bl-accent);
+    background: var(--bl-gold);
 }
 
 .blTabs .sapMITBContent {
-    background: var(--bl-soft);
+    background: var(--bl-cream);
+}
+
+.blTabs .sapMITBFilterIcon.sapUiIcon {
+    color: var(--bl-gold-dark) !important;
+    border-color: var(--bl-gold) !important;
+}
+
+.blTabs .sapMITBSelected .sapMITBFilterIcon.sapUiIcon {
+    color: #ffffff !important;
+    background: var(--bl-gold) !important;
+}
+
+.blTabs .sapMITBSelected .sapMITBContentArrow::after,
+.blTabs .sapMITBFilter.sapMITBSelected::after {
+    background: var(--bl-gold) !important;
 }
 
 @media (max-width: 599px) {
+    .blHeader.sapMBar {
+        height: 4rem;
+        padding: 0 0.25rem;
+    }
+
+    .blPage.sapMPageWithHeader > section {
+        top: 4rem;
+    }
+
+    .blHeaderLogo,
+    .blHeaderLogo.sapMImg {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    .blHeaderAction.sapMBtn .sapMBtnContent {
+        display: none;
+    }
+
     .blHero {
-        padding: 1.5rem 1rem;
+        padding: 2rem 1.25rem;
+        gap: 1.25rem;
+        flex-direction: column-reverse;
+    }
+
+    .blHeroText {
+        flex: 0 0 auto;
+    }
+
+    .blHero .blHeroTitle.sapMTitle {
+        font-size: 1.8rem;
+    }
+
+    .blAnnouncement {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 1.5rem;
+    }
+
+    .blAnnouncement .blAnnouncementText {
+        display: none;
+    }
+
+    .blAnnouncementItem {
+        flex-shrink: 0;
+    }
+
+    .blAnnouncement .blAnnouncementName {
+        white-space: nowrap;
+    }
+
+    .blHeroLogo,
+    .blHeroLogo.sapMImg {
+        width: 6.5rem;
+        height: 6.5rem;
+    }
+
+    .blBenefits {
+        grid-template-columns: repeat(4, 15rem);
+        justify-content: start;
+        overflow-x: auto;
+        gap: 1.5rem;
+    }
+
+    .blSectionTitle.sapMTitle {
+        font-size: 1.4rem;
+    }
+
+    .blCategoryNavItems {
+        margin: 0;
+    }
+
+    .blProductGrid .sapMListUl {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 1rem 0.75rem;
+    }
+
+    .blProductInfo .blProductName {
+        font-size: 0.75rem;
+    }
+
+    .blProductInfo .blProductPrice {
+        font-size: 1rem;
     }
 
     .blProductDetail {
-        gap: 1rem;
+        gap: 1.25rem;
+        padding-top: 1rem;
+    }
+
+    .blDetailTitle.sapMTitle {
+        font-size: 1.4rem;
     }
 
     .blBuyBox {
         flex-wrap: wrap;
+    }
+
+    .blWhatsappFab.sapMBtn {
+        right: 1rem;
+        bottom: 1rem;
     }
 }
