@@ -6,9 +6,9 @@ sap.ui.define([], function () {
   const OUTPUT_TYPE = "image/jpeg";
   class ImageCompressor {
     static outputType = OUTPUT_TYPE;
-    static async compress(file) {
+    static async compress(file, maxDimension = MAX_DIMENSION) {
       const bitmap = await createImageBitmap(file);
-      const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
+      const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
       const canvas = document.createElement("canvas");
       canvas.width = Math.round(bitmap.width * scale);
       canvas.height = Math.round(bitmap.height * scale);

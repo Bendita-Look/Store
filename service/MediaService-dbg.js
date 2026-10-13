@@ -27,6 +27,27 @@ sap.ui.define(["../util/http"], function (___util_http) {
       });
       this.objectUrls.set(imageId, URL.createObjectURL(content));
     }
+    static settingsBannerPath(settingsId, isActiveEntity) {
+      return `StoreSettings(ID=${settingsId},IsActiveEntity=${isActiveEntity})/BannerImage`;
+    }
+    static async loadMedia(path) {
+      const response = await adminRequest(path);
+      return URL.createObjectURL(await response.blob());
+    }
+    static async uploadMedia(path, content, contentType) {
+      await adminRequest(path, {
+        method: "PUT",
+        headers: {
+          "Content-Type": contentType
+        },
+        body: content
+      });
+    }
+    static async deleteMedia(path) {
+      await adminRequest(path, {
+        method: "DELETE"
+      });
+    }
     static release(imageId) {
       const objectUrl = this.objectUrls.get(imageId);
       if (objectUrl) {

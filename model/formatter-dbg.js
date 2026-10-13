@@ -83,6 +83,9 @@ sap.ui.define(["sap/base/strings/formatMessage", "sap/base/i18n/Localization", "
       }).format(new Date(value)) : "";
     },
     catalogImageUrl,
+    bannerUrl(bannerId, version) {
+      return bannerId ? `${XsuaaAuthHelper.getConfig().catalogService}StoreBanners(${bannerId})/BannerImage?v=${encodeURIComponent(version ?? "")}` : "";
+    },
     totalStock,
     whatsappUrl,
     coverImageUrl(images) {

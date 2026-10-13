@@ -106,6 +106,12 @@ export default {
 
     catalogImageUrl,
 
+    bannerUrl(bannerId: string | null | undefined, version: string | null | undefined): string {
+        return bannerId
+            ? `${XsuaaAuthHelper.getConfig().catalogService}StoreBanners(${bannerId})/BannerImage?v=${encodeURIComponent(version ?? "")}`
+            : "";
+    },
+
     totalStock,
 
     whatsappUrl,

@@ -139,7 +139,8 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
       }
       const detail = getBackendErrorMessage(error);
       const message = this.getText(key);
-      MessageBox.error(detail ? `${message}\n\n${detail}` : message);
+      const isRepeated = !!detail && message.toLowerCase().includes(detail.replace(/[.!]+$/, "").toLowerCase());
+      MessageBox.error(detail && !isRepeated ? `${message}\n\n${detail}` : message);
     },
     runBusy: async function _runBusy(action) {
       const controls = [this.getView(), ...InstanceManager.getOpenDialogs()];

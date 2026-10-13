@@ -26,7 +26,16 @@
                 </HBox>
             </HBox>
 
-            <FlexBox alignItems="Center" justifyContent="Center" wrap="Wrap" class="blHero">
+            <Image
+                src="{parts: ['store>/BannerId', 'store>/BannerVersion'], formatter: '.formatter.bannerUrl'}"
+                visible="{= !!${store>/BannerId} }"
+                alt="{i18n>appTitle}"
+                densityAware="false"
+                press=".onShopNow"
+                class="blHeroBanner"
+            />
+
+            <FlexBox alignItems="Center" justifyContent="Center" wrap="Wrap" visible="{= !${store>/BannerId} }" class="blHero">
                 <VBox class="blHeroText">
                     <Text text="{i18n>heroEyebrow}" class="blHeroEyebrow" />
                     <Title text="{i18n>heroTitle}" level="H1" wrapping="true" class="blHeroTitle" />

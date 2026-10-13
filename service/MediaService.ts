@@ -33,6 +33,28 @@ export default class MediaService {
         this.objectUrls.set(imageId, URL.createObjectURL(content));
     }
 
+    public static settingsBannerPath(settingsId: string, isActiveEntity: boolean): string {
+        return `StoreSettings(ID=${settingsId},IsActiveEntity=${isActiveEntity})/BannerImage`;
+    }
+
+    public static async loadMedia(path: string): Promise<string> {
+        const response = await adminRequest(path);
+
+        return URL.createObjectURL(await response.blob());
+    }
+
+    public static async uploadMedia(path: string, content: Blob, contentType: string): Promise<void> {
+        await adminRequest(path, {
+            method: "PUT",
+            headers: { "Content-Type": contentType },
+            body: content
+        });
+    }
+
+    public static async deleteMedia(path: string): Promise<void> {
+        await adminRequest(path, { method: "DELETE" });
+    }
+
     public static release(imageId: string): void {
         const objectUrl = this.objectUrls.get(imageId);
 

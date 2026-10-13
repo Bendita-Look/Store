@@ -6,9 +6,9 @@ export default class ImageCompressor {
 
     public static readonly outputType = OUTPUT_TYPE;
 
-    public static async compress(file: File): Promise<Blob> {
+    public static async compress(file: File, maxDimension = MAX_DIMENSION): Promise<Blob> {
         const bitmap = await createImageBitmap(file);
-        const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
+        const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
         const canvas = document.createElement("canvas");
 
         canvas.width = Math.round(bitmap.width * scale);
