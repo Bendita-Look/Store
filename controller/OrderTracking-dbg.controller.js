@@ -30,6 +30,14 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/Or
       const message = this.getText("whatsappOrderMessage", [orderNumber]);
       window.open(formatter.whatsappUrl(this.getStoreModel().getProperty("/Whatsapp"), message), "_blank");
     },
+    onItemPress: function _onItemPress(event) {
+      const productId = event.getSource().getBindingContext("tracking")?.getProperty("ProductId");
+      if (productId) {
+        this.navTo("product", {
+          productId
+        });
+      }
+    },
     onContinueShopping: function _onContinueShopping() {
       this.navTo("catalog");
     },

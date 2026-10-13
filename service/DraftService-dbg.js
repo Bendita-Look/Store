@@ -2,6 +2,7 @@ sap.ui.define(["sap/ui/core/Messaging"], function (Messaging) {
   "use strict";
 
   const SERVICE_NAMESPACE = "BenditaLook";
+  const NETWORK_FAILURE_STATUS = 0;
   class CreationFailedError extends Error {
     constructor(message, status) {
       super(message);
@@ -14,8 +15,9 @@ sap.ui.define(["sap/ui/core/Messaging"], function (Messaging) {
       this.adminModel = adminModel;
     }
     async createDraft(listBinding, data) {
+      const knownMessages = this.technicalMessages().length;
       const draftContext = listBinding.create(data, true);
-      await Promise.race([draftContext.created(), this.creationFailure(listBinding, draftContext)]);
+      await Promise.race([draftContext.created(), this.creationFailure(listBinding, draftContext, knownMessages)]);
       return draftContext;
     }
     async editDraft(activeContext) {
@@ -36,7 +38,7 @@ sap.ui.define(["sap/ui/core/Messaging"], function (Messaging) {
       this.adminModel.resetChanges();
       await draftContext.delete();
     }
-    creationFailure(listBinding, context) {
+    creationFailure(listBinding, context, knownMessages) {
       return new Promise((_resolve, reject) => {
         const onCreateCompleted = event => {
           if (event.getParameter("context") !== context) {
@@ -45,7 +47,7 @@ sap.ui.define(["sap/ui/core/Messaging"], function (Messaging) {
           listBinding.detachCreateCompleted(onCreateCompleted);
           if (!event.getParameter("success")) {
             setTimeout(() => {
-              reject(this.lastRequestError());
+              reject(this.lastRequestError(knownMessages));
               context.delete().catch(() => undefined);
             });
           }
@@ -53,11 +55,14 @@ sap.ui.define(["sap/ui/core/Messaging"], function (Messaging) {
         listBinding.attachCreateCompleted(onCreateCompleted);
       });
     }
-    lastRequestError() {
-      const messages = Messaging.getMessageModel().getData().filter(message => message.getTechnical());
-      const lastMessage = messages[messages.length - 1];
+    lastRequestError(knownMessages) {
+      const newMessages = this.technicalMessages().slice(knownMessages);
+      const lastMessage = newMessages[newMessages.length - 1];
       const details = lastMessage?.getTechnicalDetails();
-      return new CreationFailedError(lastMessage?.getMessage() ?? "", details?.httpStatus);
+      return new CreationFailedError(lastMessage?.getMessage() ?? "", details?.httpStatus ?? NETWORK_FAILURE_STATUS);
+    }
+    technicalMessages() {
+      return Messaging.getMessageModel().getData().filter(message => message.getTechnical());
     }
     async submitPendingChanges() {
       if (this.adminModel.hasPendingChanges()) {

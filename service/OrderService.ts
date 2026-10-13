@@ -60,6 +60,8 @@ export interface ActivePromotion {
 }
 
 export interface TrackedOrderItem {
+    ProductId?: string;
+    ImageId?: string;
     ProductName: string;
     ColorName: string;
     Size: string;

@@ -55,6 +55,15 @@ export default class OrdersSection {
         dialog.open();
     };
 
+    public onItemPress = (event: Event): void => {
+        const productId = (event.getSource() as Control).getBindingContext()?.getProperty("Product_ID") as string | undefined;
+
+        if (productId) {
+            this.onCloseDialog();
+            this.controller.navTo("product", { productId });
+        }
+    };
+
     public onCloseDialog = (): void => {
         this.dialog?.close();
     };

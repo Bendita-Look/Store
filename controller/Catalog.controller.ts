@@ -40,9 +40,14 @@ export default class Catalog extends BaseController {
     }
 
     public onProductPress(event: Event): void {
-        const context = (event.getSource() as Control).getBindingContext("catalog");
+        const productId = (event.getSource() as Control).getBindingContext("catalog")?.getProperty("ID") as string | undefined;
 
-        this.navTo("product", { productId: context?.getProperty("ID") as string });
+        if (!productId) {
+            this.getAppComponent().notifyBackendUnavailable();
+            return;
+        }
+
+        this.navTo("product", { productId });
     }
 
     public onOpenAdmin(): void {

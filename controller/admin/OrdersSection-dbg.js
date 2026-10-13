@@ -36,6 +36,15 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
       });
       dialog.open();
     };
+    onItemPress = event => {
+      const productId = event.getSource().getBindingContext()?.getProperty("Product_ID");
+      if (productId) {
+        this.onCloseDialog();
+        this.controller.navTo("product", {
+          productId
+        });
+      }
+    };
     onCloseDialog = () => {
       this.dialog?.close();
     };

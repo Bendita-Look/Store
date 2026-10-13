@@ -76,9 +76,18 @@
                         </Column>
                     </columns>
                     <items>
-                        <ColumnListItem>
+                        <ColumnListItem type="{= ${tracking>ProductId} ? 'Navigation' : 'Inactive' }" press=".onItemPress">
                             <cells>
-                                <Text text="{parts: ['tracking>ProductName', 'tracking>ColorName', 'tracking>Size'], formatter: '.formatter.variantDescription'}" />
+                                <HBox alignItems="Center">
+                                    <Image
+                                        src="{path: 'tracking>ImageId', formatter: '.formatter.catalogImageUrl'}"
+                                        width="3rem"
+                                        height="4rem"
+                                        densityAware="false"
+                                        class="blCartImage sapUiSmallMarginEnd"
+                                    />
+                                    <Text text="{parts: ['tracking>ProductName', 'tracking>ColorName', 'tracking>Size'], formatter: '.formatter.variantDescription'}" />
+                                </HBox>
                                 <Text text="{tracking>Quantity}" />
                                 <Text text="{path: 'tracking>UnitPrice', targetType: 'any', formatter: '.formatter.currency'}" />
                                 <Text text="{path: 'tracking>TotalPrice', targetType: 'any', formatter: '.formatter.currency'}" />

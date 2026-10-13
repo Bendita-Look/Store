@@ -1,5 +1,7 @@
 import JSONModel from "sap/ui/model/json/JSONModel";
 import type { Route$PatternMatchedEvent } from "sap/ui/core/routing/Route";
+import type Event from "sap/ui/base/Event";
+import type Control from "sap/ui/core/Control";
 import BaseController from "./BaseController";
 import OrderService, { FulfillmentType } from "../service/OrderService";
 import formatter, { OrderStatus } from "../model/formatter";
@@ -30,6 +32,14 @@ export default class OrderTracking extends BaseController {
         const message = this.getText("whatsappOrderMessage", [orderNumber]);
 
         window.open(formatter.whatsappUrl(this.getStoreModel().getProperty("/Whatsapp") as string, message), "_blank");
+    }
+
+    public onItemPress(event: Event): void {
+        const productId = (event.getSource() as Control).getBindingContext("tracking")?.getProperty("ProductId") as string | undefined;
+
+        if (productId) {
+            this.navTo("product", { productId });
+        }
     }
 
     public onContinueShopping(): void {

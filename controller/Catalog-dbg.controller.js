@@ -30,9 +30,13 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/mod
       this.applyFilters();
     },
     onProductPress: function _onProductPress(event) {
-      const context = event.getSource().getBindingContext("catalog");
+      const productId = event.getSource().getBindingContext("catalog")?.getProperty("ID");
+      if (!productId) {
+        this.getAppComponent().notifyBackendUnavailable();
+        return;
+      }
       this.navTo("product", {
-        productId: context?.getProperty("ID")
+        productId
       });
     },
     onOpenAdmin: function _onOpenAdmin() {
