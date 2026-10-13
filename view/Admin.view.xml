@@ -38,7 +38,7 @@
                 <items>
                     <IconTabFilter key="orders" icon="sap-icon://sales-order" text="{i18n>ordersTab}">
                         <FlexBox wrap="Wrap" alignItems="Center" class="blOrdersToolbar">
-                            <ScrollContainer horizontal="true" vertical="false" class="blStatusFilterScroll">
+                            <ScrollContainer horizontal="true" vertical="false" width="100%" class="blStatusFilterScroll">
                                 <HBox class="blCategoryNavItems blStatusFilter">
                                     <Button
                                         text="{i18n>allOrders}"
