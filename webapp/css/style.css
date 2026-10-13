@@ -525,6 +525,7 @@
 }
 
 .blProductGrid .sapMListUl {
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)) !important;
     gap: 1.5rem 1.25rem;
 }
 
@@ -842,6 +843,40 @@
 
 .blTable .sapMListTblSubCntRow .sapMListTblSubCntVal {
     font-size: 0.875rem;
+}
+
+.blEditTable .sapMListTblSubCnt {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.blEditTable .sapMListTblSubCntRow {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.blEditTable .sapMListTblSubCntRow .sapMListTblSubCntVal,
+.blEditTable .sapMListTblSubCntRow .sapMListTblSubCntVal > .sapMInputBase,
+.blEditTable .sapMListTblSubCntRow .sapMListTblSubCntVal > .sapMSlt,
+.blEditTable .sapMListTblSubCntRow .sapMListTblSubCntVal > .sapMStepInput {
+    width: 100% !important;
+}
+
+.blTable .sapMListTblSubCntRow:has(.blBar) {
+    grid-column: 1 / -1;
+}
+
+.blTable .sapMListTblSubCntRow:has(.blBar) .sapMListTblSubCntVal {
+    flex: 1 1 100%;
+}
+
+.blBar.sapMPI {
+    min-width: 8rem;
+}
+
+.blBar .sapMPITextLeft,
+.blBar .sapMPITextRight {
+    font-size: 0.75rem;
+    font-weight: 600;
 }
 
 .blCartItem {
