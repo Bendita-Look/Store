@@ -51,7 +51,8 @@
                 <Table
                     id="colorsTable"
                     updateFinished=".onColorsUpdated"
-                    class="blTable sapUiMediumMarginTop"
+                    popinLayout="GridSmall"
+                    class="blTable blEditTable sapUiMediumMarginTop"
                     noDataText="{i18n>noColors}"
                     items="{path: 'Colors', parameters: {$$ownRequest: true}, templateShareable: false}"
                 >
@@ -66,7 +67,7 @@
                         <Column>
                             <Text text="{i18n>colorName}" />
                         </Column>
-                        <Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
                             <Text text="{i18n>colorCode}" />
                         </Column>
                         <Column width="3.5rem" />
@@ -87,7 +88,8 @@
 
                 <Table
                     id="variantsTable"
-                    class="blTable sapUiMediumMarginTop"
+                    popinLayout="GridSmall"
+                    class="blTable blEditTable sapUiMediumMarginTop"
                     noDataText="{i18n>noVariants}"
                     items="{path: 'Variants', parameters: {$$ownRequest: true}, templateShareable: false}"
                 >
@@ -105,7 +107,7 @@
                         <Column>
                             <Text text="{i18n>size}" />
                         </Column>
-                        <Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
                             <Text text="{i18n>stock}" />
                         </Column>
                         <Column width="3.5rem" />
@@ -132,7 +134,8 @@
                 <Table
                     id="imagesTable"
                     updateFinished=".onImagesUpdated"
-                    class="blTable sapUiMediumMarginTop"
+                    popinLayout="GridSmall"
+                    class="blTable blEditTable sapUiMediumMarginTop"
                     noDataText="{i18n>noImages}"
                     items="{path: 'Images', parameters: {$$ownRequest: true, $orderby: 'SortOrder'}, templateShareable: false}"
                 >
@@ -153,10 +156,10 @@
                         <Column width="6rem">
                             <Text text="{i18n>photo}" />
                         </Column>
-                        <Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
                             <Text text="{i18n>color}" />
                         </Column>
-                        <Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
                             <Text text="{i18n>displayOrder}" />
                         </Column>
                         <Column width="3.5rem" />

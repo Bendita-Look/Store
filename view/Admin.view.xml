@@ -39,16 +39,68 @@
                     <IconTabFilter key="orders" icon="sap-icon://sales-order" text="{i18n>ordersTab}">
                         <FlexBox wrap="Wrap" alignItems="Center" class="blOrdersToolbar">
                             <ScrollContainer horizontal="true" vertical="false" class="blStatusFilterScroll">
-                            <SegmentedButton selectionChange=".orders.onStatusFilter" selectedKey="ALL" class="blStatusFilter">
-                                <items>
-                                    <SegmentedButtonItem key="ALL" text="{i18n>allOrders}" />
-                                    <SegmentedButtonItem key="NEW" text="{i18n>orderStatus.NEW}" />
-                                    <SegmentedButtonItem key="IN_SERVICE" text="{i18n>orderStatus.IN_SERVICE}" />
-                                    <SegmentedButtonItem key="OUT_FOR_DELIVERY" text="{i18n>orderStatus.OUT_FOR_DELIVERY}" />
-                                    <SegmentedButtonItem key="COMPLETED" text="{i18n>orderStatus.COMPLETED}" />
-                                    <SegmentedButtonItem key="CANCELLED" text="{i18n>orderStatus.CANCELLED}" />
-                                </items>
-                            </SegmentedButton>
+                                <HBox class="blCategoryNavItems blStatusFilter">
+                                    <Button
+                                        text="{i18n>allOrders}"
+                                        type="{= ${ordersFilter>/status} === 'ALL' ? 'Emphasized' : 'Transparent' }"
+                                        press=".orders.onStatusPress"
+                                        class="blCategoryItem"
+                                    >
+                                        <customData>
+                                            <core:CustomData key="status" value="ALL" />
+                                        </customData>
+                                    </Button>
+                                    <Button
+                                        text="{i18n>orderStatus.NEW}"
+                                        type="{= ${ordersFilter>/status} === 'NEW' ? 'Emphasized' : 'Transparent' }"
+                                        press=".orders.onStatusPress"
+                                        class="blCategoryItem"
+                                    >
+                                        <customData>
+                                            <core:CustomData key="status" value="NEW" />
+                                        </customData>
+                                    </Button>
+                                    <Button
+                                        text="{i18n>orderStatus.IN_SERVICE}"
+                                        type="{= ${ordersFilter>/status} === 'IN_SERVICE' ? 'Emphasized' : 'Transparent' }"
+                                        press=".orders.onStatusPress"
+                                        class="blCategoryItem"
+                                    >
+                                        <customData>
+                                            <core:CustomData key="status" value="IN_SERVICE" />
+                                        </customData>
+                                    </Button>
+                                    <Button
+                                        text="{i18n>orderStatus.OUT_FOR_DELIVERY}"
+                                        type="{= ${ordersFilter>/status} === 'OUT_FOR_DELIVERY' ? 'Emphasized' : 'Transparent' }"
+                                        press=".orders.onStatusPress"
+                                        class="blCategoryItem"
+                                    >
+                                        <customData>
+                                            <core:CustomData key="status" value="OUT_FOR_DELIVERY" />
+                                        </customData>
+                                    </Button>
+                                    <Button
+                                        text="{i18n>orderStatus.COMPLETED}"
+                                        type="{= ${ordersFilter>/status} === 'COMPLETED' ? 'Emphasized' : 'Transparent' }"
+                                        press=".orders.onStatusPress"
+                                        class="blCategoryItem"
+                                    >
+                                        <customData>
+                                            <core:CustomData key="status" value="COMPLETED" />
+                                        </customData>
+                                    </Button>
+                                    <Button
+                                        text="{i18n>orderStatus.CANCELLED}"
+                                        type="{= ${ordersFilter>/status} === 'CANCELLED' ? 'Emphasized' : 'Transparent' }"
+                                        press=".orders.onStatusPress"
+                                        class="blCategoryItem"
+                                    >
+                                        <customData>
+                                            <core:CustomData key="status" value="CANCELLED" />
+                                        </customData>
+                                    </Button>
+                                </HBox>
                             </ScrollContainer>
                             <HBox alignItems="Center" class="blOrdersActions">
                                 <Button text="{i18n>registerStoreSale}" icon="sap-icon://cart-approval" type="Emphasized" press=".storeSale.onOpenStoreSale" />
@@ -336,7 +388,9 @@
                                 <Column hAlign="End">
                                     <Text text="{i18n>kpiRevenue}" />
                                 </Column>
-                                <Column minScreenWidth="Tablet" demandPopin="true" />
+                                <Column minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>monthShare}" />
+                                </Column>
                             </columns>
                             <items>
                                 <ColumnListItem>
@@ -345,7 +399,14 @@
                                         <Text text="{report>orders}" />
                                         <Text text="{report>items}" />
                                         <Text text="{path: 'report>revenue', formatter: '.formatter.currency'}" />
-                                        <ProgressIndicator percentValue="{report>share}" showValue="false" height="0.75rem" class="blBar" />
+                                        <ProgressIndicator
+                                            percentValue="{report>share}"
+                                            displayValue="{= ${report>share} + '%' }"
+                                            showValue="true"
+                                            height="1.25rem"
+                                            width="100%"
+                                            class="blBar"
+                                        />
                                     </cells>
                                 </ColumnListItem>
                             </items>

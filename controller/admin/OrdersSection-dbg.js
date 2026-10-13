@@ -14,9 +14,13 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
     constructor(controller) {
       this.controller = controller;
     }
-    onStatusFilter = event => {
-      const status = event.getParameter("item")?.getKey() ?? ALL_STATUSES;
+    filterModel = new JSONModel({
+      status: ALL_STATUSES
+    });
+    onStatusPress = event => {
+      const status = event.getSource().data("status") ?? ALL_STATUSES;
       const filters = status === ALL_STATUSES ? [] : [new Filter("Status", FilterOperator.EQ, status)];
+      this.filterModel.setProperty("/status", status);
       this.getTableBinding().filter(filters);
     };
     onRefresh = () => {

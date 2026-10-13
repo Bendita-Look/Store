@@ -8,7 +8,7 @@ import type Control from "sap/ui/core/Control";
 import type Event from "sap/ui/base/Event";
 import type Context from "sap/ui/model/odata/v4/Context";
 import type ODataListBinding from "sap/ui/model/odata/v4/ODataListBinding";
-import type { SegmentedButton$SelectionChangeEvent } from "sap/m/SegmentedButton";
+import type Button from "sap/m/Button";
 import type Admin from "../Admin.controller";
 import AdminOrderService, { DeliveryInput, DeliveryType } from "../../service/AdminOrderService";
 import formatter, { OrderStatus } from "../../model/formatter";
@@ -32,10 +32,13 @@ export default class OrdersSection {
 
     constructor(private readonly controller: Admin) { }
 
-    public onStatusFilter = (event: SegmentedButton$SelectionChangeEvent): void => {
-        const status = event.getParameter("item")?.getKey() ?? ALL_STATUSES;
+    public readonly filterModel = new JSONModel({ status: ALL_STATUSES });
+
+    public onStatusPress = (event: Event): void => {
+        const status = ((event.getSource() as Button).data("status") as string | null) ?? ALL_STATUSES;
         const filters = status === ALL_STATUSES ? [] : [new Filter("Status", FilterOperator.EQ, status)];
 
+        this.filterModel.setProperty("/status", status);
         this.getTableBinding().filter(filters);
     };
 
