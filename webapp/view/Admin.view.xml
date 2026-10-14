@@ -370,6 +370,10 @@
                                 <Text text="{i18n>kpiCancelledOrders}" class="blKpiLabel" />
                                 <Text text="{report>/summary/CancelledOrders}" class="blKpiValue" />
                             </VBox>
+                            <VBox class="blKpi">
+                                <Text text="{i18n>kpiCustomerArranged}" class="blKpiLabel" />
+                                <Text text="{report>/summary/CustomerArrangedDeliveries}" class="blKpiValue" />
+                            </VBox>
                         </FlexBox>
 
                         <MessageStrip text="{i18n>reportInfo}" type="Information" showIcon="true" class="sapUiSmallMarginTopBottom" />
