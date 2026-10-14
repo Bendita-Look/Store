@@ -1199,6 +1199,11 @@
 }
 
 @media (max-width: 599px) {
+    .blTabs .sapMITBContainerContent {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
     .blHeader.sapMBar {
         height: 4rem;
         padding: 0 0.25rem;
