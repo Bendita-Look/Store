@@ -9,19 +9,64 @@
             <core:Fragment fragmentName="apps.dflc.benditalook.view.fragments.StoreHeader" type="XML" />
         </customHeader>
         <content>
-            <FlexBox height="100%" justifyContent="Center" alignItems="Center">
-                <VBox alignItems="Center" class="blLoginCard">
-                    <Image src="img/logo.jpg" width="4rem" height="4rem" decorative="true" class="sapUiSmallMarginBottom" />
-                    <Title text="{i18n>loginTitle}" level="H1" titleStyle="H3" textAlign="Center" />
-                    <Text text="{i18n>loginSubtitle}" textAlign="Center" class="sapUiSmallMarginTopBottom" />
-                    <Button
-                        text="{i18n>loginButton}"
-                        icon="sap-icon://log"
-                        type="Emphasized"
-                        width="100%"
-                        press=".onLogin"
-                        class="blPrimaryButton"
+            <FlexBox justifyContent="Center" alignItems="Center" class="blLoginWrapper">
+                <VBox alignItems="Center" busy="{login>/busy}" busyIndicatorDelay="0" class="blLoginCard">
+                    <Image src="img/logo.jpg" decorative="true" densityAware="false" class="blLoginLogo" />
+                    <Title text="{i18n>loginTitle}" level="H1" textAlign="Center" class="blLoginTitle" />
+                    <Text text="{i18n>loginSubtitle}" textAlign="Center" class="blLoginSubtitle" />
+
+                    <MessageStrip
+                        text="{login>/error}"
+                        type="Error"
+                        showIcon="true"
+                        visible="{= !!${login>/error} }"
+                        class="blLoginMessage"
                     />
+
+                    <VBox width="100%" class="blLoginForm">
+                        <Label text="{i18n>loginEmail}" labelFor="loginEmail" required="true" />
+                        <Input
+                            id="loginEmail"
+                            value="{login>/email}"
+                            type="Email"
+                            placeholder="{i18n>loginEmailPlaceholder}"
+                            valueState="{login>/emailState}"
+                            valueStateText="{i18n>loginEmailRequired}"
+                            maxLength="256"
+                            submit=".onPasswordLogin"
+                            width="100%"
+                        />
+                        <Label text="{i18n>loginPassword}" labelFor="loginPassword" required="true" class="blLoginLabel" />
+                        <Input
+                            id="loginPassword"
+                            value="{login>/password}"
+                            type="{= ${login>/showPassword} ? 'Text' : 'Password' }"
+                            placeholder="{i18n>loginPasswordPlaceholder}"
+                            valueState="{login>/passwordState}"
+                            valueStateText="{i18n>loginPasswordRequired}"
+                            showValueHelp="true"
+                            valueHelpIconSrc="{= ${login>/showPassword} ? 'sap-icon://hide' : 'sap-icon://show' }"
+                            valueHelpRequest=".onTogglePassword"
+                            maxLength="256"
+                            submit=".onPasswordLogin"
+                            width="100%"
+                        />
+                        <Button
+                            text="{i18n>loginButton}"
+                            icon="sap-icon://log"
+                            type="Emphasized"
+                            width="100%"
+                            press=".onPasswordLogin"
+                            class="blPrimaryButton blLoginSubmit"
+                        />
+                    </VBox>
+
+                    <HBox alignItems="Center" width="100%" class="blLoginDivider">
+                        <Text text="{i18n>loginOr}" />
+                    </HBox>
+
+                    <Link text="{i18n>loginWithSap}" press=".onLogin" class="blLoginSap" />
+                    <Text text="{i18n>loginHint}" textAlign="Center" class="blLoginHint" />
                 </VBox>
             </FlexBox>
         </content>

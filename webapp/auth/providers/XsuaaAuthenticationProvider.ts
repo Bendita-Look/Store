@@ -15,6 +15,10 @@ export class XsuaaAuthenticationProvider implements IAuthenticationProvider {
         return Promise.resolve({ accessToken: "", expiresAt: 0, userName: "" });
     }
 
+    public async loginWithPassword(username: string, password: string): Promise<UserSession> {
+        return XsuaaAuthHelper.createSession(await XsuaaAuthHelper.loginWithPassword(username, password));
+    }
+
     public logout(): Promise<void> {
         SessionStorage.clear();
         return Promise.resolve();

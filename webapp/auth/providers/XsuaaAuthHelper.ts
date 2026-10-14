@@ -7,6 +7,7 @@ interface AuthConfig {
     redirectUri: string;
     tokenEndpoint: string;
     refreshEndpoint: string;
+    passwordEndpoint?: string;
 }
 
 export interface RuntimeConfig {
@@ -29,6 +30,14 @@ const LOCAL_CATALOG_SERVICE = "/api/service/Catalog/";
 const LOCAL_ADMIN_SERVICE = "/api/service/BenditaLook/";
 const DEFAULT_TOKEN_LIFETIME_SECONDS = 3600;
 const MIN_TOKEN_LIFETIME_SECONDS = 60;
+const NETWORK_FAILURE_STATUS = 0;
+
+export class AuthRequestError extends Error {
+    public constructor(public readonly code: string, message: string, public readonly status: number) {
+        super(message);
+        this.name = "AuthRequestError";
+    }
+}
 
 let runtimeConfig: RuntimeConfig = {
     catalogService: LOCAL_CATALOG_SERVICE,
@@ -48,6 +57,7 @@ export class XsuaaAuthHelper {
         if (runtimeConfig.auth) {
             runtimeConfig.auth.tokenEndpoint = "/auth/login";
             runtimeConfig.auth.refreshEndpoint = "/auth/refresh";
+            runtimeConfig.auth.passwordEndpoint = "/auth/password";
             runtimeConfig.auth.redirectUri = "";
         }
     }
@@ -81,6 +91,17 @@ export class XsuaaAuthHelper {
         return this.postToken(endpoint, { code, redirect_uri: this.getRedirectUri() });
     }
 
+    public static async loginWithPassword(username: string, password: string): Promise<TokenResponse> {
+        const auth = this.getConfig().auth;
+        const endpoint = auth?.passwordEndpoint ?? auth?.tokenEndpoint.replace(/\/login$/, "/password");
+
+        if (!endpoint) {
+            throw new Error("Password endpoint is not configured");
+        }
+
+        return this.postToken(endpoint, { username, password });
+    }
+
     public static async refresh(refreshToken: string): Promise<TokenResponse> {
         const endpoint = this.getConfig().auth?.refreshEndpoint;
 
@@ -98,7 +119,10 @@ export class XsuaaAuthHelper {
             accessToken: tokenResponse.access_token,
             refreshToken: tokenResponse.refresh_token,
             expiresAt: Date.now() + (expiresIn * 1000),
-            userName: tokenResponse.user_name ?? this.extractUserName(tokenResponse.id_token) ?? ""
+            userName: tokenResponse.user_name
+                ?? this.extractUserName(tokenResponse.id_token)
+                ?? this.extractUserName(tokenResponse.access_token)
+                ?? ""
         };
     }
 
@@ -134,16 +158,22 @@ export class XsuaaAuthHelper {
     }
 
     private static async postToken(endpoint: string, body: Record<string, string>): Promise<TokenResponse> {
-        const response = await fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body)
-        });
+        let response: Response;
 
-        const payload = await response.json() as TokenResponse;
+        try {
+            response = await fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+        } catch {
+            throw new AuthRequestError("backend_unavailable", "Authentication service is unreachable", NETWORK_FAILURE_STATUS);
+        }
+
+        const payload = await response.json().catch(() => ({})) as TokenResponse;
 
         if (!response.ok || payload.error) {
-            throw new Error(payload.error_description ?? payload.error ?? "Token request failed");
+            throw new AuthRequestError(payload.error ?? "token_request_failed", payload.error_description ?? "Token request failed", response.status);
         }
 
         return payload;
