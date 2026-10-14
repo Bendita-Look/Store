@@ -128,6 +128,13 @@
                     <Text text="{i18n>total}" class="sapUiSmallMarginEnd" />
                     <Text text="{path: 'tracking>/order/TotalAmount', targetType: 'any', formatter: '.formatter.currency'}" class="blDetailPrice" />
                 </HBox>
+                <Text
+                    text="{i18n>shippingNotIncluded}"
+                    textAlign="End"
+                    width="100%"
+                    visible="{= !${tracking>/isPickup} &amp;&amp; ${tracking>/order/Status} !== 'COMPLETED' &amp;&amp; ${tracking>/order/Status} !== 'CANCELLED' }"
+                    class="blShippingNote"
+                />
 
                 <List
                     items="{tracking>/order/Returns}"

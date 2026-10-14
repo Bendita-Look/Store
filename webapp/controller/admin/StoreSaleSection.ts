@@ -1,7 +1,6 @@
 import Fragment from "sap/ui/core/Fragment";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import type Dialog from "sap/m/Dialog";
-import type ComboBox from "sap/m/ComboBox";
 import type Event from "sap/ui/base/Event";
 import type { StepInput$ChangeEvent } from "sap/m/StepInput";
 import type Admin from "../Admin.controller";
@@ -11,8 +10,6 @@ import OrderLines, { OrderLine } from "./OrderLines";
 
 interface SaleState {
     lines: OrderLine[];
-    selectedVariantId: string;
-    quantity: number;
     customer: {
         CustomerName: string;
         CustomerEmail: string;
@@ -39,7 +36,6 @@ export default class StoreSaleSection {
 
         const dialog = await this.getDialog();
 
-        this.controller.byControlId<ComboBox>("saleVariantCombo").getBinding("items")?.refresh();
         dialog.open();
     };
 
@@ -47,15 +43,13 @@ export default class StoreSaleSection {
         this.dialog?.close();
     };
 
-    public onAddLine = (): void => {
-        if (!this.lines.addFrom(this.controller.byControlId<ComboBox>("saleVariantCombo"), this.getState().quantity)) {
-            this.controller.showToast("saleSelectProduct");
-            return;
-        }
+    public onAddLine = async (): Promise<void> => {
+        const variant = await this.controller.productPicker.pickVariant();
 
-        this.model.setProperty("/selectedVariantId", "");
-        this.model.setProperty("/quantity", 1);
-        void this.refreshQuote();
+        if (variant) {
+            this.lines.add(variant, this.controller.productPicker.pickedQuantity);
+            void this.refreshQuote();
+        }
     };
 
     public onLineQuantityChange = (event: StepInput$ChangeEvent): void => {
@@ -124,9 +118,7 @@ export default class StoreSaleSection {
     private emptyState(): SaleState {
         return {
             lines: [],
-            selectedVariantId: "",
-            quantity: 1,
-            customer: { CustomerName: "", CustomerEmail: "", CustomerPhone: "", Notes: "" },
+                        customer: { CustomerName: "", CustomerEmail: "", CustomerPhone: "", Notes: "" },
             couponInput: "",
             couponCode: "",
             quote: null

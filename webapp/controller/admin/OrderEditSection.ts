@@ -1,11 +1,10 @@
 import Fragment from "sap/ui/core/Fragment";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import type Dialog from "sap/m/Dialog";
-import type ComboBox from "sap/m/ComboBox";
 import type Event from "sap/ui/base/Event";
 import type { StepInput$ChangeEvent } from "sap/m/StepInput";
 import type Admin from "../Admin.controller";
-import AdminOrderService from "../../service/AdminOrderService";
+import AdminOrderService, { OrderChangeInput } from "../../service/AdminOrderService";
 import type { OrderQuote } from "../../service/OrderService";
 import OrderLines, { OrderLine } from "./OrderLines";
 
@@ -14,6 +13,8 @@ const FULL_SCREEN_MAX_WIDTH = 600;
 export interface EditableOrder {
     ID: string;
     Number: number;
+    CouponCode?: string | null;
+    Promotions?: Array<{ CouponCode?: string | null }>;
     Items: Array<{
         Variant_ID: string;
         ProductName: string;
@@ -28,8 +29,9 @@ interface EditState {
     orderId: string;
     number: number;
     lines: OrderLine[];
-    selectedVariantId: string;
-    quantity: number;
+    couponInput: string;
+    couponCode: string;
+    applyPromotions: boolean;
     quote: OrderQuote | null;
 }
 
@@ -48,6 +50,9 @@ export default class OrderEditSection {
             ...this.emptyState(),
             orderId: order.ID,
             number: order.Number,
+            couponInput: order.CouponCode ?? "",
+            couponCode: order.CouponCode ?? "",
+            applyPromotions: (order.Promotions ?? []).some((promotion) => !promotion.CouponCode),
             lines: order.Items.map((item) => ({
                 VariantId: item.Variant_ID,
                 Description: [item.ProductName, item.ColorName, item.Size].filter(Boolean).join(" / "),
@@ -59,7 +64,6 @@ export default class OrderEditSection {
 
         const dialog = await this.getDialog();
 
-        this.controller.byControlId<ComboBox>("editVariantCombo").getBinding("items")?.refresh();
         dialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
         dialog.open();
         void this.refreshQuote();
@@ -69,14 +73,21 @@ export default class OrderEditSection {
         this.dialog?.close();
     };
 
-    public onAddLine = (): void => {
-        if (!this.lines.addFrom(this.controller.byControlId<ComboBox>("editVariantCombo"), this.getState().quantity)) {
-            this.controller.showToast("saleSelectProduct");
-            return;
-        }
+    public onAddLine = async (): Promise<void> => {
+        const variant = await this.controller.productPicker.pickVariant();
 
-        this.model.setProperty("/selectedVariantId", "");
-        this.model.setProperty("/quantity", 1);
+        if (variant) {
+            this.lines.add(variant, this.controller.productPicker.pickedQuantity);
+            void this.refreshQuote();
+        }
+    };
+
+    public onApplyCoupon = (): void => {
+        this.model.setProperty("/couponCode", this.getState().couponInput.trim().toUpperCase());
+        void this.refreshQuote();
+    };
+
+    public onPromotionsChange = (): void => {
         void this.refreshQuote();
     };
 
@@ -99,7 +110,7 @@ export default class OrderEditSection {
         }
 
         try {
-            await this.controller.runBusy(() => this.service().updateOrderItems(state.orderId, this.lines.toItems()));
+            await this.controller.runBusy(() => this.service().updateOrderItems(state.orderId, this.change()));
 
             this.dialog?.close();
             this.controller.showToast("orderItemsUpdated", [state.number]);
@@ -119,11 +130,17 @@ export default class OrderEditSection {
         }
 
         try {
-            this.model.setProperty("/quote", await this.service().quoteOrderUpdate(state.orderId, this.lines.toItems()));
+            this.model.setProperty("/quote", await this.service().quoteOrderUpdate(state.orderId, this.change()));
         } catch (error) {
             this.model.setProperty("/quote", null);
             this.controller.handleError(error, "quoteError");
         }
+    }
+
+    private change(): OrderChangeInput {
+        const state = this.getState();
+
+        return { Items: this.lines.toItems(), CouponCode: state.couponCode, ApplyPromotions: state.applyPromotions };
     }
 
     private service(): AdminOrderService {
@@ -135,7 +152,7 @@ export default class OrderEditSection {
     }
 
     private emptyState(): EditState {
-        return { orderId: "", number: 0, lines: [], selectedVariantId: "", quantity: 1, quote: null };
+        return { orderId: "", number: 0, lines: [], couponInput: "", couponCode: "", applyPromotions: false, quote: null };
     }
 
     private async getDialog(): Promise<Dialog> {

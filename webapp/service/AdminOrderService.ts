@@ -21,6 +21,12 @@ export interface RegisteredSale {
     Number: number;
 }
 
+export interface OrderChangeInput {
+    Items: OrderLineInput[];
+    CouponCode: string;
+    ApplyPromotions: boolean;
+}
+
 export interface ReturnItemInput {
     OrderItemId: string;
     Quantity: number;
@@ -60,12 +66,12 @@ export default class AdminOrderService {
         return operation.getBoundContext().getObject() as RegisteredSale;
     }
 
-    public quoteOrderUpdate(orderId: string, items: OrderLineInput[]): Promise<OrderQuote> {
-        return this.invokeItemsChange("/QuoteOrderUpdate(...)", orderId, items);
+    public quoteOrderUpdate(orderId: string, change: OrderChangeInput): Promise<OrderQuote> {
+        return this.invokeItemsChange("/QuoteOrderUpdate(...)", orderId, change);
     }
 
-    public updateOrderItems(orderId: string, items: OrderLineInput[]): Promise<OrderQuote> {
-        return this.invokeItemsChange("/UpdateOrderItems(...)", orderId, items);
+    public updateOrderItems(orderId: string, change: OrderChangeInput): Promise<OrderQuote> {
+        return this.invokeItemsChange("/UpdateOrderItems(...)", orderId, change);
     }
 
     public quoteReturn(orderId: string, input: ReturnInput): Promise<ReturnQuote> {
@@ -89,11 +95,11 @@ export default class AdminOrderService {
         await operation.invoke();
     }
 
-    private async invokeItemsChange(path: string, orderId: string, items: OrderLineInput[]): Promise<OrderQuote> {
+    private async invokeItemsChange(path: string, orderId: string, change: OrderChangeInput): Promise<OrderQuote> {
         const operation = this.adminModel.bindContext(path);
 
         operation.setParameter("OrderId", orderId);
-        operation.setParameter("Items", this.toItemsInput(items));
+        operation.setParameter("Change", { ...change, Items: this.toItemsInput(change.Items) });
 
         await operation.invoke();
 

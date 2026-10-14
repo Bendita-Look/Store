@@ -1,9 +1,9 @@
 import type JSONModel from "sap/ui/model/json/JSONModel";
-import type ComboBox from "sap/m/ComboBox";
 import type Control from "sap/ui/core/Control";
 import type Event from "sap/ui/base/Event";
 import type { StepInput$ChangeEvent } from "sap/m/StepInput";
 import type { OrderLineInput } from "../../service/OrderService";
+import type { PickedVariant } from "./ProductPicker";
 
 export interface OrderLine {
     VariantId: string;
@@ -11,14 +11,6 @@ export interface OrderLine {
     UnitPrice: number;
     Quantity: number;
     Stock: number | null;
-}
-
-interface VariantOption {
-    ID: string;
-    Size: string;
-    Stock: number;
-    Product: { Name: string; Price: number };
-    Color?: { Name: string } | null;
 }
 
 export default class OrderLines {
@@ -37,13 +29,7 @@ export default class OrderLines {
         this.model.setProperty(this.path, lines);
     }
 
-    public addFrom(combo: ComboBox, quantity: number): boolean {
-        const variant = combo.getSelectedItem()?.getBindingContext()?.getObject() as VariantOption | undefined;
-
-        if (!variant) {
-            return false;
-        }
-
+    public add(variant: PickedVariant, quantity: number): void {
         const amount = Math.max(1, Number(quantity) || 1);
         const lines = this.get();
         const existing = lines.find((line) => line.VariantId === variant.ID);
@@ -60,8 +46,6 @@ export default class OrderLines {
                 Stock: variant.Stock
             }]);
         }
-
-        return true;
     }
 
     public changeQuantity(event: StepInput$ChangeEvent): void {

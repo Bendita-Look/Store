@@ -977,6 +977,44 @@
     color: var(--bl-muted);
 }
 
+.blShippingNote.sapMText {
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--bl-muted);
+}
+
+.blPickerGrid.blProductGrid .sapMListUl {
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)) !important;
+    gap: 1rem;
+}
+
+.blPickerDetail {
+    gap: 1.5rem;
+}
+
+.blPickerImage,
+.blPickerImage.sapMImg {
+    flex: 0 0 15rem;
+    width: 15rem;
+    max-width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: var(--bl-radius);
+    background: var(--bl-blush-soft);
+}
+
+.blPickerInfo {
+    flex: 1 1 16rem;
+    min-width: 0;
+    gap: 0.25rem;
+}
+
+.blPickButton.sapMBtn {
+    align-self: flex-start;
+    margin: 0.5rem 0;
+}
+
 /* Footer */
 
 .blFooter {

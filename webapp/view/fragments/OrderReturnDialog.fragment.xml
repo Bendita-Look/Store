@@ -60,37 +60,7 @@
                 <TextArea value="{return>/reason}" maxLength="255" rows="2" width="100%" placeholder="{i18n>returnReasonPlaceholder}" />
 
                 <Title text="{i18n>replacementTitle}" level="H4" class="sapUiSmallMarginTop" />
-                <HBox alignItems="End" wrap="Wrap">
-                    <VBox class="sapUiSmallMarginEnd blGrow">
-                        <Label text="{i18n>product}" />
-                        <ComboBox
-                            id="returnVariantCombo"
-                            selectedKey="{return>/selectedVariantId}"
-                            width="100%"
-                            showSecondaryValues="true"
-                            items="{
-                                path: '/ProductVariants',
-                                parameters: {
-                                    $filter: 'IsActiveEntity eq true and Stock gt 0 and Product/Active eq true',
-                                    $expand: 'Product($select=Name,Price,Active),Color($select=Name)',
-                                    $select: 'ID,Size,Stock'
-                                },
-                                templateShareable: false
-                            }"
-                        >
-                            <core:ListItem
-                                key="{ID}"
-                                text="{parts: ['Product/Name', 'Color/Name', 'Size'], formatter: '.formatter.variantDescription'}"
-                                additionalText="{parts: ['i18n>inStock', 'i18n>soldOut', {path: 'Stock', targetType: 'any'}], formatter: '.formatter.stockMessage'}"
-                            />
-                        </ComboBox>
-                    </VBox>
-                    <VBox class="sapUiSmallMarginEnd">
-                        <Label text="{i18n>quantity}" />
-                        <StepInput value="{return>/quantity}" min="1" max="20" width="7rem" />
-                    </VBox>
-                    <Button text="{i18n>addItem}" icon="sap-icon://add" press=".orderReturn.onAddLine" />
-                </HBox>
+                <Button text="{i18n>pickProduct}" icon="sap-icon://add-product" type="Emphasized" press=".orderReturn.onAddLine" class="blPickButton" />
 
                 <Table
                     items="{return>/lines}"

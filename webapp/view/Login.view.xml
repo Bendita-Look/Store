@@ -11,7 +11,7 @@
         <content>
             <FlexBox justifyContent="Center" alignItems="Center" class="blLoginWrapper">
                 <VBox alignItems="Center" busy="{login>/busy}" busyIndicatorDelay="0" class="blLoginCard">
-                    <Image src="img/logo.jpg" decorative="true" densityAware="false" class="blLoginLogo" />
+                    <Image src="img/logo.svg" decorative="true" densityAware="false" class="blLoginLogo" />
                     <Title text="{i18n>loginTitle}" level="H1" textAlign="Center" class="blLoginTitle" />
                     <Text text="{i18n>loginSubtitle}" textAlign="Center" class="blLoginSubtitle" />
 

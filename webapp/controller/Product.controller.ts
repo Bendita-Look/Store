@@ -4,6 +4,7 @@ import type Carousel from "sap/m/Carousel";
 import type Event from "sap/ui/base/Event";
 import type Control from "sap/ui/core/Control";
 import BaseController from "./BaseController";
+import { imagesForColor, sortBySize } from "../util/variants";
 
 interface CatalogColor {
     ID: string;
@@ -41,7 +42,6 @@ interface SizeOption {
     enabled: boolean;
 }
 
-const SIZE_ORDER = ["PP", "P", "M", "G", "GG", "XG", "XGG", "U", "UNICO", "ÚNICO"];
 
 const PRODUCT_EXPAND = "Category($select=Name),Colors,Variants,Images($select=ID,Color_ID,SortOrder)";
 
@@ -127,13 +127,13 @@ export default class Product extends BaseController {
 
     private selectColor(colorId: string): void {
         const product = this.productModel.getProperty("/product") as CatalogProduct;
-        const variants = this.sortBySize(product.Variants.filter((variant) => !colorId || variant.Color_ID === colorId));
+        const variants = sortBySize(product.Variants.filter((variant) => !colorId || variant.Color_ID === colorId));
         const sizes: SizeOption[] = variants.map((variant) => ({ key: variant.ID, text: variant.Size, enabled: variant.Stock > 0 }));
 
         this.productModel.setProperty("/selectedColorId", colorId);
         this.productModel.setProperty("/selectedColorName", product.Colors.find((color) => color.ID === colorId)?.Name ?? "");
         this.productModel.setProperty("/sizes", sizes);
-        this.productModel.setProperty("/images", this.imagesForColor(product.Images, colorId));
+        this.productModel.setProperty("/images", imagesForColor(product.Images, colorId));
         this.selectVariant(sizes.find((size) => size.enabled)?.key ?? "");
     }
 
@@ -148,28 +148,6 @@ export default class Product extends BaseController {
     private findVariant(variantId: string): CatalogVariant | undefined {
         const product = this.productModel.getProperty("/product") as CatalogProduct | null;
         return product?.Variants.find((variant) => variant.ID === variantId);
-    }
-
-    private imagesForColor(images: CatalogImage[], colorId: string): CatalogImage[] {
-        const sorted = [...images].sort((first, second) => (first.SortOrder ?? 0) - (second.SortOrder ?? 0));
-        const forColor = sorted.filter((image) => !image.Color_ID || image.Color_ID === colorId);
-
-        return forColor.length ? forColor : sorted;
-    }
-
-    private sortBySize(variants: CatalogVariant[]): CatalogVariant[] {
-        const position = (size: string): number => {
-            const index = SIZE_ORDER.indexOf(size.toUpperCase());
-            const numericSize = Number(size);
-
-            if (index !== -1) {
-                return index;
-            }
-
-            return SIZE_ORDER.length + (Number.isNaN(numericSize) ? 0 : numericSize);
-        };
-
-        return [...variants].sort((first, second) => position(first.Size) - position(second.Size));
     }
 
     private emptyState(): object {

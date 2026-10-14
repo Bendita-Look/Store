@@ -65,6 +65,23 @@ export default class PromotionsSection {
         context.setProperty("CouponCode", couponCode.trim().toUpperCase() || null);
     };
 
+    public onPickProduct = async (): Promise<void> => {
+        const product = await this.controller.productPicker.pickProduct();
+
+        if (!product) {
+            return;
+        }
+
+        try {
+            const context = this.getDialogContext();
+
+            await context.setProperty("Product_ID", product.ID);
+            await context.requestSideEffects([{ $NavigationPropertyPath: "Product" }]);
+        } catch (error) {
+            this.controller.handleError(error, "promotionSaveError");
+        }
+    };
+
     public onSavePromotion = async (): Promise<void> => {
         try {
             await this.controller.runBusy(() => this.draftService().activateDraft(this.getDialogContext()));
