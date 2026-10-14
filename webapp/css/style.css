@@ -648,6 +648,7 @@
 
 .blGallery {
     flex: 1 1 22rem;
+    min-width: 0;
     max-width: 32rem;
 }
 
@@ -682,6 +683,7 @@
 
 .blDetailInfo {
     flex: 1 1 20rem;
+    min-width: 0;
     max-width: 30rem;
     gap: 0.25rem;
 }
@@ -1003,7 +1005,7 @@
     max-width: 76rem;
     width: 100%;
     margin: 0 auto;
-    padding: 1rem;
+    padding: 1rem 6rem 1rem 1rem;
     box-sizing: border-box;
     border-top: 1px solid #f3cdd6;
 }
@@ -1301,6 +1303,12 @@
     .blProductDetail {
         gap: 1.25rem;
         padding-top: 1rem;
+    }
+
+    .blGallery,
+    .blDetailInfo {
+        flex-basis: 100%;
+        max-width: 100%;
     }
 
     .blDetailTitle.sapMTitle {

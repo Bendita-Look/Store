@@ -129,6 +129,7 @@
                         text="{i18n>productQuestion}"
                         visible="{= !!${store>/Whatsapp} }"
                         press=".onAskAboutProduct"
+                        wrapping="true"
                         class="blProductQuestion"
                     />
 
