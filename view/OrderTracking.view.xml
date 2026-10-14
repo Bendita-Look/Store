@@ -44,7 +44,11 @@
                 <VBox visible="{tracking>/hasDelivery}" class="blDeliveryCard sapUiSmallMarginBottom">
                     <Title text="{i18n>deliveryTitle}" level="H3" class="sapUiTinyMarginBottom" />
                     <Text text="{parts: ['i18n>deliveryTypeLine', 'tracking>/deliveryTypeText'], formatter: '.formatter.message'}" />
-                    <Text text="{parts: ['i18n>courierLine', 'tracking>/order/CourierName'], formatter: '.formatter.message'}" />
+                    <Text text="{i18n>trackingCustomerArranged}" visible="{tracking>/customerArranged}" class="sapUiTinyMarginBottom" />
+                    <Text
+                        text="{parts: [{path: 'tracking>/customerArranged', formatter: '.courierLineKey'}, 'tracking>/order/CourierName'], formatter: '.formatter.message'}"
+                        visible="{= !!${tracking>/order/CourierName} }"
+                    />
                     <Text
                         text="{parts: ['i18n>vehiclePlateLine', 'tracking>/order/VehiclePlate'], formatter: '.formatter.message'}"
                         visible="{= !!${tracking>/order/VehiclePlate} }"

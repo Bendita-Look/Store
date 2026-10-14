@@ -81,12 +81,15 @@
                 >
                     <Label text="{i18n>deliveryType}" />
                     <Text text="{path: 'DeliveryType', formatter: '.formatDeliveryType'}" />
-                    <Label text="{i18n>courierName}" />
-                    <Text text="{CourierName}" />
-                    <Label text="{i18n>vehiclePlate}" />
-                    <Text text="{VehiclePlate}" />
-                    <Label text="{i18n>deliveryNotes}" />
-                    <Text text="{DeliveryNotes}" />
+                    <Label
+                        text="{= ${path: 'DeliveryType', targetType: 'any'} === 'CUSTOMER_ARRANGED' ? ${i18n>pickedUpBy} : ${i18n>courierName} }"
+                        visible="{= !!${path: 'CourierName', targetType: 'any'} }"
+                    />
+                    <Text text="{CourierName}" visible="{= !!${path: 'CourierName', targetType: 'any'} }" />
+                    <Label text="{i18n>vehiclePlate}" visible="{= !!${path: 'VehiclePlate', targetType: 'any'} }" />
+                    <Text text="{VehiclePlate}" visible="{= !!${path: 'VehiclePlate', targetType: 'any'} }" />
+                    <Label text="{i18n>deliveryNotes}" visible="{= !!${path: 'DeliveryNotes', targetType: 'any'} }" />
+                    <Text text="{DeliveryNotes}" visible="{= !!${path: 'DeliveryNotes', targetType: 'any'} }" />
                 </form:SimpleForm>
 
                 <Table items="{path: 'Items', templateShareable: false}" popinLayout="GridSmall" class="blTable sapUiSmallMarginTop">

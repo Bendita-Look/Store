@@ -4,6 +4,7 @@ import type Event from "sap/ui/base/Event";
 import type Control from "sap/ui/core/Control";
 import BaseController from "./BaseController";
 import OrderService, { FulfillmentType } from "../service/OrderService";
+import { DeliveryType } from "../service/AdminOrderService";
 import formatter, { OrderStatus } from "../model/formatter";
 
 interface TrackingStep {
@@ -34,6 +35,10 @@ export default class OrderTracking extends BaseController {
         this.openWhatsapp(message);
     }
 
+    public courierLineKey(customerArranged: boolean): string {
+        return this.getText(customerArranged ? "pickedUpByLine" : "courierLine");
+    }
+
     public onItemPress(event: Event): void {
         const productId = (event.getSource() as Control).getBindingContext("tracking")?.getProperty("ProductId") as string | undefined;
 
@@ -60,6 +65,7 @@ export default class OrderTracking extends BaseController {
                 cancelled: order.Status === OrderStatus.Cancelled,
                 isPickup: order.FulfillmentType === FulfillmentType.Pickup,
                 hasDelivery: !!order.DeliveryType,
+                customerArranged: order.DeliveryType === DeliveryType.CustomerArranged,
                 deliveryTypeText: this.formatDeliveryType(order.DeliveryType),
                 steps: this.buildSteps(order.Status as OrderStatus, !!order.DeliveryType, order.FulfillmentType === FulfillmentType.Pickup)
             });

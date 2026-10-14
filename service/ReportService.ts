@@ -22,6 +22,7 @@ export interface SalesReport {
     OpenOrders: number;
     OpenAmount: number;
     CancelledOrders: number;
+    CustomerArrangedDeliveries: number;
     Months: MonthlySales[];
     TopProducts: ProductSales[];
 }

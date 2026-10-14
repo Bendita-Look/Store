@@ -12,13 +12,17 @@
         <content>
             <form:SimpleForm editable="true" layout="ColumnLayout">
                 <Label text="{i18n>deliveryType}" required="true" />
-                <SegmentedButton selectedKey="{delivery>/DeliveryType}" width="100%">
-                    <items>
-                        <SegmentedButtonItem key="UBER_FLASH" text="{i18n>deliveryType.UBER_FLASH}" />
-                        <SegmentedButtonItem key="LOCAL_COURIER" text="{i18n>deliveryType.LOCAL_COURIER}" />
-                    </items>
-                </SegmentedButton>
-                <Label text="{i18n>courierName}" required="true" />
+                <Select selectedKey="{delivery>/DeliveryType}" width="100%">
+                    <core:Item key="UBER_FLASH" text="{i18n>deliveryType.UBER_FLASH}" />
+                    <core:Item key="LOCAL_COURIER" text="{i18n>deliveryType.LOCAL_COURIER}" />
+                    <core:Item key="CUSTOMER_ARRANGED" text="{i18n>deliveryType.CUSTOMER_ARRANGED}" />
+                </Select>
+                <Label text="" visible="{= ${delivery>/DeliveryType} === 'CUSTOMER_ARRANGED' }" />
+                <Text text="{i18n>customerArrangedInfo}" visible="{= ${delivery>/DeliveryType} === 'CUSTOMER_ARRANGED' }" class="blMuted" />
+                <Label
+                    text="{= ${delivery>/DeliveryType} === 'CUSTOMER_ARRANGED' ? ${i18n>pickedUpBy} : ${i18n>courierName} }"
+                    required="{= ${delivery>/DeliveryType} !== 'CUSTOMER_ARRANGED' }"
+                />
                 <Input value="{delivery>/CourierName}" maxLength="120" />
                 <Label text="{i18n>vehiclePlate}" required="{= ${delivery>/DeliveryType} === 'UBER_FLASH' }" />
                 <Input value="{delivery>/VehiclePlate}" maxLength="10" placeholder="{i18n>vehiclePlatePlaceholder}" />

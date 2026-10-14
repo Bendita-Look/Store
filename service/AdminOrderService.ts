@@ -3,7 +3,8 @@ import { OrderStatus } from "../model/formatter";
 
 export enum DeliveryType {
     UberFlash = "UBER_FLASH",
-    LocalCourier = "LOCAL_COURIER"
+    LocalCourier = "LOCAL_COURIER",
+    CustomerArranged = "CUSTOMER_ARRANGED"
 }
 
 export interface StoreSaleInput {

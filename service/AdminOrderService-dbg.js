@@ -4,6 +4,7 @@ sap.ui.define([], function () {
   var DeliveryType = /*#__PURE__*/function (DeliveryType) {
     DeliveryType["UberFlash"] = "UBER_FLASH";
     DeliveryType["LocalCourier"] = "LOCAL_COURIER";
+    DeliveryType["CustomerArranged"] = "CUSTOMER_ARRANGED";
     return DeliveryType;
   }(DeliveryType || {});
   class AdminOrderService {

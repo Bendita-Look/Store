@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/OrderService", "../model/formatter"], function (JSONModel, __BaseController, __OrderService, ___model_formatter) {
+sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/OrderService", "../service/AdminOrderService", "../model/formatter"], function (JSONModel, __BaseController, __OrderService, ___service_AdminOrderService, ___model_formatter) {
   "use strict";
 
   function _interopRequireDefault(obj) {
@@ -7,6 +7,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/Or
   const BaseController = _interopRequireDefault(__BaseController);
   const OrderService = _interopRequireDefault(__OrderService);
   const FulfillmentType = __OrderService["FulfillmentType"];
+  const DeliveryType = ___service_AdminOrderService["DeliveryType"];
   const OrderStatus = ___model_formatter["OrderStatus"];
   const STEPS = [OrderStatus.New, OrderStatus.InService, OrderStatus.OutForDelivery, OrderStatus.Completed];
 
@@ -28,6 +29,9 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/Or
       const orderNumber = this.trackingModel.getProperty("/order/Number");
       const message = this.getText("whatsappOrderMessage", [orderNumber]);
       this.openWhatsapp(message);
+    },
+    courierLineKey: function _courierLineKey(customerArranged) {
+      return this.getText(customerArranged ? "pickedUpByLine" : "courierLine");
     },
     onItemPress: function _onItemPress(event) {
       const productId = event.getSource().getBindingContext("tracking")?.getProperty("ProductId");
@@ -54,6 +58,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../service/Or
           cancelled: order.Status === OrderStatus.Cancelled,
           isPickup: order.FulfillmentType === FulfillmentType.Pickup,
           hasDelivery: !!order.DeliveryType,
+          customerArranged: order.DeliveryType === DeliveryType.CustomerArranged,
           deliveryTypeText: this.formatDeliveryType(order.DeliveryType),
           steps: this.buildSteps(order.Status, !!order.DeliveryType, order.FulfillmentType === FulfillmentType.Pickup)
         });
