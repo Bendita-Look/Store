@@ -1051,13 +1051,102 @@
     object-fit: cover;
 }
 
+.blLoginPage.blPage .sapMPageEnableScrolling {
+    background:
+        radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.8) 0, rgba(255, 255, 255, 0) 40%),
+        linear-gradient(135deg, var(--bl-blush-soft) 0%, var(--bl-cream) 55%, #fff4e8 100%);
+}
+
+.blLoginWrapper {
+    min-height: 100%;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+}
+
 .blLoginCard {
-    width: 22rem;
-    max-width: calc(100% - 2rem);
-    padding: 2rem;
-    border-radius: var(--bl-radius);
+    width: 26rem;
+    max-width: 100%;
+    padding: 2.5rem 2rem 2rem;
+    box-sizing: border-box;
+    border-radius: 1.25rem;
     background: #ffffff;
-    box-shadow: 0 8px 32px rgba(168, 129, 79, 0.15);
+    border: 1px solid var(--bl-line);
+    box-shadow: 0 18px 48px rgba(168, 129, 79, 0.18);
+}
+
+.blLoginLogo,
+.blLoginLogo.sapMImg {
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 6px var(--bl-blush-soft);
+}
+
+.blLoginTitle.sapMTitle {
+    margin-top: 1.25rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--bl-text);
+}
+
+.blLoginSubtitle.sapMText {
+    margin: 0.5rem 0 1.5rem;
+    color: var(--bl-muted);
+}
+
+.blLoginMessage.sapMMsgStrip {
+    align-self: stretch;
+    margin-bottom: 1rem;
+}
+
+.blLoginForm .sapMLabel {
+    font-weight: 600;
+    color: var(--bl-text);
+}
+
+.blLoginForm .blLoginLabel.sapMLabel {
+    margin-top: 1rem;
+}
+
+.blLoginForm .sapMInputBaseInner {
+    font-size: 1rem;
+}
+
+.blLoginSubmit.sapMBtn {
+    margin-top: 1.5rem;
+}
+
+.blLoginDivider {
+    gap: 0.75rem;
+    margin: 1.5rem 0 0.75rem;
+}
+
+.blLoginDivider::before,
+.blLoginDivider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--bl-line);
+}
+
+.blLoginDivider .sapMText {
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--bl-muted);
+}
+
+.blLoginSap.sapMLnk {
+    font-weight: 600;
+}
+
+.blLoginHint.sapMText {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: var(--bl-muted);
 }
 
 .blKpis {

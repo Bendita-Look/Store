@@ -5,6 +5,15 @@ sap.ui.define([], function () {
   const LOCAL_ADMIN_SERVICE = "/api/service/BenditaLook/";
   const DEFAULT_TOKEN_LIFETIME_SECONDS = 3600;
   const MIN_TOKEN_LIFETIME_SECONDS = 60;
+  const NETWORK_FAILURE_STATUS = 0;
+  class AuthRequestError extends Error {
+    constructor(code, message, status) {
+      super(message);
+      this.code = code;
+      this.status = status;
+      this.name = "AuthRequestError";
+    }
+  }
   let runtimeConfig = {
     catalogService: LOCAL_CATALOG_SERVICE,
     adminService: LOCAL_ADMIN_SERVICE
@@ -19,6 +28,7 @@ sap.ui.define([], function () {
       if (runtimeConfig.auth) {
         runtimeConfig.auth.tokenEndpoint = "/auth/login";
         runtimeConfig.auth.refreshEndpoint = "/auth/refresh";
+        runtimeConfig.auth.passwordEndpoint = "/auth/password";
         runtimeConfig.auth.redirectUri = "";
       }
     }
@@ -50,6 +60,17 @@ sap.ui.define([], function () {
         redirect_uri: this.getRedirectUri()
       });
     }
+    static async loginWithPassword(username, password) {
+      const auth = this.getConfig().auth;
+      const endpoint = auth?.passwordEndpoint ?? auth?.tokenEndpoint.replace(/\/login$/, "/password");
+      if (!endpoint) {
+        throw new Error("Password endpoint is not configured");
+      }
+      return this.postToken(endpoint, {
+        username,
+        password
+      });
+    }
     static async refresh(refreshToken) {
       const endpoint = this.getConfig().auth?.refreshEndpoint;
       if (!endpoint) {
@@ -65,7 +86,7 @@ sap.ui.define([], function () {
         accessToken: tokenResponse.access_token,
         refreshToken: tokenResponse.refresh_token,
         expiresAt: Date.now() + expiresIn * 1000,
-        userName: tokenResponse.user_name ?? this.extractUserName(tokenResponse.id_token) ?? ""
+        userName: tokenResponse.user_name ?? this.extractUserName(tokenResponse.id_token) ?? this.extractUserName(tokenResponse.access_token) ?? ""
       };
     }
     static getRedirectUri() {
@@ -92,16 +113,21 @@ sap.ui.define([], function () {
       };
     }
     static async postToken(endpoint, body) {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-      });
-      const payload = await response.json();
+      let response;
+      try {
+        response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+      } catch {
+        throw new AuthRequestError("backend_unavailable", "Authentication service is unreachable", NETWORK_FAILURE_STATUS);
+      }
+      const payload = await response.json().catch(() => ({}));
       if (!response.ok || payload.error) {
-        throw new Error(payload.error_description ?? payload.error ?? "Token request failed");
+        throw new AuthRequestError(payload.error ?? "token_request_failed", payload.error_description ?? "Token request failed", response.status);
       }
       return payload;
     }
@@ -130,6 +156,7 @@ sap.ui.define([], function () {
   var __exports = {
     __esModule: true
   };
+  __exports.AuthRequestError = AuthRequestError;
   __exports.XsuaaAuthHelper = XsuaaAuthHelper;
   return __exports;
 });

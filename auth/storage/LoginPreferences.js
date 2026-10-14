@@ -1,0 +1,2 @@
+sap.ui.define([],function(){"use strict";const e="benditaLook.adminEmail";class t{static loadEmail(){return localStorage.getItem(e)??""}static saveEmail(t){localStorage.setItem(e,t)}}var a={__esModule:true};a.LoginPreferences=t;return a});
+//# sourceMappingURL=LoginPreferences.js.map
