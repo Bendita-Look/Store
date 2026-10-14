@@ -23,7 +23,6 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
         rows: this.buildRows(order)
       });
       const dialog = await this.getDialog();
-      this.controller.byControlId("returnVariantCombo").getBinding("items")?.refresh();
       dialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
       dialog.open();
     }
@@ -33,14 +32,12 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
     onReturnQuantityChange = () => {
       void this.refreshQuote();
     };
-    onAddLine = () => {
-      if (!this.lines.addFrom(this.controller.byControlId("returnVariantCombo"), this.getState().quantity)) {
-        this.controller.showToast("saleSelectProduct");
-        return;
+    onAddLine = async () => {
+      const variant = await this.controller.productPicker.pickVariant();
+      if (variant) {
+        this.lines.add(variant, this.controller.productPicker.pickedQuantity);
+        void this.refreshQuote();
       }
-      this.model.setProperty("/selectedVariantId", "");
-      this.model.setProperty("/quantity", 1);
-      void this.refreshQuote();
     };
     onLineQuantityChange = event => {
       this.lines.changeQuantity(event);
@@ -128,8 +125,6 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
         rows: [],
         reason: "",
         lines: [],
-        selectedVariantId: "",
-        quantity: 1,
         quote: null,
         balanceText: ""
       };

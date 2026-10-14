@@ -49,6 +49,21 @@ sap.ui.define(["sap/ui/core/Fragment", "../../service/DraftService"], function (
       const couponCode = context.getProperty("CouponCode") ?? "";
       context.setProperty("CouponCode", couponCode.trim().toUpperCase() || null);
     };
+    onPickProduct = async () => {
+      const product = await this.controller.productPicker.pickProduct();
+      if (!product) {
+        return;
+      }
+      try {
+        const context = this.getDialogContext();
+        await context.setProperty("Product_ID", product.ID);
+        await context.requestSideEffects([{
+          $NavigationPropertyPath: "Product"
+        }]);
+      } catch (error) {
+        this.controller.handleError(error, "promotionSaveError");
+      }
+    };
     onSavePromotion = async () => {
       try {
         await this.controller.runBusy(() => this.draftService().activateDraft(this.getDialogContext()));

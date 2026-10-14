@@ -1,7 +1,6 @@
 import Fragment from "sap/ui/core/Fragment";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import type Dialog from "sap/m/Dialog";
-import type ComboBox from "sap/m/ComboBox";
 import type Event from "sap/ui/base/Event";
 import type { StepInput$ChangeEvent } from "sap/m/StepInput";
 import type Admin from "../Admin.controller";
@@ -44,8 +43,6 @@ interface ReturnState {
     rows: ReturnRow[];
     reason: string;
     lines: OrderLine[];
-    selectedVariantId: string;
-    quantity: number;
     quote: ReturnQuote | null;
     balanceText: string;
 }
@@ -65,7 +62,6 @@ export default class OrderReturnSection {
 
         const dialog = await this.getDialog();
 
-        this.controller.byControlId<ComboBox>("returnVariantCombo").getBinding("items")?.refresh();
         dialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
         dialog.open();
     }
@@ -78,15 +74,13 @@ export default class OrderReturnSection {
         void this.refreshQuote();
     };
 
-    public onAddLine = (): void => {
-        if (!this.lines.addFrom(this.controller.byControlId<ComboBox>("returnVariantCombo"), this.getState().quantity)) {
-            this.controller.showToast("saleSelectProduct");
-            return;
-        }
+    public onAddLine = async (): Promise<void> => {
+        const variant = await this.controller.productPicker.pickVariant();
 
-        this.model.setProperty("/selectedVariantId", "");
-        this.model.setProperty("/quantity", 1);
-        void this.refreshQuote();
+        if (variant) {
+            this.lines.add(variant, this.controller.productPicker.pickedQuantity);
+            void this.refreshQuote();
+        }
     };
 
     public onLineQuantityChange = (event: StepInput$ChangeEvent): void => {
@@ -195,9 +189,7 @@ export default class OrderReturnSection {
             rows: [],
             reason: "",
             lines: [],
-            selectedVariantId: "",
-            quantity: 1,
-            quote: null,
+                        quote: null,
             balanceText: ""
         };
     }

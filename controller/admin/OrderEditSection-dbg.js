@@ -18,6 +18,9 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
         ...this.emptyState(),
         orderId: order.ID,
         number: order.Number,
+        couponInput: order.CouponCode ?? "",
+        couponCode: order.CouponCode ?? "",
+        applyPromotions: (order.Promotions ?? []).some(promotion => !promotion.CouponCode),
         lines: order.Items.map(item => ({
           VariantId: item.Variant_ID,
           Description: [item.ProductName, item.ColorName, item.Size].filter(Boolean).join(" / "),
@@ -27,7 +30,6 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
         }))
       });
       const dialog = await this.getDialog();
-      this.controller.byControlId("editVariantCombo").getBinding("items")?.refresh();
       dialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
       dialog.open();
       void this.refreshQuote();
@@ -35,13 +37,18 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
     onClose = () => {
       this.dialog?.close();
     };
-    onAddLine = () => {
-      if (!this.lines.addFrom(this.controller.byControlId("editVariantCombo"), this.getState().quantity)) {
-        this.controller.showToast("saleSelectProduct");
-        return;
+    onAddLine = async () => {
+      const variant = await this.controller.productPicker.pickVariant();
+      if (variant) {
+        this.lines.add(variant, this.controller.productPicker.pickedQuantity);
+        void this.refreshQuote();
       }
-      this.model.setProperty("/selectedVariantId", "");
-      this.model.setProperty("/quantity", 1);
+    };
+    onApplyCoupon = () => {
+      this.model.setProperty("/couponCode", this.getState().couponInput.trim().toUpperCase());
+      void this.refreshQuote();
+    };
+    onPromotionsChange = () => {
       void this.refreshQuote();
     };
     onLineQuantityChange = event => {
@@ -59,7 +66,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
         return;
       }
       try {
-        await this.controller.runBusy(() => this.service().updateOrderItems(state.orderId, this.lines.toItems()));
+        await this.controller.runBusy(() => this.service().updateOrderItems(state.orderId, this.change()));
         this.dialog?.close();
         this.controller.showToast("orderItemsUpdated", [state.number]);
         this.controller.orders.refreshOpenOrder();
@@ -75,11 +82,19 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
         return;
       }
       try {
-        this.model.setProperty("/quote", await this.service().quoteOrderUpdate(state.orderId, this.lines.toItems()));
+        this.model.setProperty("/quote", await this.service().quoteOrderUpdate(state.orderId, this.change()));
       } catch (error) {
         this.model.setProperty("/quote", null);
         this.controller.handleError(error, "quoteError");
       }
+    }
+    change() {
+      const state = this.getState();
+      return {
+        Items: this.lines.toItems(),
+        CouponCode: state.couponCode,
+        ApplyPromotions: state.applyPromotions
+      };
     }
     service() {
       return new AdminOrderService(this.controller.getAdminModel());
@@ -92,8 +107,9 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
         orderId: "",
         number: 0,
         lines: [],
-        selectedVariantId: "",
-        quantity: 1,
+        couponInput: "",
+        couponCode: "",
+        applyPromotions: false,
         quote: null
       };
     }

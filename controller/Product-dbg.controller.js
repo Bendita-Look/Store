@@ -1,11 +1,12 @@
-sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController"], function (JSONModel, __BaseController) {
+sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "../util/variants"], function (JSONModel, __BaseController, ___util_variants) {
   "use strict";
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
   }
   const BaseController = _interopRequireDefault(__BaseController);
-  const SIZE_ORDER = ["PP", "P", "M", "G", "GG", "XG", "XGG", "U", "UNICO", "ÚNICO"];
+  const imagesForColor = ___util_variants["imagesForColor"];
+  const sortBySize = ___util_variants["sortBySize"];
   const PRODUCT_EXPAND = "Category($select=Name),Colors,Variants,Images($select=ID,Color_ID,SortOrder)";
 
   /**
@@ -75,7 +76,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController"], function (JSO
     },
     selectColor: function _selectColor(colorId) {
       const product = this.productModel.getProperty("/product");
-      const variants = this.sortBySize(product.Variants.filter(variant => !colorId || variant.Color_ID === colorId));
+      const variants = sortBySize(product.Variants.filter(variant => !colorId || variant.Color_ID === colorId));
       const sizes = variants.map(variant => ({
         key: variant.ID,
         text: variant.Size,
@@ -84,7 +85,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController"], function (JSO
       this.productModel.setProperty("/selectedColorId", colorId);
       this.productModel.setProperty("/selectedColorName", product.Colors.find(color => color.ID === colorId)?.Name ?? "");
       this.productModel.setProperty("/sizes", sizes);
-      this.productModel.setProperty("/images", this.imagesForColor(product.Images, colorId));
+      this.productModel.setProperty("/images", imagesForColor(product.Images, colorId));
       this.selectVariant(sizes.find(size => size.enabled)?.key ?? "");
     },
     selectVariant: function _selectVariant(variantId) {
@@ -96,22 +97,6 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController"], function (JSO
     findVariant: function _findVariant(variantId) {
       const product = this.productModel.getProperty("/product");
       return product?.Variants.find(variant => variant.ID === variantId);
-    },
-    imagesForColor: function _imagesForColor(images, colorId) {
-      const sorted = [...images].sort((first, second) => (first.SortOrder ?? 0) - (second.SortOrder ?? 0));
-      const forColor = sorted.filter(image => !image.Color_ID || image.Color_ID === colorId);
-      return forColor.length ? forColor : sorted;
-    },
-    sortBySize: function _sortBySize(variants) {
-      const position = size => {
-        const index = SIZE_ORDER.indexOf(size.toUpperCase());
-        const numericSize = Number(size);
-        if (index !== -1) {
-          return index;
-        }
-        return SIZE_ORDER.length + (Number.isNaN(numericSize) ? 0 : numericSize);
-      };
-      return [...variants].sort((first, second) => position(first.Size) - position(second.Size));
     },
     emptyState: function _emptyState() {
       return {

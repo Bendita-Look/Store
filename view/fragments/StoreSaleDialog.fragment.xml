@@ -14,37 +14,7 @@
             <VBox class="sapUiSmallMargin">
                 <MessageStrip text="{i18n>storeSaleInfo}" type="Information" showIcon="true" class="sapUiSmallMarginBottom" />
 
-                <HBox alignItems="End" wrap="Wrap">
-                    <VBox class="sapUiSmallMarginEnd blGrow">
-                        <Label text="{i18n>product}" />
-                        <ComboBox
-                            id="saleVariantCombo"
-                            selectedKey="{sale>/selectedVariantId}"
-                            width="100%"
-                            showSecondaryValues="true"
-                            items="{
-                                path: '/ProductVariants',
-                                parameters: {
-                                    $filter: 'IsActiveEntity eq true and Stock gt 0 and Product/Active eq true',
-                                    $expand: 'Product($select=Name,Price,Active),Color($select=Name)',
-                                    $select: 'ID,Size,Stock'
-                                },
-                                templateShareable: false
-                            }"
-                        >
-                            <core:ListItem
-                                key="{ID}"
-                                text="{parts: ['Product/Name', 'Color/Name', 'Size'], formatter: '.formatter.variantDescription'}"
-                                additionalText="{parts: ['i18n>inStock', 'i18n>soldOut', {path: 'Stock', targetType: 'any'}], formatter: '.formatter.stockMessage'}"
-                            />
-                        </ComboBox>
-                    </VBox>
-                    <VBox class="sapUiSmallMarginEnd">
-                        <Label text="{i18n>quantity}" />
-                        <StepInput value="{sale>/quantity}" min="1" max="20" width="7rem" />
-                    </VBox>
-                    <Button text="{i18n>addItem}" icon="sap-icon://add" press=".storeSale.onAddLine" />
-                </HBox>
+                <Button text="{i18n>pickProduct}" icon="sap-icon://add-product" type="Emphasized" press=".storeSale.onAddLine" class="blPickButton" />
 
                 <Table items="{sale>/lines}" noDataText="{i18n>saleNoItems}" class="blTable sapUiSmallMarginTop">
                     <columns>

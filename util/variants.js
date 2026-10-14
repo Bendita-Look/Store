@@ -1,0 +1,2 @@
+sap.ui.define([],function(){"use strict";const r=["PP","P","M","G","GG","XG","XGG","U","UNICO","ÚNICO"];function t(t){const e=t=>{const e=r.indexOf(t.toUpperCase());const o=Number(t);if(e!==-1){return e}return r.length+(Number.isNaN(o)?0:o)};return[...t].sort((r,t)=>e(r.Size)-e(t.Size))}function e(r,t){const e=[...r].sort((r,t)=>(r.SortOrder??0)-(t.SortOrder??0));const o=e.filter(r=>!r.Color_ID||r.Color_ID===t);return o.length?o:e}var o={__esModule:true};o.sortBySize=t;o.imagesForColor=e;return o});
+//# sourceMappingURL=variants.js.map

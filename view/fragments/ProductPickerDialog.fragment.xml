@@ -1,0 +1,134 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:grid="sap.ui.layout.cssgrid"
+>
+    <Dialog
+        id="productPickerDialog"
+        title="{= ${picker>/step} === 'detail' ? ${picker>/product/Name} : ${i18n>pickerTitle} }"
+        contentWidth="52rem"
+        contentHeight="38rem"
+        resizable="true"
+        class="blDialog blPicker"
+    >
+        <content>
+            <VBox visible="{= ${picker>/step} === 'list' }" busy="{picker>/busy}" busyIndicatorDelay="0" class="sapUiSmallMargin">
+                <SearchField
+                    value="{picker>/search}"
+                    placeholder="{i18n>pickerSearch}"
+                    liveChange=".productPicker.onSearch"
+                    width="100%"
+                    class="sapUiSmallMarginBottom"
+                />
+                <f:GridList items="{picker>/filtered}" noDataText="{i18n>pickerNoProducts}" class="blProductGrid blPickerGrid">
+                    <f:customLayout>
+                        <grid:GridBoxLayout boxMinWidth="10rem" />
+                    </f:customLayout>
+                    <f:GridListItem type="Active" press=".productPicker.onProductPress" class="blProductCard">
+                        <VBox>
+                            <VBox class="blProductImageWrapper">
+                                <Image
+                                    src="{path: 'picker>CoverId', formatter: '.formatter.catalogImageUrl'}"
+                                    alt="{picker>Name}"
+                                    width="100%"
+                                    densityAware="false"
+                                    class="blProductImage"
+                                />
+                                <Text text="{i18n>soldOut}" visible="{= ${picker>/mode} === 'variant' &amp;&amp; ${picker>Stock} === 0 }" class="blSoldOutTag" />
+                                <Text text="{i18n>productInactive}" visible="{= !${picker>Active} }" class="blSoldOutTag" />
+                            </VBox>
+                            <VBox alignItems="Center" class="blProductInfo">
+                                <Text text="{picker>Name}" maxLines="2" textAlign="Center" class="blProductName" />
+                                <Text text="{picker>Category/Name}" textAlign="Center" class="blMuted" />
+                                <Text text="{path: 'picker>Price', formatter: '.formatter.currency'}" class="blProductPrice" />
+                            </VBox>
+                        </VBox>
+                    </f:GridListItem>
+                </f:GridList>
+            </VBox>
+
+            <FlexBox
+                visible="{= ${picker>/step} === 'detail' }"
+                wrap="Wrap"
+                alignItems="Start"
+                class="blPickerDetail sapUiSmallMargin"
+            >
+                <Image
+                    src="{path: 'picker>/imageId', formatter: '.formatter.catalogImageUrl'}"
+                    alt="{picker>/product/Name}"
+                    densityAware="false"
+                    class="blPickerImage"
+                />
+                <VBox class="blPickerInfo">
+                    <Text text="{picker>/product/Category/Name}" class="blCategoryLabel" />
+                    <Title text="{picker>/product/Name}" level="H3" wrapping="true" />
+                    <Text text="{path: 'picker>/product/Price', formatter: '.formatter.currency'}" class="blDetailPrice" />
+
+                    <VBox visible="{= ${picker>/product/Colors}.length > 0 }" class="blOptionGroup">
+                        <Text text="{parts: ['i18n>colorSelected', 'picker>/selectedColorName'], formatter: '.formatter.message'}" class="blOptionLabel" />
+                        <HBox items="{path: 'picker>/product/Colors', templateShareable: false}" wrap="Wrap" class="blSwatches">
+                            <core:Icon
+                                src="sap-icon://circle-task-2"
+                                color="{= ${picker>HexCode} || '#d9c3b0' }"
+                                size="1.75rem"
+                                tooltip="{picker>Name}"
+                                press=".productPicker.onSwatchPress"
+                                class="blSwatch"
+                            >
+                                <core:customData>
+                                    <core:CustomData
+                                        key="selected"
+                                        value="{= ${picker>ID} === ${picker>/selectedColorId} ? 'true' : 'false' }"
+                                        writeToDom="true"
+                                    />
+                                </core:customData>
+                            </core:Icon>
+                        </HBox>
+                    </VBox>
+
+                    <VBox class="blOptionGroup">
+                        <Text text="{i18n>size}" class="blOptionLabel" />
+                        <HBox items="{path: 'picker>/sizes', templateShareable: false}" wrap="Wrap" class="blSizes">
+                            <Button
+                                text="{picker>Size}"
+                                type="{= ${picker>ID} === ${picker>/selectedVariantId} ? 'Emphasized' : 'Default' }"
+                                enabled="{= ${picker>Stock} > 0 }"
+                                press=".productPicker.onSizePress"
+                                class="blSize"
+                            />
+                        </HBox>
+                        <ObjectStatus
+                            text="{parts: ['i18n>inStock', 'i18n>soldOut', 'picker>/stock'], formatter: '.formatter.stockMessage'}"
+                            state="{= ${picker>/stock} > 0 ? 'Success' : 'Error' }"
+                            class="sapUiTinyMarginTop"
+                        />
+                    </VBox>
+
+                    <VBox class="blOptionGroup">
+                        <Text text="{i18n>quantity}" class="blOptionLabel" />
+                        <StepInput
+                            value="{picker>/quantity}"
+                            min="1"
+                            max="{= Math.max(${picker>/stock}, 1) }"
+                            enabled="{= ${picker>/stock} > 0 }"
+                            width="8rem"
+                        />
+                    </VBox>
+                </VBox>
+            </FlexBox>
+        </content>
+        <buttons>
+            <Button
+                text="{i18n>pickerAdd}"
+                type="Emphasized"
+                icon="sap-icon://add"
+                visible="{= ${picker>/step} === 'detail' }"
+                enabled="{= ${picker>/stock} > 0 }"
+                press=".productPicker.onConfirm"
+            />
+            <Button text="{i18n>back}" icon="sap-icon://nav-back" visible="{= ${picker>/step} === 'detail' }" press=".productPicker.onBack" />
+            <Button text="{i18n>cancel}" press=".productPicker.onCancel" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

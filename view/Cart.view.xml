@@ -113,6 +113,13 @@
                             class="blDetailPrice"
                         />
                     </HBox>
+                    <Text
+                        text="{i18n>shippingNotIncluded}"
+                        textAlign="End"
+                        width="100%"
+                        visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }"
+                        class="blShippingNote"
+                    />
                 </VBox>
 
                 <MessageStrip
@@ -120,6 +127,13 @@
                     type="Information"
                     showIcon="true"
                     class="sapUiSmallMarginTopBottom"
+                />
+                <MessageStrip
+                    text="{i18n>shippingInfo}"
+                    type="Information"
+                    showIcon="true"
+                    visible="{= ${checkout>/data/FulfillmentType} === 'DELIVERY' }"
+                    class="sapUiSmallMarginBottom"
                 />
 
                 <form:SimpleForm

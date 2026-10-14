@@ -11,7 +11,7 @@
             <Bar class="blHeader blAdminHeader">
                 <contentLeft>
                     <HBox alignItems="Center" class="blBrand">
-                        <Image src="img/logo.jpg" width="2rem" height="2rem" decorative="true" class="sapUiTinyMarginEnd" />
+                        <Image src="img/logo.svg" width="2rem" height="2rem" decorative="true" class="sapUiTinyMarginEnd" />
                         <Title text="{i18n>adminTitle}" class="blBrandTitle" />
                     </HBox>
                 </contentLeft>

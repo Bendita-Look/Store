@@ -12,8 +12,8 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
   const FULL_SCREEN_MAX_WIDTH = 600;
   const ORDER_EXPAND = "Items,Promotions,Returns($expand=Items;$orderby=createdAt)";
   const CHANGE_PARAMETERS = {
-    $select: "ID,Number",
-    $expand: "Items($select=ID,Variant_ID,ImageId,ProductName,ColorName,Size,Quantity,UnitPrice),Returns($select=ID;$expand=Items($select=ID,Kind,OrderItem_ID,Quantity))"
+    $select: "ID,Number,CouponCode",
+    $expand: "Items($select=ID,Variant_ID,ImageId,ProductName,ColorName,Size,Quantity,UnitPrice),Returns($select=ID;$expand=Items($select=ID,Kind,OrderItem_ID,Quantity)),Promotions($select=ID,CouponCode)"
   };
   class OrdersSection {
     deliveryModel = new JSONModel(this.emptyDelivery());

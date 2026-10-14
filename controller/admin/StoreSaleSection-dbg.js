@@ -17,20 +17,17 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
     onOpenStoreSale = async () => {
       this.model.setData(this.emptyState());
       const dialog = await this.getDialog();
-      this.controller.byControlId("saleVariantCombo").getBinding("items")?.refresh();
       dialog.open();
     };
     onCloseStoreSale = () => {
       this.dialog?.close();
     };
-    onAddLine = () => {
-      if (!this.lines.addFrom(this.controller.byControlId("saleVariantCombo"), this.getState().quantity)) {
-        this.controller.showToast("saleSelectProduct");
-        return;
+    onAddLine = async () => {
+      const variant = await this.controller.productPicker.pickVariant();
+      if (variant) {
+        this.lines.add(variant, this.controller.productPicker.pickedQuantity);
+        void this.refreshQuote();
       }
-      this.model.setProperty("/selectedVariantId", "");
-      this.model.setProperty("/quantity", 1);
-      void this.refreshQuote();
     };
     onLineQuantityChange = event => {
       this.lines.changeQuantity(event);
@@ -85,8 +82,6 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
     emptyState() {
       return {
         lines: [],
-        selectedVariantId: "",
-        quantity: 1,
         customer: {
           CustomerName: "",
           CustomerEmail: "",

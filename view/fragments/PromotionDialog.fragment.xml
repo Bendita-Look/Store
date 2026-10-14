@@ -80,14 +80,16 @@
                     <core:Item key="{ID}" text="{Name}" />
                 </Select>
                 <Label text="{i18n>product}" required="true" visible="{= ${path: 'Scope', targetType: 'any'} === 'PRODUCT' }" />
-                <ComboBox
-                    selectedKey="{Product_ID}"
+                <Input
+                    value="{Product/Name}"
+                    placeholder="{i18n>pickProductPlaceholder}"
+                    showValueHelp="true"
+                    valueHelpOnly="true"
+                    valueHelpIconSrc="sap-icon://product"
+                    valueHelpRequest=".promotions.onPickProduct"
                     width="100%"
                     visible="{= ${path: 'Scope', targetType: 'any'} === 'PRODUCT' }"
-                    items="{path: '/Products', parameters: {$select: 'ID,Name', $filter: 'IsActiveEntity eq true'}, sorter: {path: 'Name'}, templateShareable: false}"
-                >
-                    <core:Item key="{ID}" text="{Name}" />
-                </ComboBox>
+                />
                 <Label text="{i18n>minQuantity}" />
                 <StepInput value="{MinQuantity}" min="1" max="99" width="8rem" />
                 <Label text="{i18n>minAmount}" />

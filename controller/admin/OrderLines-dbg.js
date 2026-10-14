@@ -13,11 +13,7 @@ sap.ui.define([], function () {
     set(lines) {
       this.model.setProperty(this.path, lines);
     }
-    addFrom(combo, quantity) {
-      const variant = combo.getSelectedItem()?.getBindingContext()?.getObject();
-      if (!variant) {
-        return false;
-      }
+    add(variant, quantity) {
       const amount = Math.max(1, Number(quantity) || 1);
       const lines = this.get();
       const existing = lines.find(line => line.VariantId === variant.ID);
@@ -33,7 +29,6 @@ sap.ui.define([], function () {
           Stock: variant.Stock
         }]);
       }
-      return true;
     }
     changeQuantity(event) {
       const variantId = this.variantIdOf(event);

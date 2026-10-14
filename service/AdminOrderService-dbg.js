@@ -20,11 +20,11 @@ sap.ui.define([], function () {
       await operation.invoke();
       return operation.getBoundContext().getObject();
     }
-    quoteOrderUpdate(orderId, items) {
-      return this.invokeItemsChange("/QuoteOrderUpdate(...)", orderId, items);
+    quoteOrderUpdate(orderId, change) {
+      return this.invokeItemsChange("/QuoteOrderUpdate(...)", orderId, change);
     }
-    updateOrderItems(orderId, items) {
-      return this.invokeItemsChange("/UpdateOrderItems(...)", orderId, items);
+    updateOrderItems(orderId, change) {
+      return this.invokeItemsChange("/UpdateOrderItems(...)", orderId, change);
     }
     quoteReturn(orderId, input) {
       return this.invokeReturn("/QuoteOrderReturn(...)", orderId, input);
@@ -41,10 +41,13 @@ sap.ui.define([], function () {
       }
       await operation.invoke();
     }
-    async invokeItemsChange(path, orderId, items) {
+    async invokeItemsChange(path, orderId, change) {
       const operation = this.adminModel.bindContext(path);
       operation.setParameter("OrderId", orderId);
-      operation.setParameter("Items", this.toItemsInput(items));
+      operation.setParameter("Change", {
+        ...change,
+        Items: this.toItemsInput(change.Items)
+      });
       await operation.invoke();
       return operation.getBoundContext().getObject();
     }
