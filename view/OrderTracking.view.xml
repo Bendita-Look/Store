@@ -129,6 +129,30 @@
                     <Text text="{path: 'tracking>/order/TotalAmount', targetType: 'any', formatter: '.formatter.currency'}" class="blDetailPrice" />
                 </HBox>
 
+                <List
+                    items="{tracking>/order/Returns}"
+                    visible="{= !!${tracking>/order/Returns} &amp;&amp; ${tracking>/order/Returns}.length > 0 }"
+                    headerText="{i18n>returnsTitle}"
+                    showSeparators="Inner"
+                    class="blReturnList sapUiMediumMarginTop"
+                >
+                    <CustomListItem>
+                        <VBox class="blReturnEntry">
+                            <HBox justifyContent="SpaceBetween" alignItems="Center" wrap="Wrap">
+                                <Text text="{path: 'tracking>createdAt', formatter: '.formatter.dateTime'}" class="blMuted" />
+                                <Text text="{path: 'tracking>BalanceAmount', formatter: '.formatBalance'}" class="blReturnBalance" />
+                            </HBox>
+                            <VBox items="{path: 'tracking>Items', templateShareable: false}">
+                                <ObjectStatus
+                                    text="{parts: ['tracking>Kind', 'tracking>Quantity', 'tracking>ProductName', 'tracking>ColorName', 'tracking>Size'], formatter: '.formatReturnItem'}"
+                                    icon="{= ${tracking>Kind} === 'RETURNED' ? 'sap-icon://undo' : 'sap-icon://cart-4' }"
+                                    state="{= ${tracking>Kind} === 'RETURNED' ? 'Warning' : 'Success' }"
+                                />
+                            </VBox>
+                        </VBox>
+                    </CustomListItem>
+                </List>
+
                 <HBox justifyContent="End" class="sapUiMediumMarginTop">
                     <Button text="{i18n>continueShopping}" press=".onContinueShopping" class="sapUiSmallMarginEnd" />
                     <Button

@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../service/AdminOrderService", "../../service/OrderService"], function (Fragment, JSONModel, __AdminOrderService, __OrderService) {
+sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../service/AdminOrderService", "../../service/OrderService", "./OrderLines"], function (Fragment, JSONModel, __AdminOrderService, __OrderService, __OrderLines) {
   "use strict";
 
   function _interopRequireDefault(obj) {
@@ -7,8 +7,10 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
   const AdminOrderService = _interopRequireDefault(__AdminOrderService);
   const OrderService = _interopRequireDefault(__OrderService);
   const CouponStatus = __OrderService["CouponStatus"];
+  const OrderLines = _interopRequireDefault(__OrderLines);
   class StoreSaleSection {
     model = new JSONModel(this.emptyState());
+    lines = new OrderLines(this.model, "sale");
     constructor(controller) {
       this.controller = controller;
     }
@@ -22,43 +24,20 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
       this.dialog?.close();
     };
     onAddLine = () => {
-      const combo = this.controller.byControlId("saleVariantCombo");
-      const variant = combo.getSelectedItem()?.getBindingContext()?.getObject();
-      if (!variant) {
+      if (!this.lines.addFrom(this.controller.byControlId("saleVariantCombo"), this.getState().quantity)) {
         this.controller.showToast("saleSelectProduct");
         return;
       }
-      const state = this.getState();
-      const quantity = Math.max(1, Number(state.quantity) || 1);
-      const existing = state.lines.find(line => line.VariantId === variant.ID);
-      if (existing) {
-        existing.Quantity = Math.min(existing.Quantity + quantity, variant.Stock);
-      } else {
-        state.lines.push({
-          VariantId: variant.ID,
-          Description: [variant.Product.Name, variant.Color?.Name, variant.Size].filter(Boolean).join(" / "),
-          UnitPrice: Number(variant.Product.Price),
-          Quantity: Math.min(quantity, variant.Stock),
-          Stock: variant.Stock
-        });
-      }
-      this.model.setProperty("/lines", [...state.lines]);
       this.model.setProperty("/selectedVariantId", "");
       this.model.setProperty("/quantity", 1);
       void this.refreshQuote();
     };
     onLineQuantityChange = event => {
-      const variantId = this.variantIdOf(event);
-      const quantity = Number(event.getParameter("value"));
-      this.model.setProperty("/lines", this.getState().lines.map(line => line.VariantId === variantId ? {
-        ...line,
-        Quantity: quantity
-      } : line));
+      this.lines.changeQuantity(event);
       void this.refreshQuote();
     };
     onRemoveLine = event => {
-      const variantId = this.variantIdOf(event);
-      this.model.setProperty("/lines", this.getState().lines.filter(line => line.VariantId !== variantId));
+      this.lines.remove(event);
       void this.refreshQuote();
     };
     onApplySaleCoupon = () => {
@@ -74,10 +53,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
       const sale = {
         ...state.customer,
         CouponCode: state.quote?.CouponStatus === CouponStatus.Applied ? state.couponCode : "",
-        Items: state.lines.map(line => ({
-          VariantId: line.VariantId,
-          Quantity: line.Quantity
-        }))
+        Items: this.lines.toItems()
       };
       try {
         const order = await this.controller.runBusy(() => new AdminOrderService(this.controller.getAdminModel()).registerStoreSale(sale));
@@ -96,10 +72,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
         return;
       }
       try {
-        const quote = await new OrderService(this.controller.getCatalogModel()).quoteOrder(state.lines.map(line => ({
-          VariantId: line.VariantId,
-          Quantity: line.Quantity
-        })), state.couponCode);
+        const quote = await new OrderService(this.controller.getCatalogModel()).quoteOrder(this.lines.toItems(), state.couponCode);
         this.model.setProperty("/quote", quote);
       } catch (error) {
         this.model.setProperty("/quote", null);
@@ -108,9 +81,6 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
     }
     getState() {
       return this.model.getData();
-    }
-    variantIdOf(event) {
-      return event.getSource().getBindingContext("sale")?.getProperty("VariantId");
     }
     emptyState() {
       return {

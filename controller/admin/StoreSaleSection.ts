@@ -2,31 +2,15 @@ import Fragment from "sap/ui/core/Fragment";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import type Dialog from "sap/m/Dialog";
 import type ComboBox from "sap/m/ComboBox";
-import type Control from "sap/ui/core/Control";
 import type Event from "sap/ui/base/Event";
 import type { StepInput$ChangeEvent } from "sap/m/StepInput";
 import type Admin from "../Admin.controller";
 import AdminOrderService, { StoreSaleInput } from "../../service/AdminOrderService";
 import OrderService, { CouponStatus, OrderQuote } from "../../service/OrderService";
-
-interface SaleLine {
-    VariantId: string;
-    Description: string;
-    UnitPrice: number;
-    Quantity: number;
-    Stock: number;
-}
-
-interface VariantOption {
-    ID: string;
-    Size: string;
-    Stock: number;
-    Product: { Name: string; Price: number };
-    Color?: { Name: string } | null;
-}
+import OrderLines, { OrderLine } from "./OrderLines";
 
 interface SaleState {
-    lines: SaleLine[];
+    lines: OrderLine[];
     selectedVariantId: string;
     quantity: number;
     customer: {
@@ -43,6 +27,8 @@ interface SaleState {
 export default class StoreSaleSection {
 
     public readonly model = new JSONModel(this.emptyState());
+
+    private readonly lines = new OrderLines(this.model, "sale");
 
     private dialog?: Dialog;
 
@@ -62,48 +48,23 @@ export default class StoreSaleSection {
     };
 
     public onAddLine = (): void => {
-        const combo = this.controller.byControlId<ComboBox>("saleVariantCombo");
-        const variant = combo.getSelectedItem()?.getBindingContext()?.getObject() as VariantOption | undefined;
-
-        if (!variant) {
+        if (!this.lines.addFrom(this.controller.byControlId<ComboBox>("saleVariantCombo"), this.getState().quantity)) {
             this.controller.showToast("saleSelectProduct");
             return;
         }
 
-        const state = this.getState();
-        const quantity = Math.max(1, Number(state.quantity) || 1);
-        const existing = state.lines.find((line) => line.VariantId === variant.ID);
-
-        if (existing) {
-            existing.Quantity = Math.min(existing.Quantity + quantity, variant.Stock);
-        } else {
-            state.lines.push({
-                VariantId: variant.ID,
-                Description: [variant.Product.Name, variant.Color?.Name, variant.Size].filter(Boolean).join(" / "),
-                UnitPrice: Number(variant.Product.Price),
-                Quantity: Math.min(quantity, variant.Stock),
-                Stock: variant.Stock
-            });
-        }
-
-        this.model.setProperty("/lines", [...state.lines]);
         this.model.setProperty("/selectedVariantId", "");
         this.model.setProperty("/quantity", 1);
         void this.refreshQuote();
     };
 
     public onLineQuantityChange = (event: StepInput$ChangeEvent): void => {
-        const variantId = this.variantIdOf(event);
-        const quantity = Number(event.getParameter("value"));
-
-        this.model.setProperty("/lines", this.getState().lines.map((line) => line.VariantId === variantId ? { ...line, Quantity: quantity } : line));
+        this.lines.changeQuantity(event);
         void this.refreshQuote();
     };
 
     public onRemoveLine = (event: Event): void => {
-        const variantId = this.variantIdOf(event);
-
-        this.model.setProperty("/lines", this.getState().lines.filter((line) => line.VariantId !== variantId));
+        this.lines.remove(event);
         void this.refreshQuote();
     };
 
@@ -123,7 +84,7 @@ export default class StoreSaleSection {
         const sale: StoreSaleInput = {
             ...state.customer,
             CouponCode: state.quote?.CouponStatus === CouponStatus.Applied ? state.couponCode : "",
-            Items: state.lines.map((line) => ({ VariantId: line.VariantId, Quantity: line.Quantity }))
+            Items: this.lines.toItems()
         };
 
         try {
@@ -147,10 +108,7 @@ export default class StoreSaleSection {
         }
 
         try {
-            const quote = await new OrderService(this.controller.getCatalogModel()).quoteOrder(
-                state.lines.map((line) => ({ VariantId: line.VariantId, Quantity: line.Quantity })),
-                state.couponCode
-            );
+            const quote = await new OrderService(this.controller.getCatalogModel()).quoteOrder(this.lines.toItems(), state.couponCode);
 
             this.model.setProperty("/quote", quote);
         } catch (error) {
@@ -161,10 +119,6 @@ export default class StoreSaleSection {
 
     private getState(): SaleState {
         return this.model.getData() as SaleState;
-    }
-
-    private variantIdOf(event: Event): string {
-        return (event.getSource() as Control).getBindingContext("sale")?.getProperty("VariantId") as string;
     }
 
     private emptyState(): SaleState {

@@ -21,7 +21,8 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "../../service/ReportService"], fu
         loaded: false,
         summary: null,
         months: [],
-        topProducts: []
+        topProducts: [],
+        topReturned: []
       });
     }
     onYearChange = event => {
@@ -38,6 +39,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "../../service/ReportService"], fu
         this.model.setProperty("/summary", report);
         this.model.setProperty("/months", this.buildMonths(report));
         this.model.setProperty("/topProducts", report.TopProducts);
+        this.model.setProperty("/topReturned", report.TopReturned);
         this.model.setProperty("/loaded", true);
       } catch (error) {
         this.controller.handleError(error, "reportLoadError");
@@ -50,6 +52,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "../../service/ReportService"], fu
         orders: month.Orders,
         items: month.Items,
         revenue: Number(month.Revenue),
+        refunds: Number(month.Refunds),
         share: highestRevenue ? Math.round(Number(month.Revenue) / highestRevenue * PERCENT) : 0
       }));
     }

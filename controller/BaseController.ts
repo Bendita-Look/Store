@@ -88,6 +88,28 @@ export default abstract class BaseController extends Controller {
         return fulfillment ? this.getText(`fulfillment.${fulfillment}`) : "";
     }
 
+    public formatBalance(balance: number | string | null | undefined): string {
+        const amount = Number(balance ?? 0);
+
+        if (!amount) {
+            return this.getText("balanceEven");
+        }
+
+        return this.getText(amount > 0 ? "balanceToPay" : "balanceToRefund", [formatter.currency(Math.abs(amount))]);
+    }
+
+    public formatReturnItem(
+        kind: string | null | undefined,
+        quantity: number | null | undefined,
+        ...details: Array<string | boolean | null | undefined>
+    ): string {
+        const restock = details[3];
+        const description = formatter.variantDescription(...details.slice(0, 3) as Array<string | null | undefined>);
+        const text = this.getText(kind === "RETURNED" ? "returnedItemLine" : "replacementItemLine", [quantity ?? 0, description]);
+
+        return kind === "RETURNED" && restock === false ? this.getText("returnedNoRestock", [text]) : text;
+    }
+
     public formatReward(
         rewardType: string | null | undefined,
         rewardValue: number | string | null | undefined,

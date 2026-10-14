@@ -952,6 +952,31 @@
     color: var(--bl-text);
 }
 
+.blReturnSummary {
+    gap: 0.35rem;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--bl-radius);
+    background: var(--bl-blush-soft);
+}
+
+.blReturnBalance.sapMText {
+    margin-top: 0.25rem;
+    font-weight: 700;
+    color: var(--bl-gold-dark);
+}
+
+.blReturnEntry {
+    width: 100%;
+    gap: 0.3rem;
+    padding: 0.6rem 0;
+}
+
+.blReturnReason.sapMText {
+    font-style: italic;
+    color: var(--bl-muted);
+}
+
 /* Footer */
 
 .blFooter {

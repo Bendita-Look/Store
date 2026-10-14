@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/OrdersSection", "./admin/ProductsSection", "./admin/CategoriesSection", "./admin/BackupSection", "./admin/ReportsSection", "./admin/SettingsSection", "./admin/PromotionsSection", "./admin/StoreSaleSection", "../auth/AuthenticationService"], function (JSONModel, __BaseController, __OrdersSection, __ProductsSection, __CategoriesSection, __BackupSection, __ReportsSection, __SettingsSection, __PromotionsSection, __StoreSaleSection, ___auth_AuthenticationService) {
+sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/OrdersSection", "./admin/ProductsSection", "./admin/CategoriesSection", "./admin/BackupSection", "./admin/ReportsSection", "./admin/SettingsSection", "./admin/PromotionsSection", "./admin/StoreSaleSection", "./admin/OrderEditSection", "./admin/OrderReturnSection", "../auth/AuthenticationService"], function (JSONModel, __BaseController, __OrdersSection, __ProductsSection, __CategoriesSection, __BackupSection, __ReportsSection, __SettingsSection, __PromotionsSection, __StoreSaleSection, __OrderEditSection, __OrderReturnSection, ___auth_AuthenticationService) {
   "use strict";
 
   function _interopRequireDefault(obj) {
@@ -13,6 +13,8 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/Order
   const SettingsSection = _interopRequireDefault(__SettingsSection);
   const PromotionsSection = _interopRequireDefault(__PromotionsSection);
   const StoreSaleSection = _interopRequireDefault(__StoreSaleSection);
+  const OrderEditSection = _interopRequireDefault(__OrderEditSection);
+  const OrderReturnSection = _interopRequireDefault(__OrderReturnSection);
   const AuthenticationService = ___auth_AuthenticationService["AuthenticationService"];
   const DEFAULT_TAB = "orders";
   const REPORTS_TAB = "reports";
@@ -32,6 +34,8 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/Order
       this.settings = new SettingsSection(this);
       this.promotions = new PromotionsSection(this);
       this.storeSale = new StoreSaleSection(this);
+      this.orderEdit = new OrderEditSection(this);
+      this.orderReturn = new OrderReturnSection(this);
     },
     onInit: function _onInit() {
       this.viewModel = new JSONModel({

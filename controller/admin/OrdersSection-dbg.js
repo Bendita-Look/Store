@@ -10,6 +10,11 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
   const OrderStatus = __formatter["OrderStatus"];
   const ALL_STATUSES = "ALL";
   const FULL_SCREEN_MAX_WIDTH = 600;
+  const ORDER_EXPAND = "Items,Promotions,Returns($expand=Items;$orderby=createdAt)";
+  const CHANGE_PARAMETERS = {
+    $select: "ID,Number",
+    $expand: "Items($select=ID,Variant_ID,ImageId,ProductName,ColorName,Size,Quantity,UnitPrice),Returns($select=ID;$expand=Items($select=ID,Kind,OrderItem_ID,Quantity))"
+  };
   class OrdersSection {
     deliveryModel = new JSONModel(this.emptyDelivery());
     constructor(controller) {
@@ -30,13 +35,29 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
     refresh() {
       this.getTableBinding()?.refresh();
     }
+    refreshOpenOrder() {
+      this.dialog?.getElementBinding()?.refresh();
+      this.refresh();
+    }
+    onEditItems = async () => {
+      const order = await this.loadChangeableOrder();
+      if (order) {
+        await this.controller.orderEdit.open(order);
+      }
+    };
+    onRegisterReturn = async () => {
+      const order = await this.loadChangeableOrder();
+      if (order) {
+        await this.controller.orderReturn.open(order);
+      }
+    };
     onOrderPress = async event => {
       const context = event.getSource().getBindingContext();
       const dialog = await this.getDialog();
       dialog.bindElement({
         path: context.getPath(),
         parameters: {
-          $expand: "Items,Promotions"
+          $expand: ORDER_EXPAND
         }
       });
       dialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
@@ -84,12 +105,20 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
       try {
         await this.controller.runBusy(() => new AdminOrderService(this.controller.getAdminModel()).changeStatus(order.ID, status, delivery));
         this.controller.showToast(successKey, [order.Number]);
-        this.dialog?.getElementBinding()?.refresh();
-        this.getTableBinding().refresh();
+        this.refreshOpenOrder();
         return true;
       } catch (error) {
         this.controller.handleError(error, "orderStatusError");
         return false;
+      }
+    }
+    async loadChangeableOrder() {
+      const path = this.dialog?.getBindingContext()?.getPath();
+      try {
+        return await this.controller.runBusy(() => this.controller.getAdminModel().bindContext(path, undefined, CHANGE_PARAMETERS).requestObject());
+      } catch (error) {
+        this.controller.handleError(error, "orderLoadError");
+        return undefined;
       }
     }
     emptyDelivery() {

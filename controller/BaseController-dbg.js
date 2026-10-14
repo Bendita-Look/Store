@@ -67,6 +67,19 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
     formatFulfillment: function _formatFulfillment(fulfillment) {
       return fulfillment ? this.getText(`fulfillment.${fulfillment}`) : "";
     },
+    formatBalance: function _formatBalance(balance) {
+      const amount = Number(balance ?? 0);
+      if (!amount) {
+        return this.getText("balanceEven");
+      }
+      return this.getText(amount > 0 ? "balanceToPay" : "balanceToRefund", [formatter.currency(Math.abs(amount))]);
+    },
+    formatReturnItem: function _formatReturnItem(kind, quantity, ...details) {
+      const restock = details[3];
+      const description = formatter.variantDescription(...details.slice(0, 3));
+      const text = this.getText(kind === "RETURNED" ? "returnedItemLine" : "replacementItemLine", [quantity ?? 0, description]);
+      return kind === "RETURNED" && restock === false ? this.getText("returnedNoRestock", [text]) : text;
+    },
     formatReward: function _formatReward(rewardType, rewardValue, gift, maxDiscount) {
       if (!rewardType) {
         return "";

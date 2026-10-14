@@ -150,11 +150,20 @@
                                         </VBox>
                                         <Text text="{path: 'createdAt', targetType: 'any', formatter: '.formatter.dateTime'}" />
                                         <Text text="{path: 'TotalAmount', targetType: 'any', formatter: '.formatter.currency'}" />
-                                        <ObjectStatus
-                                            text="{path: 'Status', formatter: '.formatStatus'}"
-                                            state="{path: 'Status', formatter: '.formatter.statusState'}"
-                                            inverted="true"
-                                        />
+                                        <VBox alignItems="Center">
+                                            <ObjectStatus
+                                                text="{path: 'Status', formatter: '.formatStatus'}"
+                                                state="{path: 'Status', formatter: '.formatter.statusState'}"
+                                                inverted="true"
+                                            />
+                                            <ObjectStatus
+                                                text="{i18n>hasReturns}"
+                                                icon="sap-icon://journey-change"
+                                                state="Warning"
+                                                visible="{= ${path: 'RefundedAmount', targetType: 'any'} > 0 || ${path: 'ExchangedAmount', targetType: 'any'} > 0 }"
+                                                class="sapUiTinyMarginTop"
+                                            />
+                                        </VBox>
                                     </cells>
                                 </ColumnListItem>
                             </items>
@@ -346,8 +355,12 @@
 
                         <FlexBox wrap="Wrap" class="blKpis" visible="{report>/loaded}">
                             <VBox class="blKpi">
-                                <Text text="{i18n>kpiRevenue}" class="blKpiLabel" />
+                                <Text text="{i18n>kpiNetRevenue}" class="blKpiLabel" />
                                 <Text text="{path: 'report>/summary/Revenue', formatter: '.formatter.currency'}" class="blKpiValue" />
+                            </VBox>
+                            <VBox class="blKpi">
+                                <Text text="{i18n>kpiGrossRevenue}" class="blKpiLabel" />
+                                <Text text="{path: 'report>/summary/GrossRevenue', formatter: '.formatter.currency'}" class="blKpiValue" />
                             </VBox>
                             <VBox class="blKpi">
                                 <Text text="{i18n>kpiCompletedOrders}" class="blKpiLabel" />
@@ -374,6 +387,22 @@
                                 <Text text="{i18n>kpiCustomerArranged}" class="blKpiLabel" />
                                 <Text text="{report>/summary/CustomerArrangedDeliveries}" class="blKpiValue" />
                             </VBox>
+                            <VBox class="blKpi">
+                                <Text text="{i18n>kpiReturns}" class="blKpiLabel" />
+                                <Text text="{report>/summary/ReturnsCount}" class="blKpiValue" />
+                            </VBox>
+                            <VBox class="blKpi">
+                                <Text text="{i18n>kpiReturnedItems}" class="blKpiLabel" />
+                                <Text text="{report>/summary/ReturnedItems}" class="blKpiValue" />
+                            </VBox>
+                            <VBox class="blKpi">
+                                <Text text="{i18n>kpiRefunded}" class="blKpiLabel" />
+                                <Text text="{path: 'report>/summary/RefundedAmount', formatter: '.formatter.currency'}" class="blKpiValue" />
+                            </VBox>
+                            <VBox class="blKpi">
+                                <Text text="{i18n>kpiExchanged}" class="blKpiLabel" />
+                                <Text text="{path: 'report>/summary/ExchangedAmount', formatter: '.formatter.currency'}" class="blKpiValue" />
+                            </VBox>
                         </FlexBox>
 
                         <MessageStrip text="{i18n>reportInfo}" type="Information" showIcon="true" class="sapUiSmallMarginTopBottom" />
@@ -392,6 +421,9 @@
                                 <Column hAlign="End">
                                     <Text text="{i18n>kpiRevenue}" />
                                 </Column>
+                                <Column hAlign="End" minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>monthRefunds}" />
+                                </Column>
                                 <Column minScreenWidth="Tablet" demandPopin="true">
                                     <Text text="{i18n>monthShare}" />
                                 </Column>
@@ -403,6 +435,7 @@
                                         <Text text="{report>orders}" />
                                         <Text text="{report>items}" />
                                         <Text text="{path: 'report>revenue', formatter: '.formatter.currency'}" />
+                                        <Text text="{path: 'report>refunds', formatter: '.formatter.negativeAmount'}" />
                                         <ProgressIndicator
                                             percentValue="{report>share}"
                                             displayValue="{= ${report>share} + '%' }"
@@ -432,6 +465,35 @@
                                 </Column>
                                 <Column hAlign="End">
                                     <Text text="{i18n>kpiRevenue}" />
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{report>ProductName}" />
+                                        <Text text="{report>Quantity}" />
+                                        <Text text="{path: 'report>Revenue', formatter: '.formatter.currency'}" />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+
+                        <Table
+                            items="{report>/topReturned}"
+                            class="blTable sapUiMediumMarginTop"
+                            headerText="{i18n>topReturned}"
+                            noDataText="{i18n>noReturnsInYear}"
+                            popinLayout="GridSmall"
+                        >
+                            <columns>
+                                <Column>
+                                    <Text text="{i18n>product}" />
+                                </Column>
+                                <Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>kpiReturnedItems}" />
+                                </Column>
+                                <Column hAlign="End">
+                                    <Text text="{i18n>kpiRefunded}" />
                                 </Column>
                             </columns>
                             <items>
