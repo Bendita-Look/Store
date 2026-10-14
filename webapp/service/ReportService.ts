@@ -5,6 +5,7 @@ export interface MonthlySales {
     Orders: number;
     Items: number;
     Revenue: number;
+    Refunds: number;
 }
 
 export interface ProductSales {
@@ -23,8 +24,14 @@ export interface SalesReport {
     OpenAmount: number;
     CancelledOrders: number;
     CustomerArrangedDeliveries: number;
+    GrossRevenue: number;
+    ReturnsCount: number;
+    ReturnedItems: number;
+    RefundedAmount: number;
+    ExchangedAmount: number;
     Months: MonthlySales[];
     TopProducts: ProductSales[];
+    TopReturned: ProductSales[];
 }
 
 export default class ReportService {

@@ -1,0 +1,107 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="orderEditDialog"
+        title="{parts: ['i18n>editOrderTitle', 'edit>/number'], formatter: '.formatter.message'}"
+        contentWidth="44rem"
+        resizable="true"
+        class="blDialog"
+    >
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <MessageStrip text="{i18n>editOrderInfo}" type="Information" showIcon="true" class="sapUiSmallMarginBottom" />
+
+                <HBox alignItems="End" wrap="Wrap">
+                    <VBox class="sapUiSmallMarginEnd blGrow">
+                        <Label text="{i18n>product}" />
+                        <ComboBox
+                            id="editVariantCombo"
+                            selectedKey="{edit>/selectedVariantId}"
+                            width="100%"
+                            showSecondaryValues="true"
+                            items="{
+                                path: '/ProductVariants',
+                                parameters: {
+                                    $filter: 'IsActiveEntity eq true and Stock gt 0 and Product/Active eq true',
+                                    $expand: 'Product($select=Name,Price,Active),Color($select=Name)',
+                                    $select: 'ID,Size,Stock'
+                                },
+                                templateShareable: false
+                            }"
+                        >
+                            <core:ListItem
+                                key="{ID}"
+                                text="{parts: ['Product/Name', 'Color/Name', 'Size'], formatter: '.formatter.variantDescription'}"
+                                additionalText="{parts: ['i18n>inStock', 'i18n>soldOut', {path: 'Stock', targetType: 'any'}], formatter: '.formatter.stockMessage'}"
+                            />
+                        </ComboBox>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>quantity}" />
+                        <StepInput value="{edit>/quantity}" min="1" max="20" width="7rem" />
+                    </VBox>
+                    <Button text="{i18n>addItem}" icon="sap-icon://add" press=".orderEdit.onAddLine" />
+                </HBox>
+
+                <Table items="{edit>/lines}" noDataText="{i18n>editOrderNoItems}" popinLayout="GridSmall" class="blTable sapUiSmallMarginTop">
+                    <columns>
+                        <Column>
+                            <Text text="{i18n>product}" />
+                        </Column>
+                        <Column hAlign="Center" width="8rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>quantity}" />
+                        </Column>
+                        <Column hAlign="End" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>unitPrice}" />
+                        </Column>
+                        <Column width="3rem" hAlign="End" />
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{edit>Description}" />
+                                <StepInput value="{edit>Quantity}" min="1" max="{= ${edit>Stock} || 20 }" width="7rem" change=".orderEdit.onLineQuantityChange" />
+                                <Text text="{path: 'edit>UnitPrice', formatter: '.formatter.currency'}" />
+                                <Button icon="sap-icon://delete" type="Transparent" tooltip="{i18n>remove}" press=".orderEdit.onRemoveLine" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+
+                <ObjectStatus
+                    text="{edit>/quote/CouponMessage}"
+                    state="{= ${edit>/quote/CouponStatus} === 'APPLIED' ? 'Success' : 'Warning' }"
+                    visible="{= !!${edit>/quote/CouponMessage} }"
+                    class="sapUiSmallMarginTop"
+                />
+
+                <List
+                    items="{edit>/quote/Promotions}"
+                    visible="{= !!${edit>/quote/Promotions} &amp;&amp; ${edit>/quote/Promotions}.length > 0 }"
+                    headerText="{i18n>appliedPromotions}"
+                    showSeparators="None"
+                    class="blPromotionList"
+                >
+                    <StandardListItem
+                        icon="{= ${edit>RewardType} === 'GIFT' ? 'sap-icon://gift' : 'sap-icon://lead' }"
+                        title="{edit>PromotionName}"
+                        description="{edit>GiftDescription}"
+                        info="{path: 'edit>DiscountAmount', formatter: '.formatter.negativeAmount'}"
+                        infoState="Success"
+                    />
+                </List>
+
+                <HBox justifyContent="End" alignItems="Center" class="blCartTotal" visible="{= !!${edit>/quote} }">
+                    <Text text="{i18n>newTotal}" class="sapUiSmallMarginEnd" />
+                    <Text text="{path: 'edit>/quote/TotalAmount', formatter: '.formatter.currency'}" class="blDetailPrice" />
+                </HBox>
+            </VBox>
+        </content>
+        <buttons>
+            <Button text="{i18n>saveItems}" type="Emphasized" icon="sap-icon://save" press=".orderEdit.onConfirm" />
+            <Button text="{i18n>cancel}" press=".orderEdit.onClose" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

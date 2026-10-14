@@ -10,6 +10,8 @@ import ReportsSection from "./admin/ReportsSection";
 import SettingsSection from "./admin/SettingsSection";
 import PromotionsSection from "./admin/PromotionsSection";
 import StoreSaleSection from "./admin/StoreSaleSection";
+import OrderEditSection from "./admin/OrderEditSection";
+import OrderReturnSection from "./admin/OrderReturnSection";
 import { AuthenticationService } from "../auth/AuthenticationService";
 
 const DEFAULT_TAB = "orders";
@@ -36,6 +38,10 @@ export default class Admin extends BaseController {
     public readonly promotions = new PromotionsSection(this);
 
     public readonly storeSale = new StoreSaleSection(this);
+
+    public readonly orderEdit = new OrderEditSection(this);
+
+    public readonly orderReturn = new OrderReturnSection(this);
 
     private viewModel: JSONModel;
 

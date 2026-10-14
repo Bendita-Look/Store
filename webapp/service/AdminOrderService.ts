@@ -1,5 +1,6 @@
 import type ODataModel from "sap/ui/model/odata/v4/ODataModel";
 import { OrderStatus } from "../model/formatter";
+import type { OrderLineInput, OrderQuote } from "./OrderService";
 
 export enum DeliveryType {
     UberFlash = "UBER_FLASH",
@@ -20,6 +21,24 @@ export interface RegisteredSale {
     Number: number;
 }
 
+export interface ReturnItemInput {
+    OrderItemId: string;
+    Quantity: number;
+    Restock: boolean;
+}
+
+export interface ReturnInput {
+    Reason: string;
+    Items: ReturnItemInput[];
+    Replacements: OrderLineInput[];
+}
+
+export interface ReturnQuote {
+    RefundAmount: number;
+    ExchangeAmount: number;
+    BalanceAmount: number;
+}
+
 export interface DeliveryInput {
     DeliveryType: DeliveryType;
     CourierName: string;
@@ -34,14 +53,27 @@ export default class AdminOrderService {
     public async registerStoreSale(sale: StoreSaleInput): Promise<RegisteredSale> {
         const operation = this.adminModel.bindContext("/RegisterStoreSale(...)");
 
-        operation.setParameter("Sale", {
-            ...sale,
-            Items: sale.Items.map((item) => ({ Variant_ID: item.VariantId, Quantity: item.Quantity }))
-        });
+        operation.setParameter("Sale", { ...sale, Items: this.toItemsInput(sale.Items) });
 
         await operation.invoke();
 
         return operation.getBoundContext().getObject() as RegisteredSale;
+    }
+
+    public quoteOrderUpdate(orderId: string, items: OrderLineInput[]): Promise<OrderQuote> {
+        return this.invokeItemsChange("/QuoteOrderUpdate(...)", orderId, items);
+    }
+
+    public updateOrderItems(orderId: string, items: OrderLineInput[]): Promise<OrderQuote> {
+        return this.invokeItemsChange("/UpdateOrderItems(...)", orderId, items);
+    }
+
+    public quoteReturn(orderId: string, input: ReturnInput): Promise<ReturnQuote> {
+        return this.invokeReturn("/QuoteOrderReturn(...)", orderId, input);
+    }
+
+    public registerReturn(orderId: string, input: ReturnInput): Promise<ReturnQuote> {
+        return this.invokeReturn("/RegisterOrderReturn(...)", orderId, input);
     }
 
     public async changeStatus(orderId: string, status: OrderStatus, delivery?: DeliveryInput): Promise<void> {
@@ -55,6 +87,36 @@ export default class AdminOrderService {
         }
 
         await operation.invoke();
+    }
+
+    private async invokeItemsChange(path: string, orderId: string, items: OrderLineInput[]): Promise<OrderQuote> {
+        const operation = this.adminModel.bindContext(path);
+
+        operation.setParameter("OrderId", orderId);
+        operation.setParameter("Items", this.toItemsInput(items));
+
+        await operation.invoke();
+
+        return operation.getBoundContext().getObject() as OrderQuote;
+    }
+
+    private async invokeReturn(path: string, orderId: string, input: ReturnInput): Promise<ReturnQuote> {
+        const operation = this.adminModel.bindContext(path);
+
+        operation.setParameter("OrderId", orderId);
+        operation.setParameter("Return", {
+            Reason: input.Reason,
+            Items: input.Items.map((item) => ({ OrderItem_ID: item.OrderItemId, Quantity: item.Quantity, Restock: item.Restock })),
+            Replacements: this.toItemsInput(input.Replacements)
+        });
+
+        await operation.invoke();
+
+        return operation.getBoundContext().getObject() as ReturnQuote;
+    }
+
+    private toItemsInput(items: OrderLineInput[]): object[] {
+        return items.map((item) => ({ Variant_ID: item.VariantId, Quantity: item.Quantity }));
     }
 
 }

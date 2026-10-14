@@ -12,16 +12,21 @@ import type Button from "sap/m/Button";
 import type Admin from "../Admin.controller";
 import AdminOrderService, { DeliveryInput, DeliveryType } from "../../service/AdminOrderService";
 import formatter, { OrderStatus } from "../../model/formatter";
+import type { EditableOrder } from "./OrderEditSection";
+import type { ReturnableOrder } from "./OrderReturnSection";
 
 const ALL_STATUSES = "ALL";
 const FULL_SCREEN_MAX_WIDTH = 600;
+const ORDER_EXPAND = "Items,Promotions,Returns($expand=Items;$orderby=createdAt)";
+const CHANGE_PARAMETERS = {
+    $select: "ID,Number",
+    $expand: "Items($select=ID,Variant_ID,ImageId,ProductName,ColorName,Size,Quantity,UnitPrice),Returns($select=ID;$expand=Items($select=ID,Kind,OrderItem_ID,Quantity))"
+};
 
-interface DialogOrder {
-    ID: string;
-    Number: number;
+type DialogOrder = EditableOrder & ReturnableOrder & {
     CustomerName: string;
     CustomerPhone: string;
-}
+};
 
 export default class OrdersSection {
 
@@ -51,11 +56,32 @@ export default class OrdersSection {
         this.getTableBinding()?.refresh();
     }
 
+    public refreshOpenOrder(): void {
+        this.dialog?.getElementBinding()?.refresh();
+        this.refresh();
+    }
+
+    public onEditItems = async (): Promise<void> => {
+        const order = await this.loadChangeableOrder();
+
+        if (order) {
+            await this.controller.orderEdit.open(order);
+        }
+    };
+
+    public onRegisterReturn = async (): Promise<void> => {
+        const order = await this.loadChangeableOrder();
+
+        if (order) {
+            await this.controller.orderReturn.open(order);
+        }
+    };
+
     public onOrderPress = async (event: Event): Promise<void> => {
         const context = (event.getSource() as Control).getBindingContext() as Context;
         const dialog = await this.getDialog();
 
-        dialog.bindElement({ path: context.getPath(), parameters: { $expand: "Items,Promotions" } });
+        dialog.bindElement({ path: context.getPath(), parameters: { $expand: ORDER_EXPAND } });
         dialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
         dialog.open();
     };
@@ -114,14 +140,27 @@ export default class OrdersSection {
             await this.controller.runBusy(() => new AdminOrderService(this.controller.getAdminModel()).changeStatus(order.ID, status, delivery));
 
             this.controller.showToast(successKey, [order.Number]);
-            this.dialog?.getElementBinding()?.refresh();
-            this.getTableBinding().refresh();
+            this.refreshOpenOrder();
 
             return true;
         } catch (error) {
             this.controller.handleError(error, "orderStatusError");
 
             return false;
+        }
+    }
+
+    private async loadChangeableOrder(): Promise<DialogOrder | undefined> {
+        const path = this.dialog?.getBindingContext()?.getPath() as string;
+
+        try {
+            return await this.controller.runBusy(() => this.controller.getAdminModel()
+                .bindContext(path, undefined, CHANGE_PARAMETERS)
+                .requestObject() as Promise<DialogOrder>);
+        } catch (error) {
+            this.controller.handleError(error, "orderLoadError");
+
+            return undefined;
         }
     }
 

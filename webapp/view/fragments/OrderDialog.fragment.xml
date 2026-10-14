@@ -28,7 +28,7 @@
 
                 <FlexBox
                     wrap="Wrap"
-                    visible="{= ${path: 'Status', targetType: 'any'} !== 'COMPLETED' &amp;&amp; ${path: 'Status', targetType: 'any'} !== 'CANCELLED' }"
+                    visible="{= ${path: 'Status', targetType: 'any'} !== 'CANCELLED' }"
                     class="blOrderActions"
                 >
                     <Button
@@ -48,6 +48,19 @@
                         type="Emphasized"
                         visible="{= ${path: 'Status', targetType: 'any'} === 'IN_SERVICE' || ${path: 'Status', targetType: 'any'} === 'OUT_FOR_DELIVERY' }"
                         press=".orders.onComplete"
+                    />
+                    <Button
+                        text="{i18n>editItems}"
+                        icon="sap-icon://edit"
+                        visible="{= ${path: 'Status', targetType: 'any'} === 'NEW' || ${path: 'Status', targetType: 'any'} === 'IN_SERVICE' }"
+                        press=".orders.onEditItems"
+                    />
+                    <Button
+                        text="{i18n>registerReturn}"
+                        icon="sap-icon://journey-change"
+                        type="Emphasized"
+                        visible="{= ${path: 'Status', targetType: 'any'} === 'COMPLETED' }"
+                        press=".orders.onRegisterReturn"
                     />
                     <Button
                         text="{i18n>cancelOrder}"
@@ -152,6 +165,39 @@
                     <Text text="{i18n>total}" class="sapUiSmallMarginEnd" />
                     <Text text="{path: 'TotalAmount', targetType: 'any', formatter: '.formatter.currency'}" class="blDetailPrice" />
                 </HBox>
+                <HBox justifyContent="End" alignItems="Center" visible="{= ${path: 'RefundedAmount', targetType: 'any'} > 0 }">
+                    <Text text="{i18n>refundedTotal}" class="sapUiSmallMarginEnd" />
+                    <ObjectStatus text="{path: 'RefundedAmount', targetType: 'any', formatter: '.formatter.negativeAmount'}" state="Warning" />
+                </HBox>
+                <HBox justifyContent="End" alignItems="Center" visible="{= ${path: 'ExchangedAmount', targetType: 'any'} > 0 }">
+                    <Text text="{i18n>exchangedTotal}" class="sapUiSmallMarginEnd" />
+                    <Text text="{path: 'ExchangedAmount', targetType: 'any', formatter: '.formatter.currency'}" />
+                </HBox>
+
+                <List
+                    items="{path: 'Returns', templateShareable: false}"
+                    visible="{= ${path: 'RefundedAmount', targetType: 'any'} > 0 || ${path: 'ExchangedAmount', targetType: 'any'} > 0 }"
+                    headerText="{i18n>returnsTitle}"
+                    showSeparators="Inner"
+                    class="blReturnList sapUiSmallMarginTop"
+                >
+                    <CustomListItem>
+                        <VBox class="blReturnEntry">
+                            <HBox justifyContent="SpaceBetween" alignItems="Center">
+                                <Text text="{path: 'createdAt', targetType: 'any', formatter: '.formatter.dateTime'}" class="blMuted" />
+                                <Text text="{path: 'BalanceAmount', targetType: 'any', formatter: '.formatBalance'}" class="blReturnBalance" />
+                            </HBox>
+                            <Text text="{Reason}" visible="{= !!${path: 'Reason', targetType: 'any'} }" class="blReturnReason" />
+                            <VBox items="{path: 'Items', templateShareable: false}">
+                                <ObjectStatus
+                                    text="{parts: ['Kind', 'Quantity', 'ProductName', 'ColorName', 'Size', 'Restock'], formatter: '.formatReturnItem'}"
+                                    icon="{= ${path: 'Kind', targetType: 'any'} === 'RETURNED' ? 'sap-icon://undo' : 'sap-icon://cart-4' }"
+                                    state="{= ${path: 'Kind', targetType: 'any'} === 'RETURNED' ? 'Warning' : 'Success' }"
+                                />
+                            </VBox>
+                        </VBox>
+                    </CustomListItem>
+                </List>
             </VBox>
         </content>
         <buttons>

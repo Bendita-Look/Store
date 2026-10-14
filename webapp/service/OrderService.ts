@@ -70,6 +70,14 @@ export interface TrackedOrderItem {
     TotalPrice: number;
 }
 
+export interface TrackedReturn {
+    createdAt: string;
+    RefundAmount: number;
+    ExchangeAmount: number;
+    BalanceAmount: number;
+    Items: Array<{ Kind: string; ProductName: string; ColorName?: string; Size: string; Quantity: number }>;
+}
+
 export interface TrackedOrder {
     Number: number;
     Status: string;
@@ -87,6 +95,7 @@ export interface TrackedOrder {
     createdAt: string;
     modifiedAt: string;
     Items: TrackedOrderItem[];
+    Returns: TrackedReturn[];
 }
 
 export default class OrderService {
