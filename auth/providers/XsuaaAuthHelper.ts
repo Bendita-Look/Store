@@ -128,16 +128,14 @@ export class XsuaaAuthHelper {
 
     public static getRedirectUri(): string {
         const configured = this.getConfig().auth?.redirectUri;
-
-        if (configured) {
-            return configured;
-        }
-
         const currentUrl = new URL(window.location.href);
+
         currentUrl.search = "";
         currentUrl.hash = "";
 
-        return currentUrl.toString();
+        const current = currentUrl.toString();
+
+        return configured && current.startsWith(configured) ? configured : current;
     }
 
     public static async loadRuntimeConfig(): Promise<void> {

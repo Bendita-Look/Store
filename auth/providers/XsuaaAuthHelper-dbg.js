@@ -91,13 +91,11 @@ sap.ui.define([], function () {
     }
     static getRedirectUri() {
       const configured = this.getConfig().auth?.redirectUri;
-      if (configured) {
-        return configured;
-      }
       const currentUrl = new URL(window.location.href);
       currentUrl.search = "";
       currentUrl.hash = "";
-      return currentUrl.toString();
+      const current = currentUrl.toString();
+      return configured && current.startsWith(configured) ? configured : current;
     }
     static async loadRuntimeConfig() {
       const url = sap.ui.require.toUrl("apps/dflc/benditalook/config/runtime-config.json");
