@@ -8,6 +8,7 @@ import CategoriesSection from "./admin/CategoriesSection";
 import BackupSection from "./admin/BackupSection";
 import ReportsSection from "./admin/ReportsSection";
 import SettingsSection from "./admin/SettingsSection";
+import EmailServerSection from "./admin/EmailServerSection";
 import PromotionsSection from "./admin/PromotionsSection";
 import StoreSaleSection from "./admin/StoreSaleSection";
 import OrderEditSection from "./admin/OrderEditSection";
@@ -38,6 +39,8 @@ export default class Admin extends BaseController {
 
     public readonly settings = new SettingsSection(this);
 
+    public readonly emailServer = new EmailServerSection(this);
+
     public readonly promotions = new PromotionsSection(this);
 
     public readonly storeSale = new StoreSaleSection(this);
@@ -59,6 +62,7 @@ export default class Admin extends BaseController {
         this.getView()?.setModel(this.viewModel, "adminView");
         this.getView()?.setModel(this.reports.model, "report");
         this.getView()?.setModel(this.settings.model, "settings");
+        this.getView()?.setModel(this.emailServer.model, "emailServer");
         this.getView()?.setModel(this.orders.filterModel, "ordersFilter");
         this.getView()?.setModel(this.products.filterModel, "productsFilter");
 
@@ -105,7 +109,7 @@ export default class Admin extends BaseController {
         }
 
         if (selectedTab === SETTINGS_TAB) {
-            await this.settings.load();
+            await Promise.all([this.settings.load(), this.emailServer.load()]);
         }
     }
 

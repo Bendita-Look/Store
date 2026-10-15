@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/OrdersSection", "./admin/ProductsSection", "./admin/CategoriesSection", "./admin/BackupSection", "./admin/ReportsSection", "./admin/SettingsSection", "./admin/PromotionsSection", "./admin/StoreSaleSection", "./admin/OrderEditSection", "./admin/OrderReturnSection", "./admin/ProductPicker", "./admin/WhatsappComposer", "./admin/StockSection", "../auth/AuthenticationService"], function (JSONModel, __BaseController, __OrdersSection, __ProductsSection, __CategoriesSection, __BackupSection, __ReportsSection, __SettingsSection, __PromotionsSection, __StoreSaleSection, __OrderEditSection, __OrderReturnSection, __ProductPicker, __WhatsappComposer, __StockSection, ___auth_AuthenticationService) {
+sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/OrdersSection", "./admin/ProductsSection", "./admin/CategoriesSection", "./admin/BackupSection", "./admin/ReportsSection", "./admin/SettingsSection", "./admin/EmailServerSection", "./admin/PromotionsSection", "./admin/StoreSaleSection", "./admin/OrderEditSection", "./admin/OrderReturnSection", "./admin/ProductPicker", "./admin/WhatsappComposer", "./admin/StockSection", "../auth/AuthenticationService"], function (JSONModel, __BaseController, __OrdersSection, __ProductsSection, __CategoriesSection, __BackupSection, __ReportsSection, __SettingsSection, __EmailServerSection, __PromotionsSection, __StoreSaleSection, __OrderEditSection, __OrderReturnSection, __ProductPicker, __WhatsappComposer, __StockSection, ___auth_AuthenticationService) {
   "use strict";
 
   function _interopRequireDefault(obj) {
@@ -11,6 +11,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/Order
   const BackupSection = _interopRequireDefault(__BackupSection);
   const ReportsSection = _interopRequireDefault(__ReportsSection);
   const SettingsSection = _interopRequireDefault(__SettingsSection);
+  const EmailServerSection = _interopRequireDefault(__EmailServerSection);
   const PromotionsSection = _interopRequireDefault(__PromotionsSection);
   const StoreSaleSection = _interopRequireDefault(__StoreSaleSection);
   const OrderEditSection = _interopRequireDefault(__OrderEditSection);
@@ -35,6 +36,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/Order
       this.backup = new BackupSection(this);
       this.reports = new ReportsSection(this);
       this.settings = new SettingsSection(this);
+      this.emailServer = new EmailServerSection(this);
       this.promotions = new PromotionsSection(this);
       this.storeSale = new StoreSaleSection(this);
       this.orderEdit = new OrderEditSection(this);
@@ -51,6 +53,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/Order
       this.getView()?.setModel(this.viewModel, "adminView");
       this.getView()?.setModel(this.reports.model, "report");
       this.getView()?.setModel(this.settings.model, "settings");
+      this.getView()?.setModel(this.emailServer.model, "emailServer");
       this.getView()?.setModel(this.orders.filterModel, "ordersFilter");
       this.getView()?.setModel(this.products.filterModel, "productsFilter");
       this.getRouter().getRoute("admin")?.attachPatternMatched(event => this.onRouteMatched(event));
@@ -90,7 +93,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "./BaseController", "./admin/Order
         await this.reports.load();
       }
       if (selectedTab === SETTINGS_TAB) {
-        await this.settings.load();
+        await Promise.all([this.settings.load(), this.emailServer.load()]);
       }
     }
   });
