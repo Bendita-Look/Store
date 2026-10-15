@@ -49,12 +49,14 @@ O proxy local (`custom-proxy`) encaminha `/api/service/...` e `/auth/...` para o
 
 1. Faça o deploy do CAP no BTP Trial (ver README do CAP).
 2. Preencha `webapp/config/runtime-config.json` com a URL do serviço CAP e os dados do XSUAA (`authDomain`, `clientId`, `scope`), obtidos na service key do `BenditaLook-uaa`.
-3. Faça push na `main`: o workflow `.github/workflows/deploy.yml` gera o build e publica na branch `gh-pages`.
-4. Em Settings > Pages do repositório, selecione a branch `gh-pages`.
+3. Faça push na `main`: o `mirror-store.yml` replica o código para `Bendita-Look/Store`, onde o `deploy.yml` gera o build e publica na branch `gh-pages`.
+4. Em Settings > Pages do `Bendita-Look/Store`, selecione a branch `gh-pages`.
 
-### Espelho em benditalook.github.io/Store
+### Repositório oficial e espelho publicado
 
-Este repositório é o oficial. O workflow `.github/workflows/mirror-store.yml` replica cada push na `main` para `benditalook/Store` (variável `MIRROR_REPOSITORY` para trocar o destino), e o `deploy.yml` daquele repositório publica a loja em `https://benditalook.github.io/Store/`. Alterações feitas direto no espelho são sobrescritas.
+Este repositório é o oficial (onde se desenvolve), e a loja é publicada só pelo espelho `Bendita-Look/Store`, em `https://bendita-look.github.io/Store/`:
 
-- Secret `STORE_MIRROR_TOKEN`: token fine-grained criado na conta dona do espelho, com acesso ao repositório e permissões *Contents* e *Workflows* de leitura e escrita.
+- `mirror-store.yml` roda apenas aqui e replica cada push na `main` para o espelho (variável `MIRROR_REPOSITORY` para trocar o destino). Alterações feitas direto no espelho são sobrescritas.
+- `deploy.yml` roda apenas no espelho; aqui ele é ignorado, então este repositório não publica GitHub Pages.
+- Secret `STORE_MIRROR_TOKEN`: token fine-grained com *Resource owner* `Bendita-Look`, acesso só ao repositório `Store` e permissões *Contents* e *Workflows* de leitura e escrita.
 - O login pela conta SAP volta para o próprio site em que foi iniciado: o `redirectUri` do `runtime-config.json` só é usado quando o usuário está naquele endereço; nos demais, vale a URL atual (que precisa estar nos redirect URIs do XSUAA).
