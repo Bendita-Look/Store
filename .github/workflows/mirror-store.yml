@@ -1,4 +1,4 @@
-name: Mirror to Bendita-Look/Store
+name: Mirror to store repository
 
 on:
   push:
@@ -15,14 +15,14 @@ jobs:
     if: github.repository == 'DaviCastr/SAP-UI5-BenditaLook'
     runs-on: ubuntu-latest
     env:
-      MIRROR_REPOSITORY: ${{ vars.MIRROR_REPOSITORY || 'Bendita-Look/Store' }}
+      MIRROR_REPOSITORIES: ${{ vars.MIRROR_REPOSITORIES || 'BenditaLook/Store,Bendita-Look/Store' }}
       MIRROR_TOKEN: ${{ secrets.STORE_MIRROR_TOKEN }}
 
     steps:
       - name: Check mirror token
         run: |
           if [ -z "$MIRROR_TOKEN" ]; then
-            echo "::error::Missing repository secret STORE_MIRROR_TOKEN (fine-grained token with resource owner of ${MIRROR_REPOSITORY}, Contents and Workflows read and write)."
+            echo "::error::Missing repository secret STORE_MIRROR_TOKEN (fine-grained token owned by the store organization, Contents and Workflows read and write)."
             exit 1
           fi
 
@@ -32,7 +32,18 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Push to mirror
+      - name: Push to the first available mirror
         run: |
-          git remote add mirror "https://x-access-token:${MIRROR_TOKEN}@github.com/${MIRROR_REPOSITORY}.git"
-          git push --force mirror HEAD:main
+          IFS=',' read -ra candidates <<< "$MIRROR_REPOSITORIES"
+          for candidate in "${candidates[@]}"; do
+            repository="$(echo "$candidate" | xargs)"
+            url="https://x-access-token:${MIRROR_TOKEN}@github.com/${repository}.git"
+            if git ls-remote --heads "$url" > /dev/null 2>&1; then
+              git push --force "$url" HEAD:main
+              echo "Mirrored to ${repository}"
+              exit 0
+            fi
+            echo "::notice::${repository} is not reachable, trying the next candidate"
+          done
+          echo "::error::None of the mirror repositories is reachable: ${MIRROR_REPOSITORIES}"
+          exit 1

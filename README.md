@@ -56,7 +56,7 @@ O proxy local (`custom-proxy`) encaminha `/api/service/...` e `/auth/...` para o
 
 Este repositório é o oficial (onde se desenvolve), e a loja é publicada só pelo espelho `Bendita-Look/Store`, em `https://bendita-look.github.io/Store/`:
 
-- `mirror-store.yml` roda apenas aqui e replica cada push na `main` para o espelho (variável `MIRROR_REPOSITORY` para trocar o destino). Alterações feitas direto no espelho são sobrescritas.
-- `deploy.yml` roda apenas no espelho; aqui ele é ignorado, então este repositório não publica GitHub Pages.
-- Secret `STORE_MIRROR_TOKEN`: token fine-grained com *Resource owner* `Bendita-Look`, acesso só ao repositório `Store` e permissões *Contents* e *Workflows* de leitura e escrita.
+- `mirror-store.yml` roda apenas aqui e replica cada push na `main` para o primeiro espelho acessível da lista `BenditaLook/Store,Bendita-Look/Store` (variável `MIRROR_REPOSITORIES` para trocar), o que cobre a renomeação da organização. Alterações feitas direto no espelho são sobrescritas.
+- `deploy.yml` roda apenas no espelho (`BenditaLook/Store` ou `Bendita-Look/Store`); aqui ele é ignorado, então este repositório não publica GitHub Pages.
+- Secret `STORE_MIRROR_TOKEN`: token fine-grained com *Resource owner* a organização da loja (continua válido depois de renomeá-la), acesso só ao repositório `Store` e permissões *Contents* e *Workflows* de leitura e escrita.
 - O login pela conta SAP volta para o próprio site em que foi iniciado: o `redirectUri` do `runtime-config.json` só é usado quando o usuário está naquele endereço; nos demais, vale a URL atual (que precisa estar nos redirect URIs do XSUAA).
