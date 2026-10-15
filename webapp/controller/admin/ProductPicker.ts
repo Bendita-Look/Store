@@ -13,6 +13,7 @@ const PRODUCT_EXPAND = "Category($select=Name),Colors($select=ID,Name,HexCode),V
 
 enum PickerMode {
     Variant = "variant",
+    Restock = "restock",
     Product = "product"
 }
 
@@ -39,6 +40,7 @@ interface PickerProduct {
     ID: string;
     Name: string;
     Price: number;
+    CostPrice?: number | null;
     Active: boolean;
     Category?: { Name: string } | null;
     Colors: PickerColor[];
@@ -52,7 +54,7 @@ export interface PickedVariant {
     ID: string;
     Size: string;
     Stock: number;
-    Product: { Name: string; Price: number };
+    Product: { Name: string; Price: number; CostPrice: number };
     Color?: { Name: string } | null;
 }
 
@@ -83,6 +85,10 @@ export default class ProductPicker {
 
     public pickVariant(): Promise<PickedVariant | undefined> {
         return this.open(PickerMode.Variant) as Promise<PickedVariant | undefined>;
+    }
+
+    public pickRestockVariant(): Promise<PickedVariant | undefined> {
+        return this.open(PickerMode.Restock) as Promise<PickedVariant | undefined>;
     }
 
     public pickProduct(): Promise<PickedProduct | undefined> {
@@ -123,17 +129,21 @@ export default class ProductPicker {
         const product = this.model.getProperty("/product") as PickerProduct;
         const variant = product.Variants.find((item) => item.ID === this.model.getProperty("/selectedVariantId"));
 
-        if (!variant || variant.Stock < 1) {
+        const restock = this.isRestock();
+
+        if (!variant || (!restock && variant.Stock < 1)) {
             this.controller.showToast("selectAvailableSize");
             return;
         }
 
-        this.quantity = Math.min(Math.max(1, Number(this.model.getProperty("/quantity")) || 1), variant.Stock);
+        const requested = Math.max(1, Number(this.model.getProperty("/quantity")) || 1);
+
+        this.quantity = restock ? requested : Math.min(requested, variant.Stock);
         this.finish({
             ID: variant.ID,
             Size: variant.Size,
             Stock: variant.Stock,
-            Product: { Name: product.Name, Price: Number(product.Price) },
+            Product: { Name: product.Name, Price: Number(product.Price), CostPrice: Number(product.CostPrice ?? 0) },
             Color: product.Colors.find((color) => color.ID === variant.Color_ID) ?? null
         });
     };
@@ -211,7 +221,7 @@ export default class ProductPicker {
         this.model.setProperty("/selectedColorName", product.Colors.find((color) => color.ID === colorId)?.Name ?? "");
         this.model.setProperty("/sizes", variants);
         this.model.setProperty("/imageId", imagesForColor(product.Images, colorId)[0]?.ID ?? "");
-        this.selectVariant(variants.find((variant) => variant.Stock > 0)?.ID ?? "");
+        this.selectVariant((this.isRestock() ? variants[0] : variants.find((variant) => variant.Stock > 0))?.ID ?? "");
     }
 
     private selectVariant(variantId: string): void {
@@ -220,6 +230,10 @@ export default class ProductPicker {
         this.model.setProperty("/selectedVariantId", variantId);
         this.model.setProperty("/stock", product.Variants.find((variant) => variant.ID === variantId)?.Stock ?? 0);
         this.model.setProperty("/quantity", 1);
+    }
+
+    private isRestock(): boolean {
+        return this.model.getProperty("/mode") === PickerMode.Restock;
     }
 
     private emptyState(mode: PickerMode): object {

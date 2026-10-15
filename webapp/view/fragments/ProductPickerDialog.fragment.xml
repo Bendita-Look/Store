@@ -93,7 +93,7 @@
                             <Button
                                 text="{picker>Size}"
                                 type="{= ${picker>ID} === ${picker>/selectedVariantId} ? 'Emphasized' : 'Default' }"
-                                enabled="{= ${picker>Stock} > 0 }"
+                                enabled="{= ${picker>/mode} === 'restock' || ${picker>Stock} > 0 }"
                                 press=".productPicker.onSizePress"
                                 class="blSize"
                             />
@@ -110,8 +110,8 @@
                         <StepInput
                             value="{picker>/quantity}"
                             min="1"
-                            max="{= Math.max(${picker>/stock}, 1) }"
-                            enabled="{= ${picker>/stock} > 0 }"
+                            max="{= ${picker>/mode} === 'restock' ? 999 : Math.max(${picker>/stock}, 1) }"
+                            enabled="{= ${picker>/mode} === 'restock' || ${picker>/stock} > 0 }"
                             width="8rem"
                         />
                     </VBox>
@@ -124,7 +124,7 @@
                 type="Emphasized"
                 icon="sap-icon://add"
                 visible="{= ${picker>/step} === 'detail' }"
-                enabled="{= ${picker>/stock} > 0 }"
+                enabled="{= ${picker>/mode} === 'restock' || ${picker>/stock} > 0 }"
                 press=".productPicker.onConfirm"
             />
             <Button text="{i18n>back}" icon="sap-icon://nav-back" visible="{= ${picker>/step} === 'detail' }" press=".productPicker.onBack" />

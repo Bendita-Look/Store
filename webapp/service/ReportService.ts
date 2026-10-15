@@ -6,12 +6,24 @@ export interface MonthlySales {
     Items: number;
     Revenue: number;
     Refunds: number;
+    Cost: number;
+    Profit: number;
+    Purchases: number;
 }
 
 export interface ProductSales {
     ProductName: string;
     Quantity: number;
     Revenue: number;
+    Cost: number;
+    Profit: number;
+}
+
+export interface CategorySales {
+    CategoryName: string;
+    Quantity: number;
+    Revenue: number;
+    Profit: number;
 }
 
 export interface SalesReport {
@@ -29,9 +41,15 @@ export interface SalesReport {
     ReturnedItems: number;
     RefundedAmount: number;
     ExchangedAmount: number;
+    Cost: number;
+    Profit: number;
+    Margin: number;
+    Purchases: number;
+    ItemsWithoutCost: number;
     Months: MonthlySales[];
     TopProducts: ProductSales[];
     TopReturned: ProductSales[];
+    TopCategories: CategorySales[];
 }
 
 export default class ReportService {

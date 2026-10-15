@@ -1020,6 +1020,111 @@
     margin-top: 0.25rem;
 }
 
+.blReportViews.sapMSegB {
+    margin: 0.5rem 0;
+}
+
+.blChartRow {
+    gap: 1rem;
+}
+
+.blChartCard {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: var(--bl-radius);
+    background: #ffffff;
+    border: 1px solid var(--bl-line);
+}
+
+.blChartCard.blGrow {
+    flex: 1 1 22rem;
+    min-width: 0;
+}
+
+.blChartScroll {
+    overflow-x: auto;
+}
+
+.blChartScroll svg {
+    display: block;
+    width: 100%;
+    min-width: 34rem;
+    max-height: 20rem;
+    height: auto;
+}
+
+.blChartGrid {
+    stroke: var(--bl-line);
+    stroke-width: 1;
+}
+
+.blChartAxis,
+.blChartLabel,
+.blChartValue {
+    font-family: Montserrat, Arial, sans-serif;
+    font-size: 11px;
+    fill: var(--bl-muted);
+}
+
+.blChartLabel {
+    font-size: 12px;
+    fill: var(--bl-text);
+}
+
+.blChartValue {
+    font-weight: 600;
+    fill: var(--bl-text);
+}
+
+.blChartTotal {
+    font-family: Montserrat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    fill: var(--bl-text);
+}
+
+.blChartDonut {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+}
+
+.blChartDonut svg {
+    width: 13rem;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.blChartLegend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--bl-text);
+}
+
+.blChartDonut .blChartLegend {
+    flex-direction: column;
+    flex: 1 1 10rem;
+}
+
+.blChartLegendItem i {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    margin-right: 0.35rem;
+    border-radius: 0.2rem;
+    vertical-align: middle;
+}
+
+.blChartEmpty {
+    padding: 2rem 0;
+    text-align: center;
+    color: var(--bl-muted);
+}
+
 /* Footer */
 
 .blFooter {
@@ -1219,7 +1324,9 @@
     color: var(--bl-muted);
 }
 
-.blKpis {
+.blKpis.sapMFlexBox {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
     gap: 1rem;
     margin-bottom: 0.5rem;
 }
@@ -1240,6 +1347,7 @@
 .blKpiValue {
     font-size: 1.5rem;
     font-weight: 700;
+    white-space: nowrap;
     color: var(--bl-gold-dark);
 }
 
@@ -1267,6 +1375,19 @@
 }
 
 @media (max-width: 599px) {
+    .blKpis.sapMFlexBox {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.6rem;
+    }
+
+    .blKpi {
+        padding: 0.75rem 0.85rem;
+    }
+
+    .blKpiValue {
+        font-size: 1.1rem;
+    }
+
     .blTabs .sapMITBContainerContent {
         padding-left: 0.5rem;
         padding-right: 0.5rem;

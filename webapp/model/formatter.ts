@@ -59,7 +59,28 @@ function whatsappUrl(phone: string | null | undefined, message?: string): string
     return `https://wa.me/${fullNumber}${text}`;
 }
 
+function formatPercent(value: number | string | null | undefined): string {
+    return new Intl.NumberFormat(languageTag(), { style: "percent", maximumFractionDigits: 1 }).format(Number(value ?? 0) / 100);
+}
+
+function costMargin(pattern: string, price: number | string | null | undefined, cost: number | string | null | undefined): string {
+    const salePrice = Number(price);
+    const costPrice = Number(cost);
+
+    if (!(salePrice > 0) || !(costPrice > 0)) {
+        return "";
+    }
+
+    const profit = salePrice - costPrice;
+
+    return pattern
+        .replace("{0}", formatCurrency(profit))
+        .replace("{1}", formatPercent(profit / salePrice * 100));
+}
+
 export default {
+    costMargin,
+    percent: formatPercent,
 
     currency: formatCurrency,
 

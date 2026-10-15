@@ -14,6 +14,7 @@ import OrderEditSection from "./admin/OrderEditSection";
 import OrderReturnSection from "./admin/OrderReturnSection";
 import ProductPicker from "./admin/ProductPicker";
 import WhatsappComposer from "./admin/WhatsappComposer";
+import StockSection from "./admin/StockSection";
 import { AuthenticationService } from "../auth/AuthenticationService";
 
 const DEFAULT_TAB = "orders";
@@ -48,6 +49,8 @@ export default class Admin extends BaseController {
     public readonly productPicker = new ProductPicker(this);
 
     public readonly whatsapp = new WhatsappComposer(this);
+
+    public readonly stock = new StockSection(this);
 
     private viewModel: JSONModel;
 
@@ -94,6 +97,7 @@ export default class Admin extends BaseController {
         this.orders.refresh();
         this.products.refresh();
         this.promotions.refresh();
+        this.stock.refresh();
 
         if (selectedTab === REPORTS_TAB) {
             await this.reports.load();
