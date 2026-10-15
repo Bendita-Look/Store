@@ -5,7 +5,7 @@
     <VBox class="blFooter">
         <FlexBox wrap="Wrap" justifyContent="SpaceBetween" class="blFooterContent">
             <VBox class="blFooterColumn">
-                <Image src="img/logo.svg" alt="{i18n>appTitle}" densityAware="false" class="blFooterLogo" />
+                <Image src="img/logo.webp" alt="{i18n>appTitle}" densityAware="false" class="blFooterLogo" />
                 <Text text="{i18n>footerText}" class="blFooterText" />
             </VBox>
             <VBox class="blFooterColumn">
