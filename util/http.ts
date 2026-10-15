@@ -25,9 +25,17 @@ export class RequestFailedError extends Error {
     }
 }
 
+const STORE_URL_HEADER = "X-Store-Url";
+
+export function storeUrlHeader(): Record<string, string> {
+    return { [STORE_URL_HEADER]: `${window.location.origin}${window.location.pathname}` };
+}
+
 export function buildAuthHeaders(headers: HeadersInit = {}): Headers {
     const result = new Headers(headers);
     const token = AuthenticationService.getSession()?.accessToken;
+
+    result.set(STORE_URL_HEADER, storeUrlHeader()[STORE_URL_HEADER]);
 
     if (token) {
         result.set("Authorization", `Bearer ${token}`);

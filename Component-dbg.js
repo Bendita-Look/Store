@@ -15,6 +15,7 @@ sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "s
   const isAuthorizationError = ___util_http["isAuthorizationError"];
   const isBackendUnavailableError = ___util_http["isBackendUnavailableError"];
   const isSessionExpiredError = ___util_http["isSessionExpiredError"];
+  const storeUrlHeader = ___util_http["storeUrlHeader"];
   const getBackendErrorMessage = ___util_feedback["getBackendErrorMessage"];
   const StoreService = _interopRequireDefault(__StoreService);
   const ADMIN_ROUTE = "admin";
@@ -130,9 +131,12 @@ sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "s
     createODataModel: function _createODataModel(serviceUrl, accessToken = "") {
       const model = new ODataModel({
         serviceUrl,
-        httpHeaders: accessToken ? {
-          Authorization: this.authorizationHeader(accessToken)
-        } : {},
+        httpHeaders: {
+          ...storeUrlHeader(),
+          ...(accessToken ? {
+            Authorization: this.authorizationHeader(accessToken)
+          } : {})
+        },
         operationMode: "Server",
         autoExpandSelect: true,
         earlyRequests: true
