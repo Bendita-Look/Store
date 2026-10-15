@@ -8,6 +8,9 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
   const DeliveryType = __AdminOrderService["DeliveryType"];
   const OrderStatus = ____model_formatter["OrderStatus"];
   const ALL_STATUSES = "ALL";
+  const ALL = "ALL";
+  const SEARCH_DELAY = 300;
+  const DIGITS_ONLY = /^\d+$/;
   const FULL_SCREEN_MAX_WIDTH = 600;
   const ORDER_EXPAND = "Items,Promotions,Returns($expand=Items;$orderby=createdAt)";
   const CHANGE_PARAMETERS = {
@@ -19,14 +22,24 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
     constructor(controller) {
       this.controller = controller;
     }
-    filterModel = new JSONModel({
-      status: ALL_STATUSES
-    });
+    filterModel = new JSONModel(this.emptyFilters());
     onStatusPress = event => {
-      const status = event.getSource().data("status") ?? ALL_STATUSES;
-      const filters = status === ALL_STATUSES ? [] : [new Filter("Status", FilterOperator.EQ, status)];
-      this.filterModel.setProperty("/status", status);
-      this.getTableBinding().filter(filters);
+      this.filterModel.setProperty("/status", event.getSource().data("status") ?? ALL_STATUSES);
+      this.applyFilters();
+    };
+    onSearch = () => {
+      clearTimeout(this.searchTimer);
+      this.searchTimer = setTimeout(() => this.applyFilters(), SEARCH_DELAY);
+    };
+    onFilterChange = () => {
+      this.applyFilters();
+    };
+    onClearFilters = () => {
+      this.filterModel.setData({
+        ...this.emptyFilters(),
+        status: this.filterModel.getProperty("/status")
+      });
+      this.applyFilters();
     };
     onRefresh = () => {
       this.refresh();
@@ -144,6 +157,66 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
         this.controller.handleError(error, "orderLoadError");
         return undefined;
       }
+    }
+    applyFilters() {
+      const criteria = this.filterModel.getData();
+      const filters = [];
+      const search = criteria.search.trim();
+      if (criteria.status !== ALL_STATUSES) {
+        filters.push(new Filter("Status", FilterOperator.EQ, criteria.status));
+      }
+      if (search) {
+        filters.push(this.searchFilter(search));
+      }
+      if (criteria.channel !== ALL) {
+        filters.push(new Filter("Channel", FilterOperator.EQ, criteria.channel));
+      }
+      if (criteria.fulfillment !== ALL) {
+        filters.push(new Filter("FulfillmentType", FilterOperator.EQ, criteria.fulfillment));
+      }
+      if (criteria.from) {
+        filters.push(new Filter("createdAt", FilterOperator.GE, this.startOfDay(criteria.from).toISOString()));
+      }
+      if (criteria.to) {
+        filters.push(new Filter("createdAt", FilterOperator.LT, this.startOfDay(criteria.to, 1).toISOString()));
+      }
+      this.getTableBinding().filter(filters.length ? new Filter({
+        filters,
+        and: true
+      }) : []);
+    }
+    searchFilter(search) {
+      const text = (path, value = search) => new Filter({
+        path,
+        operator: FilterOperator.Contains,
+        value1: value,
+        caseSensitive: false
+      });
+      const alternatives = [text("CustomerName"), text("CustomerEmail")];
+      const digits = search.replace(/\D/g, "");
+      if (digits) {
+        alternatives.push(text("CustomerPhone", digits));
+      }
+      if (DIGITS_ONLY.test(search)) {
+        alternatives.push(new Filter("Number", FilterOperator.EQ, Number(search)));
+      }
+      return new Filter({
+        filters: alternatives,
+        and: false
+      });
+    }
+    startOfDay(date, addDays = 0) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate() + addDays);
+    }
+    emptyFilters() {
+      return {
+        status: ALL_STATUSES,
+        search: "",
+        channel: ALL,
+        fulfillment: ALL,
+        from: null,
+        to: null
+      };
     }
     emptyDelivery() {
       return {

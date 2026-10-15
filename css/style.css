@@ -1125,6 +1125,21 @@
     color: var(--bl-muted);
 }
 
+.blFilterBar {
+    gap: 0.5rem;
+    margin: 0.25rem 0 0.75rem;
+}
+
+.blFilterSearch.sapMSF {
+    flex: 1 1 16rem;
+    width: auto;
+}
+
+.blFilterField {
+    flex: 0 1 12rem;
+    min-width: 10rem;
+}
+
 /* Footer */
 
 .blFooter {
@@ -1375,6 +1390,11 @@
 }
 
 @media (max-width: 599px) {
+    .blFilterField {
+        flex: 1 1 45%;
+        min-width: 0;
+    }
+
     .blKpis.sapMFlexBox {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.6rem;

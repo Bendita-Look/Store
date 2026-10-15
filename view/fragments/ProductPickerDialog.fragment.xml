@@ -13,7 +13,7 @@
         class="blDialog blPicker"
     >
         <content>
-            <VBox visible="{= ${picker>/step} === 'list' }" busy="{picker>/busy}" busyIndicatorDelay="0" class="sapUiSmallMargin">
+            <VBox visible="{= ${picker>/step} === 'list' }" class="sapUiSmallMargin">
                 <SearchField
                     value="{picker>/search}"
                     placeholder="{i18n>pickerSearch}"
@@ -21,7 +21,23 @@
                     width="100%"
                     class="sapUiSmallMarginBottom"
                 />
-                <f:GridList items="{picker>/filtered}" noDataText="{i18n>pickerNoProducts}" class="blProductGrid blPickerGrid">
+                <f:GridList
+                    id="pickerGrid"
+                    items="{
+                        path: '/Products',
+                        parameters: {
+                            $expand: 'Category($select=Name),Colors($select=ID,Name,HexCode),Variants($select=ID,Size,Stock,Color_ID),Images($select=ID,Color_ID,SortOrder)',
+                            $orderby: 'Name'
+                        },
+                        suspended: true,
+                        templateShareable: false
+                    }"
+                    growing="true"
+                    growingThreshold="24"
+                    growingScrollToLoad="true"
+                    noDataText="{i18n>pickerNoProducts}"
+                    class="blProductGrid blPickerGrid"
+                >
                     <f:customLayout>
                         <grid:GridBoxLayout boxMinWidth="10rem" />
                     </f:customLayout>
@@ -29,19 +45,23 @@
                         <VBox>
                             <VBox class="blProductImageWrapper">
                                 <Image
-                                    src="{path: 'picker>CoverId', formatter: '.formatter.catalogImageUrl'}"
-                                    alt="{picker>Name}"
+                                    src="{path: 'Images', targetType: 'any', formatter: '.formatter.coverImageUrl'}"
+                                    alt="{Name}"
                                     width="100%"
                                     densityAware="false"
                                     class="blProductImage"
                                 />
-                                <Text text="{i18n>soldOut}" visible="{= ${picker>/mode} === 'variant' &amp;&amp; ${picker>Stock} === 0 }" class="blSoldOutTag" />
-                                <Text text="{i18n>productInactive}" visible="{= !${picker>Active} }" class="blSoldOutTag" />
+                                <Text
+                                    text="{i18n>soldOut}"
+                                    visible="{parts: ['picker>/mode', {path: 'Variants', targetType: 'any'}], formatter: '.productPicker.soldOutVisible'}"
+                                    class="blSoldOutTag"
+                                />
+                                <Text text="{i18n>productInactive}" visible="{= !${path: 'Active', targetType: 'any'} }" class="blSoldOutTag" />
                             </VBox>
                             <VBox alignItems="Center" class="blProductInfo">
-                                <Text text="{picker>Name}" maxLines="2" textAlign="Center" class="blProductName" />
-                                <Text text="{picker>Category/Name}" textAlign="Center" class="blMuted" />
-                                <Text text="{path: 'picker>Price', formatter: '.formatter.currency'}" class="blProductPrice" />
+                                <Text text="{Name}" maxLines="2" textAlign="Center" class="blProductName" />
+                                <Text text="{Category/Name}" textAlign="Center" class="blMuted" />
+                                <Text text="{path: 'Price', targetType: 'any', formatter: '.formatter.currency'}" class="blProductPrice" />
                             </VBox>
                         </VBox>
                     </f:GridListItem>

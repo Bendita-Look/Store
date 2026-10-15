@@ -1,11 +1,10 @@
-sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../util/variants"], function (Fragment, JSONModel, ____util_variants) {
+sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/ui/model/FilterOperator", "../../util/variants"], function (Fragment, JSONModel, Filter, FilterOperator, ____util_variants) {
   "use strict";
 
   const imagesForColor = ____util_variants["imagesForColor"];
   const sortBySize = ____util_variants["sortBySize"];
   const FULL_SCREEN_MAX_WIDTH = 600;
-  const PRODUCTS_LIMIT = 500;
-  const PRODUCT_EXPAND = "Category($select=Name),Colors($select=ID,Name,HexCode),Variants($select=ID,Size,Stock,Color_ID),Images($select=ID,Color_ID,SortOrder)";
+  const SEARCH_DELAY = 300;
   var PickerMode = /*#__PURE__*/function (PickerMode) {
     PickerMode["Variant"] = "variant";
     PickerMode["Restock"] = "restock";
@@ -32,10 +31,14 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../uti
     }
     onSearch = event => {
       this.model.setProperty("/search", event.getParameter("newValue") ?? "");
-      this.applyFilter();
+      clearTimeout(this.searchTimer);
+      this.searchTimer = setTimeout(() => this.applyFilters(), SEARCH_DELAY);
+    };
+    soldOutVisible = (mode, variants) => {
+      return mode === PickerMode.Variant && (variants ?? []).every(variant => !(variant.Stock > 0));
     };
     onProductPress = event => {
-      const product = event.getSource().getBindingContext("picker")?.getObject();
+      const product = event.getSource().getBindingContext()?.getObject();
       if (this.model.getProperty("/mode") === PickerMode.Product) {
         this.finish({
           ID: product.ID,
@@ -87,8 +90,8 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../uti
       this.model.setData(this.emptyState(mode));
       const dialog = await this.getDialog();
       dialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
+      this.applyFilters();
       dialog.open();
-      void this.loadProducts(mode);
       return new Promise(resolve => {
         this.resolver = resolve;
       });
@@ -101,34 +104,36 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../uti
       this.resolver?.(this.picked);
       this.resolver = undefined;
     }
-    async loadProducts(mode) {
-      this.model.setProperty("/busy", true);
-      try {
-        const filter = mode === PickerMode.Variant ? "IsActiveEntity eq true and Active eq true" : "IsActiveEntity eq true";
-        const contexts = await this.controller.getAdminModel().bindList("/Products", undefined, undefined, undefined, {
-          $filter: filter,
-          $expand: PRODUCT_EXPAND,
-          $orderby: "Name"
-        }).requestContexts(0, PRODUCTS_LIMIT);
-        this.model.setProperty("/products", contexts.map(context => this.toPickerProduct(context.getObject())));
-        this.applyFilter();
-      } catch (error) {
-        this.controller.handleError(error, "pickerLoadError");
-      } finally {
-        this.model.setProperty("/busy", false);
+    applyFilters() {
+      const binding = this.controller.byControlId("pickerGrid").getBinding("items");
+      const search = this.model.getProperty("/search").trim();
+      const filters = [new Filter("IsActiveEntity", FilterOperator.EQ, true)];
+      if (this.model.getProperty("/mode") === PickerMode.Variant) {
+        filters.push(new Filter("Active", FilterOperator.EQ, true));
       }
-    }
-    toPickerProduct(product) {
-      return {
-        ...product,
-        CoverId: imagesForColor(product.Images ?? [], "")[0]?.ID,
-        Stock: (product.Variants ?? []).reduce((total, variant) => total + variant.Stock, 0)
-      };
-    }
-    applyFilter() {
-      const search = this.model.getProperty("/search").trim().toLowerCase();
-      const products = this.model.getProperty("/products");
-      this.model.setProperty("/filtered", search ? products.filter(product => `${product.Name} ${product.Category?.Name ?? ""}`.toLowerCase().includes(search)) : products);
+      if (search) {
+        filters.push(new Filter({
+          filters: [new Filter({
+            path: "Name",
+            operator: FilterOperator.Contains,
+            value1: search,
+            caseSensitive: false
+          }), new Filter({
+            path: "Category/Name",
+            operator: FilterOperator.Contains,
+            value1: search,
+            caseSensitive: false
+          })],
+          and: false
+        }));
+      }
+      binding.filter(new Filter({
+        filters,
+        and: true
+      }));
+      if (binding.isSuspended()) {
+        binding.resume();
+      }
     }
     selectColor(colorId) {
       const product = this.model.getProperty("/product");
@@ -152,10 +157,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../uti
       return {
         mode,
         step: "list",
-        busy: false,
         search: "",
-        products: [],
-        filtered: [],
         product: null,
         sizes: [],
         imageId: "",

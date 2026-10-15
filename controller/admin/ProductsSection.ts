@@ -1,3 +1,6 @@
+import JSONModel from "sap/ui/model/json/JSONModel";
+import Filter from "sap/ui/model/Filter";
+import FilterOperator from "sap/ui/model/FilterOperator";
 import type Table from "sap/m/Table";
 import type Control from "sap/ui/core/Control";
 import type Event from "sap/ui/base/Event";
@@ -6,9 +9,47 @@ import type ODataListBinding from "sap/ui/model/odata/v4/ODataListBinding";
 import type Admin from "../Admin.controller";
 import DraftService from "../../service/DraftService";
 
+const ALL = "ALL";
+const SEARCH_DELAY = 300;
+
+enum ProductStatusFilter {
+    Active = "ACTIVE",
+    Inactive = "INACTIVE"
+}
+
+enum ProductStockFilter {
+    Available = "AVAILABLE",
+    SoldOut = "SOLD_OUT"
+}
+
+interface ProductFilters {
+    search: string;
+    category: string;
+    status: string;
+    stock: string;
+}
+
 export default class ProductsSection {
 
+    public readonly filterModel = new JSONModel(this.emptyFilters());
+
+    private searchTimer?: ReturnType<typeof setTimeout>;
+
     constructor(private readonly controller: Admin) { }
+
+    public onSearch = (): void => {
+        clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(() => this.applyFilters(), SEARCH_DELAY);
+    };
+
+    public onFilterChange = (): void => {
+        this.applyFilters();
+    };
+
+    public onClearFilters = (): void => {
+        this.filterModel.setData(this.emptyFilters());
+        this.applyFilters();
+    };
 
     public onNewProduct = async (): Promise<void> => {
         try {
@@ -52,6 +93,38 @@ export default class ProductsSection {
 
     public refresh(): void {
         this.getTableBinding()?.refresh();
+    }
+
+    private applyFilters(): void {
+        const criteria = this.filterModel.getData() as ProductFilters;
+        const filters: Filter[] = [];
+        const search = criteria.search.trim();
+
+        if (search) {
+            filters.push(new Filter({ path: "Name", operator: FilterOperator.Contains, value1: search, caseSensitive: false }));
+        }
+
+        if (criteria.category) {
+            filters.push(new Filter("Category_ID", FilterOperator.EQ, criteria.category));
+        }
+
+        if (criteria.status !== ALL) {
+            filters.push(new Filter("Active", FilterOperator.EQ, criteria.status === ProductStatusFilter.Active));
+        }
+
+        if (criteria.stock === ProductStockFilter.Available) {
+            filters.push(new Filter({ path: "Variants", operator: FilterOperator.Any, variable: "variant", condition: new Filter("variant/Stock", FilterOperator.GT, 0) }));
+        }
+
+        if (criteria.stock === ProductStockFilter.SoldOut) {
+            filters.push(new Filter({ path: "Variants", operator: FilterOperator.All, variable: "variant", condition: new Filter("variant/Stock", FilterOperator.LE, 0) }));
+        }
+
+        this.getTableBinding().filter(filters.length ? new Filter({ filters, and: true }) : []);
+    }
+
+    private emptyFilters(): ProductFilters {
+        return { search: "", category: "", status: ALL, stock: ALL };
     }
 
     private openEditor(draft: Context): void {
