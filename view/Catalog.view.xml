@@ -42,7 +42,7 @@
                     <Text text="{i18n>heroSubtitle}" class="blHeroSubtitle" />
                     <Button text="{i18n>heroAction}" type="Emphasized" press=".onShopNow" class="blPrimaryButton blHeroButton" />
                 </VBox>
-                <Image src="img/logo.svg" alt="{i18n>appTitle}" densityAware="false" class="blHeroLogo" />
+                <Image src="img/logo.webp" alt="{i18n>appTitle}" densityAware="false" class="blHeroLogo" />
             </FlexBox>
 
             <FlexBox justifyContent="Center" wrap="Wrap" class="blBenefits">

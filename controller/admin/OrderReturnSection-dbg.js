@@ -9,6 +9,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
   const OrderLines = _interopRequireDefault(__OrderLines);
   const FULL_SCREEN_MAX_WIDTH = 600;
   const RETURNED_KIND = "RETURNED";
+  const REPLACEMENT_KIND = "REPLACEMENT";
   class OrderReturnSection {
     model = new JSONModel(this.emptyState());
     lines = new OrderLines(this.model, "return");
@@ -93,6 +94,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
         Reason: state.reason.trim(),
         Items: state.rows.filter(row => row.Quantity > 0).map(row => ({
           OrderItemId: row.OrderItemId,
+          ReplacementId: row.ReplacementId,
           Quantity: row.Quantity,
           Restock: row.Restock
         })),
@@ -100,17 +102,31 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../ser
       };
     }
     buildRows(order) {
+      const entries = (order.Returns ?? []).flatMap(orderReturn => orderReturn.Items);
       const returned = new Map();
-      (order.Returns ?? []).flatMap(orderReturn => orderReturn.Items).filter(item => item.Kind === RETURNED_KIND && item.OrderItem_ID).forEach(item => returned.set(item.OrderItem_ID, (returned.get(item.OrderItem_ID) ?? 0) + item.Quantity));
-      return order.Items.map(item => ({
-        OrderItemId: item.ID,
+      entries.filter(entry => entry.Kind === RETURNED_KIND).forEach(entry => {
+        const key = entry.OrderItem_ID ?? entry.Replacement_ID;
+        returned.set(key, (returned.get(key) ?? 0) + entry.Quantity);
+      });
+      const orderRows = order.Items.map(item => this.row(item, item.Quantity - (returned.get(item.ID) ?? 0), {
+        OrderItemId: item.ID
+      }));
+      const replacementRows = entries.filter(entry => entry.Kind === REPLACEMENT_KIND).map(entry => this.row(entry, entry.Quantity - (returned.get(entry.ID) ?? 0), {
+        ReplacementId: entry.ID
+      }, true));
+      return [...orderRows, ...replacementRows];
+    }
+    row(item, available, source, fromExchange = false) {
+      const description = [item.ProductName, item.ColorName, item.Size].filter(Boolean).join(" / ");
+      return {
+        ...source,
         ImageId: item.ImageId,
-        Description: [item.ProductName, item.ColorName, item.Size].filter(Boolean).join(" / "),
+        Description: fromExchange ? this.controller.getText("returnFromExchange", [description]) : description,
         Purchased: item.Quantity,
-        Available: item.Quantity - (returned.get(item.ID) ?? 0),
+        Available: available,
         Quantity: 0,
         Restock: true
-      }));
+      };
     }
     service() {
       return new AdminOrderService(this.controller.getAdminModel());

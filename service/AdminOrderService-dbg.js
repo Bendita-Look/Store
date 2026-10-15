@@ -57,7 +57,8 @@ sap.ui.define([], function () {
       operation.setParameter("Return", {
         Reason: input.Reason,
         Items: input.Items.map(item => ({
-          OrderItem_ID: item.OrderItemId,
+          OrderItem_ID: item.OrderItemId ?? null,
+          Replacement_ID: item.ReplacementId ?? null,
           Quantity: item.Quantity,
           Restock: item.Restock
         })),

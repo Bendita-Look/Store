@@ -20,7 +20,7 @@ const FULL_SCREEN_MAX_WIDTH = 600;
 const ORDER_EXPAND = "Items,Promotions,Returns($expand=Items;$orderby=createdAt)";
 const CHANGE_PARAMETERS = {
     $select: "ID,Number,CouponCode",
-    $expand: "Items($select=ID,Variant_ID,ImageId,ProductName,ColorName,Size,Quantity,UnitPrice),Returns($select=ID;$expand=Items($select=ID,Kind,OrderItem_ID,Quantity)),Promotions($select=ID,CouponCode)"
+    $expand: "Items($select=ID,Variant_ID,ImageId,ProductName,ColorName,Size,Quantity,UnitPrice),Returns($select=ID;$expand=Items($select=ID,Kind,OrderItem_ID,Replacement_ID,ImageId,ProductName,ColorName,Size,Quantity)),Promotions($select=ID,CouponCode)"
 };
 
 type DialogOrder = EditableOrder & ReturnableOrder & {

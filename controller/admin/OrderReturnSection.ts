@@ -10,6 +10,19 @@ import OrderLines, { OrderLine } from "./OrderLines";
 
 const FULL_SCREEN_MAX_WIDTH = 600;
 const RETURNED_KIND = "RETURNED";
+const REPLACEMENT_KIND = "REPLACEMENT";
+
+interface ReturnedEntry {
+    ID: string;
+    Kind: string;
+    OrderItem_ID?: string | null;
+    Replacement_ID?: string | null;
+    ImageId?: string | null;
+    ProductName: string;
+    ColorName?: string | null;
+    Size: string;
+    Quantity: number;
+}
 
 export interface ReturnableOrder {
     ID: string;
@@ -23,13 +36,14 @@ export interface ReturnableOrder {
         Quantity: number;
     }>;
     Returns?: Array<{
-        Items: Array<{ Kind: string; OrderItem_ID?: string; Quantity: number }>;
+        Items: ReturnedEntry[];
     }>;
 }
 
 interface ReturnRow {
-    OrderItemId: string;
-    ImageId?: string;
+    OrderItemId?: string;
+    ReplacementId?: string;
+    ImageId?: string | null;
     Description: string;
     Purchased: number;
     Available: number;
@@ -150,28 +164,48 @@ export default class OrderReturnSection {
             Reason: state.reason.trim(),
             Items: state.rows
                 .filter((row) => row.Quantity > 0)
-                .map((row) => ({ OrderItemId: row.OrderItemId, Quantity: row.Quantity, Restock: row.Restock })),
+                .map((row) => ({ OrderItemId: row.OrderItemId, ReplacementId: row.ReplacementId, Quantity: row.Quantity, Restock: row.Restock })),
             Replacements: this.lines.toItems()
         };
     }
 
     private buildRows(order: ReturnableOrder): ReturnRow[] {
+        const entries = (order.Returns ?? []).flatMap((orderReturn) => orderReturn.Items);
         const returned = new Map<string, number>();
 
-        (order.Returns ?? [])
-            .flatMap((orderReturn) => orderReturn.Items)
-            .filter((item) => item.Kind === RETURNED_KIND && item.OrderItem_ID)
-            .forEach((item) => returned.set(item.OrderItem_ID as string, (returned.get(item.OrderItem_ID as string) ?? 0) + item.Quantity));
+        entries
+            .filter((entry) => entry.Kind === RETURNED_KIND)
+            .forEach((entry) => {
+                const key = (entry.OrderItem_ID ?? entry.Replacement_ID) as string;
 
-        return order.Items.map((item) => ({
-            OrderItemId: item.ID,
+                returned.set(key, (returned.get(key) ?? 0) + entry.Quantity);
+            });
+
+        const orderRows = order.Items.map((item) => this.row(item, item.Quantity - (returned.get(item.ID) ?? 0), { OrderItemId: item.ID }));
+        const replacementRows = entries
+            .filter((entry) => entry.Kind === REPLACEMENT_KIND)
+            .map((entry) => this.row(entry, entry.Quantity - (returned.get(entry.ID) ?? 0), { ReplacementId: entry.ID }, true));
+
+        return [...orderRows, ...replacementRows];
+    }
+
+    private row(
+        item: { ImageId?: string | null; ProductName: string; ColorName?: string | null; Size: string; Quantity: number },
+        available: number,
+        source: Pick<ReturnRow, "OrderItemId" | "ReplacementId">,
+        fromExchange = false
+    ): ReturnRow {
+        const description = [item.ProductName, item.ColorName, item.Size].filter(Boolean).join(" / ");
+
+        return {
+            ...source,
             ImageId: item.ImageId,
-            Description: [item.ProductName, item.ColorName, item.Size].filter(Boolean).join(" / "),
+            Description: fromExchange ? this.controller.getText("returnFromExchange", [description]) : description,
             Purchased: item.Quantity,
-            Available: item.Quantity - (returned.get(item.ID) ?? 0),
+            Available: available,
             Quantity: 0,
             Restock: true
-        }));
+        };
     }
 
     private service(): AdminOrderService {

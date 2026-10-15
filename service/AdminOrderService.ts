@@ -28,7 +28,8 @@ export interface OrderChangeInput {
 }
 
 export interface ReturnItemInput {
-    OrderItemId: string;
+    OrderItemId?: string;
+    ReplacementId?: string;
     Quantity: number;
     Restock: boolean;
 }
@@ -112,7 +113,12 @@ export default class AdminOrderService {
         operation.setParameter("OrderId", orderId);
         operation.setParameter("Return", {
             Reason: input.Reason,
-            Items: input.Items.map((item) => ({ OrderItem_ID: item.OrderItemId, Quantity: item.Quantity, Restock: item.Restock })),
+            Items: input.Items.map((item) => ({
+                OrderItem_ID: item.OrderItemId ?? null,
+                Replacement_ID: item.ReplacementId ?? null,
+                Quantity: item.Quantity,
+                Restock: item.Restock
+            })),
             Replacements: this.toItemsInput(input.Replacements)
         });
 
