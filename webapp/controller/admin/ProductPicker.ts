@@ -1,5 +1,9 @@
 import Fragment from "sap/ui/core/Fragment";
 import JSONModel from "sap/ui/model/json/JSONModel";
+import Filter from "sap/ui/model/Filter";
+import FilterOperator from "sap/ui/model/FilterOperator";
+import type GridList from "sap/f/GridList";
+import type ODataListBinding from "sap/ui/model/odata/v4/ODataListBinding";
 import type Dialog from "sap/m/Dialog";
 import type Control from "sap/ui/core/Control";
 import type Event from "sap/ui/base/Event";
@@ -8,8 +12,7 @@ import type Admin from "../Admin.controller";
 import { imagesForColor, sortBySize } from "../../util/variants";
 
 const FULL_SCREEN_MAX_WIDTH = 600;
-const PRODUCTS_LIMIT = 500;
-const PRODUCT_EXPAND = "Category($select=Name),Colors($select=ID,Name,HexCode),Variants($select=ID,Size,Stock,Color_ID),Images($select=ID,Color_ID,SortOrder)";
+const SEARCH_DELAY = 300;
 
 enum PickerMode {
     Variant = "variant",
@@ -46,8 +49,6 @@ interface PickerProduct {
     Colors: PickerColor[];
     Variants: PickerVariant[];
     Images: PickerImage[];
-    CoverId?: string;
-    Stock: number;
 }
 
 export interface PickedVariant {
@@ -77,6 +78,8 @@ export default class ProductPicker {
 
     private quantity = 1;
 
+    private searchTimer?: ReturnType<typeof setTimeout>;
+
     constructor(private readonly controller: Admin) { }
 
     public get pickedQuantity(): number {
@@ -97,11 +100,16 @@ export default class ProductPicker {
 
     public onSearch = (event: SearchField$LiveChangeEvent): void => {
         this.model.setProperty("/search", event.getParameter("newValue") ?? "");
-        this.applyFilter();
+        clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(() => this.applyFilters(), SEARCH_DELAY);
+    };
+
+    public soldOutVisible = (mode: string, variants: Array<{ Stock: number }> | null | undefined): boolean => {
+        return mode === PickerMode.Variant && (variants ?? []).every((variant) => !(variant.Stock > 0));
     };
 
     public onProductPress = (event: Event): void => {
-        const product = (event.getSource() as Control).getBindingContext("picker")?.getObject() as PickerProduct;
+        const product = (event.getSource() as Control).getBindingContext()?.getObject() as PickerProduct;
 
         if (this.model.getProperty("/mode") === PickerMode.Product) {
             this.finish({ ID: product.ID, Name: product.Name });
@@ -160,8 +168,8 @@ export default class ProductPicker {
         const dialog = await this.getDialog();
 
         dialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
+        this.applyFilters();
         dialog.open();
-        void this.loadProducts(mode);
 
         return new Promise((resolve) => {
             this.resolver = resolve;
@@ -178,39 +186,30 @@ export default class ProductPicker {
         this.resolver = undefined;
     }
 
-    private async loadProducts(mode: PickerMode): Promise<void> {
-        this.model.setProperty("/busy", true);
+    private applyFilters(): void {
+        const binding = this.controller.byControlId<GridList>("pickerGrid").getBinding("items") as ODataListBinding;
+        const search = (this.model.getProperty("/search") as string).trim();
+        const filters = [new Filter("IsActiveEntity", FilterOperator.EQ, true)];
 
-        try {
-            const filter = mode === PickerMode.Variant ? "IsActiveEntity eq true and Active eq true" : "IsActiveEntity eq true";
-            const contexts = await this.controller.getAdminModel()
-                .bindList("/Products", undefined, undefined, undefined, { $filter: filter, $expand: PRODUCT_EXPAND, $orderby: "Name" })
-                .requestContexts(0, PRODUCTS_LIMIT);
-
-            this.model.setProperty("/products", contexts.map((context) => this.toPickerProduct(context.getObject() as PickerProduct)));
-            this.applyFilter();
-        } catch (error) {
-            this.controller.handleError(error, "pickerLoadError");
-        } finally {
-            this.model.setProperty("/busy", false);
+        if (this.model.getProperty("/mode") === PickerMode.Variant) {
+            filters.push(new Filter("Active", FilterOperator.EQ, true));
         }
-    }
 
-    private toPickerProduct(product: PickerProduct): PickerProduct {
-        return {
-            ...product,
-            CoverId: imagesForColor(product.Images ?? [], "")[0]?.ID,
-            Stock: (product.Variants ?? []).reduce((total, variant) => total + variant.Stock, 0)
-        };
-    }
+        if (search) {
+            filters.push(new Filter({
+                filters: [
+                    new Filter({ path: "Name", operator: FilterOperator.Contains, value1: search, caseSensitive: false }),
+                    new Filter({ path: "Category/Name", operator: FilterOperator.Contains, value1: search, caseSensitive: false })
+                ],
+                and: false
+            }));
+        }
 
-    private applyFilter(): void {
-        const search = (this.model.getProperty("/search") as string).trim().toLowerCase();
-        const products = this.model.getProperty("/products") as PickerProduct[];
+        binding.filter(new Filter({ filters, and: true }));
 
-        this.model.setProperty("/filtered", search
-            ? products.filter((product) => `${product.Name} ${product.Category?.Name ?? ""}`.toLowerCase().includes(search))
-            : products);
+        if (binding.isSuspended()) {
+            binding.resume();
+        }
     }
 
     private selectColor(colorId: string): void {
@@ -240,10 +239,7 @@ export default class ProductPicker {
         return {
             mode,
             step: "list",
-            busy: false,
             search: "",
-            products: [],
-            filtered: [],
             product: null,
             sizes: [],
             imageId: "",

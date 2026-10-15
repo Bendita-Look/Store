@@ -107,6 +107,33 @@
                                 <Button icon="sap-icon://refresh" tooltip="{i18n>refresh}" press=".orders.onRefresh" />
                             </HBox>
                         </FlexBox>
+                        <FlexBox wrap="Wrap" alignItems="End" class="blFilterBar">
+                            <SearchField
+                                value="{ordersFilter>/search}"
+                                placeholder="{i18n>filterSearchOrders}"
+                                liveChange=".orders.onSearch"
+                                search=".orders.onFilterChange"
+                                class="blFilterSearch"
+                            />
+                            <Select selectedKey="{ordersFilter>/channel}" change=".orders.onFilterChange" class="blFilterField">
+                                <core:Item key="ALL" text="{i18n>channelAll}" />
+                                <core:Item key="ONLINE" text="{i18n>channel.ONLINE}" />
+                                <core:Item key="STORE" text="{i18n>channel.STORE}" />
+                            </Select>
+                            <Select selectedKey="{ordersFilter>/fulfillment}" change=".orders.onFilterChange" class="blFilterField">
+                                <core:Item key="ALL" text="{i18n>fulfillmentAll}" />
+                                <core:Item key="DELIVERY" text="{i18n>fulfillment.DELIVERY}" />
+                                <core:Item key="PICKUP" text="{i18n>fulfillment.PICKUP}" />
+                            </Select>
+                            <DateRangeSelection
+                                dateValue="{ordersFilter>/from}"
+                                secondDateValue="{ordersFilter>/to}"
+                                placeholder="{i18n>filterPeriod}"
+                                change=".orders.onFilterChange"
+                                class="blFilterField"
+                            />
+                            <Button text="{i18n>clearFilters}" icon="sap-icon://clear-filter" type="Transparent" press=".orders.onClearFilters" />
+                        </FlexBox>
                         <Table
                             id="ordersTable"
                             popinLayout="GridSmall"
@@ -175,6 +202,36 @@
                             <ToolbarSpacer />
                             <Button text="{i18n>newProduct}" icon="sap-icon://add" type="Emphasized" press=".products.onNewProduct" />
                         </Toolbar>
+                        <FlexBox wrap="Wrap" alignItems="End" class="blFilterBar">
+                            <SearchField
+                                value="{productsFilter>/search}"
+                                placeholder="{i18n>filterSearchProducts}"
+                                liveChange=".products.onSearch"
+                                search=".products.onFilterChange"
+                                class="blFilterSearch"
+                            />
+                            <ComboBox
+                                selectedKey="{productsFilter>/category}"
+                                placeholder="{i18n>categoryAll}"
+                                showClearIcon="true"
+                                selectionChange=".products.onFilterChange"
+                                class="blFilterField"
+                                items="{path: '/Categories', parameters: {$select: 'ID,Name', $filter: 'IsActiveEntity eq true'}, sorter: {path: 'Name'}, templateShareable: false}"
+                            >
+                                <core:Item key="{ID}" text="{Name}" />
+                            </ComboBox>
+                            <Select selectedKey="{productsFilter>/status}" change=".products.onFilterChange" class="blFilterField">
+                                <core:Item key="ALL" text="{i18n>productStatusAll}" />
+                                <core:Item key="ACTIVE" text="{i18n>productStatusActive}" />
+                                <core:Item key="INACTIVE" text="{i18n>productStatusInactive}" />
+                            </Select>
+                            <Select selectedKey="{productsFilter>/stock}" change=".products.onFilterChange" class="blFilterField">
+                                <core:Item key="ALL" text="{i18n>stockFilterAll}" />
+                                <core:Item key="AVAILABLE" text="{i18n>stockFilterAvailable}" />
+                                <core:Item key="SOLD_OUT" text="{i18n>stockFilterSoldOut}" />
+                            </Select>
+                            <Button text="{i18n>clearFilters}" icon="sap-icon://clear-filter" type="Transparent" press=".products.onClearFilters" />
+                        </FlexBox>
                         <Table
                             id="productsTable"
                             popinLayout="GridSmall"

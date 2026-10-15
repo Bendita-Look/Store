@@ -17,6 +17,18 @@ import type { ReturnableOrder } from "./OrderReturnSection";
 import type { ComposableOrder } from "./WhatsappComposer";
 
 const ALL_STATUSES = "ALL";
+const ALL = "ALL";
+const SEARCH_DELAY = 300;
+const DIGITS_ONLY = /^\d+$/;
+
+interface OrderFilters {
+    status: string;
+    search: string;
+    channel: string;
+    fulfillment: string;
+    from: Date | null;
+    to: Date | null;
+}
 const FULL_SCREEN_MAX_WIDTH = 600;
 const ORDER_EXPAND = "Items,Promotions,Returns($expand=Items;$orderby=createdAt)";
 const CHANGE_PARAMETERS = {
@@ -38,14 +50,27 @@ export default class OrdersSection {
 
     constructor(private readonly controller: Admin) { }
 
-    public readonly filterModel = new JSONModel({ status: ALL_STATUSES });
+    public readonly filterModel = new JSONModel(this.emptyFilters());
+
+    private searchTimer?: ReturnType<typeof setTimeout>;
 
     public onStatusPress = (event: Event): void => {
-        const status = ((event.getSource() as Button).data("status") as string | null) ?? ALL_STATUSES;
-        const filters = status === ALL_STATUSES ? [] : [new Filter("Status", FilterOperator.EQ, status)];
+        this.filterModel.setProperty("/status", ((event.getSource() as Button).data("status") as string | null) ?? ALL_STATUSES);
+        this.applyFilters();
+    };
 
-        this.filterModel.setProperty("/status", status);
-        this.getTableBinding().filter(filters);
+    public onSearch = (): void => {
+        clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(() => this.applyFilters(), SEARCH_DELAY);
+    };
+
+    public onFilterChange = (): void => {
+        this.applyFilters();
+    };
+
+    public onClearFilters = (): void => {
+        this.filterModel.setData({ ...this.emptyFilters(), status: this.filterModel.getProperty("/status") });
+        this.applyFilters();
     };
 
     public onRefresh = (): void => {
@@ -185,6 +210,62 @@ export default class OrdersSection {
 
             return undefined;
         }
+    }
+
+    private applyFilters(): void {
+        const criteria = this.filterModel.getData() as OrderFilters;
+        const filters: Filter[] = [];
+        const search = criteria.search.trim();
+
+        if (criteria.status !== ALL_STATUSES) {
+            filters.push(new Filter("Status", FilterOperator.EQ, criteria.status));
+        }
+
+        if (search) {
+            filters.push(this.searchFilter(search));
+        }
+
+        if (criteria.channel !== ALL) {
+            filters.push(new Filter("Channel", FilterOperator.EQ, criteria.channel));
+        }
+
+        if (criteria.fulfillment !== ALL) {
+            filters.push(new Filter("FulfillmentType", FilterOperator.EQ, criteria.fulfillment));
+        }
+
+        if (criteria.from) {
+            filters.push(new Filter("createdAt", FilterOperator.GE, this.startOfDay(criteria.from).toISOString()));
+        }
+
+        if (criteria.to) {
+            filters.push(new Filter("createdAt", FilterOperator.LT, this.startOfDay(criteria.to, 1).toISOString()));
+        }
+
+        this.getTableBinding().filter(filters.length ? new Filter({ filters, and: true }) : []);
+    }
+
+    private searchFilter(search: string): Filter {
+        const text = (path: string, value = search): Filter => new Filter({ path, operator: FilterOperator.Contains, value1: value, caseSensitive: false });
+        const alternatives = [text("CustomerName"), text("CustomerEmail")];
+        const digits = search.replace(/\D/g, "");
+
+        if (digits) {
+            alternatives.push(text("CustomerPhone", digits));
+        }
+
+        if (DIGITS_ONLY.test(search)) {
+            alternatives.push(new Filter("Number", FilterOperator.EQ, Number(search)));
+        }
+
+        return new Filter({ filters: alternatives, and: false });
+    }
+
+    private startOfDay(date: Date, addDays = 0): Date {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate() + addDays);
+    }
+
+    private emptyFilters(): OrderFilters {
+        return { status: ALL_STATUSES, search: "", channel: ALL, fulfillment: ALL, from: null, to: null };
     }
 
     private emptyDelivery(): DeliveryInput {
