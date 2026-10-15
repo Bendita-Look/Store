@@ -808,6 +808,72 @@
                                     press=".settings.onSave"
                                 />
                             </HBox>
+                            <VBox visible="{emailServer>/loaded}" class="sapUiMediumMarginTop">
+                                <MessageStrip
+                                    text="{path: 'emailServer>/Source', formatter: '.emailServer.sourceText'}"
+                                    type="{path: 'emailServer>/Source', formatter: '.emailServer.sourceState'}"
+                                    showIcon="true"
+                                    class="sapUiSmallMarginBottom"
+                                />
+                                <MessageStrip
+                                    text="{i18n>emailPasswordUnreadable}"
+                                    type="Warning"
+                                    showIcon="true"
+                                    visible="{= ${emailServer>/Saved} &amp;&amp; !${emailServer>/PasswordReadable} }"
+                                    class="sapUiSmallMarginBottom"
+                                />
+                                <form:SimpleForm
+                                    id="emailServerForm"
+                                    editable="true"
+                                    layout="ColumnLayout"
+                                    columnsM="2"
+                                    columnsL="2"
+                                    columnsXL="2"
+                                    title="{i18n>emailServerTitle}"
+                                    class="blForm"
+                                >
+                                    <Label text="{i18n>emailServerHost}" required="true" />
+                                    <Input value="{emailServer>/Host}" maxLength="120" placeholder="smtp.gmail.com" />
+                                    <Label text="{i18n>emailServerPort}" required="true" />
+                                    <Input value="{path: 'emailServer>/Port', type: 'sap.ui.model.type.Integer'}" type="Number" maxLength="5" />
+                                    <Label text="{i18n>emailServerUsername}" required="true" />
+                                    <Input value="{emailServer>/Username}" maxLength="120" placeholder="{i18n>emailServerUsernamePlaceholder}" />
+                                    <Label text="{i18n>emailServerPassword}" required="{= !${emailServer>/PasswordReadable} }" />
+                                    <Input
+                                        value="{emailServer>/Password}"
+                                        type="Password"
+                                        maxLength="200"
+                                        autocomplete="false"
+                                        placeholder="{= ${emailServer>/PasswordReadable} ? ${i18n>emailServerPasswordKeep} : ${i18n>emailServerPasswordPlaceholder} }"
+                                    />
+                                    <Label text="{i18n>emailServerSender}" />
+                                    <Input value="{emailServer>/Sender}" type="Email" maxLength="120" placeholder="{i18n>emailServerSenderPlaceholder}" />
+                                </form:SimpleForm>
+                                <Text text="{i18n>emailServerHelp}" class="blMuted sapUiTinyMarginTop" />
+                                <HBox justifyContent="End" wrap="Wrap" class="sapUiSmallMarginTop">
+                                    <Button
+                                        text="{i18n>emailServerRemove}"
+                                        icon="sap-icon://delete"
+                                        type="Transparent"
+                                        visible="{emailServer>/Saved}"
+                                        press=".emailServer.onRemove"
+                                        class="sapUiSmallMarginEnd"
+                                    />
+                                    <Button text="{i18n>emailServerSave}" icon="sap-icon://save" type="Emphasized" press=".emailServer.onSave" />
+                                </HBox>
+                                <FlexBox wrap="Wrap" alignItems="End" class="blFilterBar sapUiSmallMarginTop">
+                                    <VBox class="blFilterSearch">
+                                        <Label text="{i18n>emailTestRecipient}" labelFor="emailTestRecipient" />
+                                        <Input id="emailTestRecipient" value="{emailServer>/testRecipient}" valueLiveUpdate="true" type="Email" maxLength="120" />
+                                    </VBox>
+                                    <Button
+                                        text="{i18n>emailTestSend}"
+                                        icon="sap-icon://email"
+                                        enabled="{= ${emailServer>/Source} !== 'NONE' &amp;&amp; !!${emailServer>/testRecipient} }"
+                                        press=".emailServer.onSendTest"
+                                    />
+                                </FlexBox>
+                            </VBox>
                         </VBox>
                     </IconTabFilter>
 
