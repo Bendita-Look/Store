@@ -12,7 +12,7 @@ import { AuthenticatedProviderFactory } from "./auth/providers/AuthenticatedProv
 import { XsuaaAuthHelper } from "./auth/providers/XsuaaAuthHelper";
 import { SessionStorage } from "./auth/storage/SessionStorage";
 import Environment from "./util/Environment";
-import { isAuthenticationError, isAuthorizationError, isBackendUnavailableError, isSessionExpiredError } from "./util/http";
+import { isAuthenticationError, isAuthorizationError, isBackendUnavailableError, isSessionExpiredError, storeUrlHeader } from "./util/http";
 import { getBackendErrorMessage } from "./util/feedback";
 import StoreService from "./service/StoreService";
 
@@ -162,7 +162,10 @@ export default class Component extends BaseComponent {
     private createODataModel(serviceUrl: string, accessToken = ""): ODataModel {
         const model = new ODataModel({
             serviceUrl,
-            httpHeaders: accessToken ? { Authorization: this.authorizationHeader(accessToken) } : {},
+            httpHeaders: {
+                ...storeUrlHeader(),
+                ...(accessToken ? { Authorization: this.authorizationHeader(accessToken) as string } : {})
+            },
             operationMode: "Server",
             autoExpandSelect: true,
             earlyRequests: true
