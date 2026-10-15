@@ -24,16 +24,9 @@ sap.ui.define(["../auth/AuthenticationService", "../auth/providers/XsuaaAuthHelp
       this.name = "RequestFailedError";
     }
   }
-  const STORE_URL_HEADER = "X-Store-Url";
-  function storeUrlHeader() {
-    return {
-      [STORE_URL_HEADER]: `${window.location.origin}${window.location.pathname}`
-    };
-  }
   function buildAuthHeaders(headers = {}) {
     const result = new Headers(headers);
     const token = AuthenticationService.getSession()?.accessToken;
-    result.set(STORE_URL_HEADER, storeUrlHeader()[STORE_URL_HEADER]);
     if (token) {
       result.set("Authorization", `Bearer ${token}`);
     }
@@ -93,7 +86,6 @@ sap.ui.define(["../auth/AuthenticationService", "../auth/providers/XsuaaAuthHelp
   __exports.BackendUnavailableError = BackendUnavailableError;
   __exports.SessionExpiredError = SessionExpiredError;
   __exports.RequestFailedError = RequestFailedError;
-  __exports.storeUrlHeader = storeUrlHeader;
   __exports.buildAuthHeaders = buildAuthHeaders;
   __exports.adminRequest = adminRequest;
   __exports.isAuthorizationError = isAuthorizationError;
