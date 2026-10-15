@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/FilterOperator", "sap/ui/model/json/JSONModel", "../../service/AdminOrderService", "../../model/formatter"], function (Fragment, Filter, FilterOperator, JSONModel, __AdminOrderService, __formatter) {
+sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/FilterOperator", "sap/ui/model/json/JSONModel", "../../service/AdminOrderService", "../../model/formatter"], function (Fragment, Filter, FilterOperator, JSONModel, __AdminOrderService, ____model_formatter) {
   "use strict";
 
   function _interopRequireDefault(obj) {
@@ -6,8 +6,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
   }
   const AdminOrderService = _interopRequireDefault(__AdminOrderService);
   const DeliveryType = __AdminOrderService["DeliveryType"];
-  const formatter = _interopRequireDefault(__formatter);
-  const OrderStatus = __formatter["OrderStatus"];
+  const OrderStatus = ____model_formatter["OrderStatus"];
   const ALL_STATUSES = "ALL";
   const FULL_SCREEN_MAX_WIDTH = 600;
   const ORDER_EXPAND = "Items,Promotions,Returns($expand=Items;$orderby=createdAt)";
@@ -123,9 +122,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
       }
     };
     onWhatsapp = () => {
-      const order = this.getDialogOrder();
-      const message = this.controller.getText("whatsappCustomerMessage", [order.CustomerName, order.Number]);
-      window.open(formatter.whatsappUrl(order.CustomerPhone, message), "_blank");
+      void this.controller.whatsapp.open(this.getDialogOrder());
     };
     async changeStatus(status, successKey, delivery) {
       const order = this.getDialogOrder();

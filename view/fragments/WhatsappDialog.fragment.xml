@@ -1,0 +1,30 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="whatsappDialog"
+        title="{parts: ['i18n>waDialogTitle', 'whatsapp>/customer'], formatter: '.formatter.message'}"
+        contentWidth="36rem"
+        resizable="true"
+        class="blDialog"
+    >
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <MessageStrip text="{i18n>waDialogInfo}" type="Information" showIcon="true" class="sapUiSmallMarginBottom" />
+                <Label text="{parts: ['i18n>waDialogPhone', 'whatsapp>/phone'], formatter: '.formatter.message'}" />
+                <TextArea value="{whatsapp>/message}" rows="14" growing="true" growingMaxLines="24" maxLength="4000" width="100%" />
+            </VBox>
+        </content>
+        <buttons>
+            <Button
+                text="{i18n>waDialogSend}"
+                icon="sap-icon://discussion"
+                type="Success"
+                enabled="{= !!${whatsapp>/message} }"
+                press=".whatsapp.onSend"
+            />
+            <Button text="{i18n>cancel}" press=".whatsapp.onCancel" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

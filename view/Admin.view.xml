@@ -540,6 +540,14 @@
                                 />
                                 <Label text="{i18n>storeUrl}" />
                                 <Input value="{StoreUrl}" maxLength="255" placeholder="{i18n>storeUrlPlaceholder}" editable="{settings>/editing}" />
+                                <Label text="{i18n>whatsappSignature}" />
+                                <TextArea
+                                    value="{WhatsappSignature}"
+                                    maxLength="255"
+                                    rows="2"
+                                    placeholder="{i18n>whatsappSignaturePlaceholder}"
+                                    editable="{settings>/editing}"
+                                />
                                 <Label text="{i18n>notificationEmails}" />
                                 <TextArea
                                     value="{NotificationEmails}"

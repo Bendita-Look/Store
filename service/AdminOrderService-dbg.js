@@ -20,6 +20,12 @@ sap.ui.define([], function () {
       await operation.invoke();
       return operation.getBoundContext().getObject();
     }
+    async trackingUrl(orderId) {
+      const operation = this.adminModel.bindContext("/OrderTrackingUrl(...)");
+      operation.setParameter("OrderId", orderId);
+      await operation.invoke();
+      return operation.getBoundContext().getObject()?.value ?? null;
+    }
     quoteOrderUpdate(orderId, change) {
       return this.invokeItemsChange("/QuoteOrderUpdate(...)", orderId, change);
     }
