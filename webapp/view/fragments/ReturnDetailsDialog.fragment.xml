@@ -1,0 +1,81 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="returnDetailsDialog"
+        title="{parts: ['i18n>returnDetailsTitle', {path: 'createdAt', targetType: 'any', formatter: '.formatter.dateTime'}], formatter: '.formatter.message'}"
+        contentWidth="44rem"
+        resizable="true"
+        class="blDialog"
+    >
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <Text text="{Reason}" visible="{= !!${path: 'Reason', targetType: 'any'} }" class="blReturnReason sapUiSmallMarginBottom" />
+
+                <Table items="{path: 'Items', templateShareable: false}" popinLayout="GridSmall" class="blTable">
+                    <columns>
+                        <Column>
+                            <Text text="{i18n>product}" />
+                        </Column>
+                        <Column hAlign="Center" width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>quantity}" />
+                        </Column>
+                        <Column hAlign="End" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>unitPrice}" />
+                        </Column>
+                        <Column hAlign="End" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>total}" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem type="{= ${Product_ID} ? 'Navigation' : 'Inactive' }" press=".orders.onReturnItemPress">
+                            <cells>
+                                <HBox alignItems="Center">
+                                    <Image
+                                        src="{path: 'ImageId', formatter: '.formatter.catalogImageUrl'}"
+                                        width="3.5rem"
+                                        height="4.5rem"
+                                        densityAware="false"
+                                        class="blCartImage sapUiSmallMarginEnd"
+                                    />
+                                    <VBox>
+                                        <Text text="{parts: ['ProductName', 'ColorName', 'Size'], formatter: '.formatter.variantDescription'}" />
+                                        <ObjectStatus
+                                            text="{= ${path: 'Kind', targetType: 'any'} === 'RETURNED' ? ${i18n>returnKindReturned} : ${i18n>returnKindReplacement} }"
+                                            icon="{= ${path: 'Kind', targetType: 'any'} === 'RETURNED' ? 'sap-icon://undo' : 'sap-icon://cart-4' }"
+                                            state="{= ${path: 'Kind', targetType: 'any'} === 'RETURNED' ? 'Warning' : 'Success' }"
+                                        />
+                                        <Text
+                                            text="{= ${path: 'Restock', targetType: 'any'} ? ${i18n>returnRestocked} : ${i18n>returnNotRestocked} }"
+                                            visible="{= ${path: 'Kind', targetType: 'any'} === 'RETURNED' }"
+                                            class="blMuted"
+                                        />
+                                    </VBox>
+                                </HBox>
+                                <Text text="{Quantity}" />
+                                <Text text="{path: 'UnitPrice', targetType: 'any', formatter: '.formatter.currency'}" class="blNoWrap" />
+                                <Text text="{path: 'TotalPrice', targetType: 'any', formatter: '.formatter.currency'}" class="blNoWrap" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+
+                <VBox class="blReturnSummary">
+                    <HBox justifyContent="SpaceBetween">
+                        <Text text="{i18n>refundAmount}" />
+                        <Text text="{path: 'RefundAmount', targetType: 'any', formatter: '.formatter.currency'}" />
+                    </HBox>
+                    <HBox justifyContent="SpaceBetween" visible="{= ${path: 'ExchangeAmount', targetType: 'any'} > 0 }">
+                        <Text text="{i18n>exchangeAmount}" />
+                        <Text text="{path: 'ExchangeAmount', targetType: 'any', formatter: '.formatter.currency'}" />
+                    </HBox>
+                    <Text text="{path: 'BalanceAmount', targetType: 'any', formatter: '.formatBalance'}" class="blReturnBalance" />
+                </VBox>
+            </VBox>
+        </content>
+        <buttons>
+            <Button text="{i18n>close}" press=".orders.onCloseReturnDetails" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

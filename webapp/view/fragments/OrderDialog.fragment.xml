@@ -195,6 +195,13 @@
                                     state="{= ${path: 'Kind', targetType: 'any'} === 'RETURNED' ? 'Warning' : 'Success' }"
                                 />
                             </VBox>
+                            <Button
+                                text="{i18n>returnDetails}"
+                                icon="sap-icon://detail-view"
+                                type="Transparent"
+                                press=".orders.onReturnDetails"
+                                class="blReturnDetailsButton"
+                            />
                         </VBox>
                     </CustomListItem>
                 </List>
