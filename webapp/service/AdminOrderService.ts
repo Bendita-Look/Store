@@ -67,6 +67,16 @@ export default class AdminOrderService {
         return operation.getBoundContext().getObject() as RegisteredSale;
     }
 
+    public async trackingUrl(orderId: string): Promise<string | null> {
+        const operation = this.adminModel.bindContext("/OrderTrackingUrl(...)");
+
+        operation.setParameter("OrderId", orderId);
+
+        await operation.invoke();
+
+        return (operation.getBoundContext().getObject() as { value?: string | null } | undefined)?.value ?? null;
+    }
+
     public quoteOrderUpdate(orderId: string, change: OrderChangeInput): Promise<OrderQuote> {
         return this.invokeItemsChange("/QuoteOrderUpdate(...)", orderId, change);
     }

@@ -11,9 +11,10 @@ import type ODataListBinding from "sap/ui/model/odata/v4/ODataListBinding";
 import type Button from "sap/m/Button";
 import type Admin from "../Admin.controller";
 import AdminOrderService, { DeliveryInput, DeliveryType } from "../../service/AdminOrderService";
-import formatter, { OrderStatus } from "../../model/formatter";
+import { OrderStatus } from "../../model/formatter";
 import type { EditableOrder } from "./OrderEditSection";
 import type { ReturnableOrder } from "./OrderReturnSection";
+import type { ComposableOrder } from "./WhatsappComposer";
 
 const ALL_STATUSES = "ALL";
 const FULL_SCREEN_MAX_WIDTH = 600;
@@ -23,10 +24,7 @@ const CHANGE_PARAMETERS = {
     $expand: "Items($select=ID,Variant_ID,ImageId,ProductName,ColorName,Size,Quantity,UnitPrice),Returns($select=ID;$expand=Items($select=ID,Kind,OrderItem_ID,Replacement_ID,ImageId,ProductName,ColorName,Size,Quantity)),Promotions($select=ID,CouponCode)"
 };
 
-type DialogOrder = EditableOrder & ReturnableOrder & {
-    CustomerName: string;
-    CustomerPhone: string;
-};
+type DialogOrder = EditableOrder & ReturnableOrder & ComposableOrder;
 
 export default class OrdersSection {
 
@@ -155,10 +153,7 @@ export default class OrdersSection {
     };
 
     public onWhatsapp = (): void => {
-        const order = this.getDialogOrder();
-        const message = this.controller.getText("whatsappCustomerMessage", [order.CustomerName, order.Number]);
-
-        window.open(formatter.whatsappUrl(order.CustomerPhone, message), "_blank");
+        void this.controller.whatsapp.open(this.getDialogOrder());
     };
 
     private async changeStatus(status: OrderStatus, successKey: string, delivery?: DeliveryInput): Promise<boolean> {

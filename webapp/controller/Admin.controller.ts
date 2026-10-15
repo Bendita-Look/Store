@@ -13,6 +13,7 @@ import StoreSaleSection from "./admin/StoreSaleSection";
 import OrderEditSection from "./admin/OrderEditSection";
 import OrderReturnSection from "./admin/OrderReturnSection";
 import ProductPicker from "./admin/ProductPicker";
+import WhatsappComposer from "./admin/WhatsappComposer";
 import { AuthenticationService } from "../auth/AuthenticationService";
 
 const DEFAULT_TAB = "orders";
@@ -45,6 +46,8 @@ export default class Admin extends BaseController {
     public readonly orderReturn = new OrderReturnSection(this);
 
     public readonly productPicker = new ProductPicker(this);
+
+    public readonly whatsapp = new WhatsappComposer(this);
 
     private viewModel: JSONModel;
 
