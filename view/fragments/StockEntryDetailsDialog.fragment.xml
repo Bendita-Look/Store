@@ -1,0 +1,51 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="stockEntryDetailsDialog"
+        title="{parts: ['i18n>stockEntryDetailsTitle', {path: 'createdAt', targetType: 'any', formatter: '.formatter.dateTime'}], formatter: '.formatter.message'}"
+        contentWidth="40rem"
+        resizable="true"
+        class="blDialog"
+    >
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <Text text="{Note}" visible="{= !!${path: 'Note', targetType: 'any'} }" class="blReturnReason sapUiSmallMarginBottom" />
+                <Table items="{path: 'Items', templateShareable: false}" popinLayout="GridSmall" class="blTable">
+                    <columns>
+                        <Column>
+                            <Text text="{i18n>product}" />
+                        </Column>
+                        <Column hAlign="Center" width="6rem">
+                            <Text text="{i18n>quantity}" />
+                        </Column>
+                        <Column hAlign="End" width="8rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>unitCost}" />
+                        </Column>
+                        <Column hAlign="End" width="8rem">
+                            <Text text="{i18n>total}" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{parts: ['ProductName', 'ColorName', 'Size'], formatter: '.formatter.variantDescription'}" />
+                                <Text text="{Quantity}" />
+                                <Text text="{path: 'UnitCost', targetType: 'any', formatter: '.formatter.currency'}" />
+                                <Text text="{path: 'TotalCost', targetType: 'any', formatter: '.formatter.currency'}" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+                <HBox justifyContent="End" alignItems="Center" class="blCartTotal">
+                    <Text text="{i18n>stockEntryTotal}" class="sapUiSmallMarginEnd" />
+                    <Text text="{path: 'TotalCost', targetType: 'any', formatter: '.formatter.currency'}" class="blDetailPrice" />
+                </HBox>
+            </VBox>
+        </content>
+        <buttons>
+            <Button text="{i18n>close}" press=".stock.onCloseDetails" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

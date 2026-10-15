@@ -1,0 +1,2 @@
+sap.ui.define([],function(){"use strict";class t{constructor(t){this.adminModel=t}async registerEntry(t){const n=this.adminModel.bindContext("/RegisterStockEntry(...)");n.setParameter("Entry",{Note:t.Note,Items:t.Items.map(t=>({Variant_ID:t.VariantId,Quantity:t.Quantity,UnitCost:t.UnitCost}))});await n.invoke()}}return t});
+//# sourceMappingURL=StockService.js.map

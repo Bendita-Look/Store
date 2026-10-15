@@ -40,6 +40,12 @@
                     </Select>
                     <Label text="{i18n>price}" required="true" />
                     <Input value="{Price}" description="{i18n>currencySymbol}" />
+                    <Label text="{i18n>costPrice}" />
+                    <Input value="{CostPrice}" description="{i18n>currencySymbol}" placeholder="{i18n>costPricePlaceholder}" />
+                    <Text
+                        text="{parts: ['i18n>costMarginHint', {path: 'Price', targetType: 'any'}, {path: 'CostPrice', targetType: 'any'}], formatter: '.formatter.costMargin'}"
+                        class="blMuted"
+                    />
                     <Label text="{i18n>activeInStore}" />
                     <Switch state="{Active}" customTextOn="{i18n>yes}" customTextOff="{i18n>no}" />
                     <Label text="{i18n>featured}" />

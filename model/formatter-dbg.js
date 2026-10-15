@@ -43,7 +43,24 @@ sap.ui.define(["sap/base/strings/formatMessage", "sap/base/i18n/Localization", "
     const text = message ? `?text=${encodeURIComponent(message)}` : "";
     return `https://wa.me/${fullNumber}${text}`;
   }
+  function formatPercent(value) {
+    return new Intl.NumberFormat(languageTag(), {
+      style: "percent",
+      maximumFractionDigits: 1
+    }).format(Number(value ?? 0) / 100);
+  }
+  function costMargin(pattern, price, cost) {
+    const salePrice = Number(price);
+    const costPrice = Number(cost);
+    if (!(salePrice > 0) || !(costPrice > 0)) {
+      return "";
+    }
+    const profit = salePrice - costPrice;
+    return pattern.replace("{0}", formatCurrency(profit)).replace("{1}", formatPercent(profit / salePrice * 100));
+  }
   var __exports = {
+    costMargin,
+    percent: formatPercent,
     currency: formatCurrency,
     negativeAmount(value) {
       const amount = Number(value ?? 0);

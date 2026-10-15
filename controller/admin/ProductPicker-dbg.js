@@ -8,6 +8,7 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../uti
   const PRODUCT_EXPAND = "Category($select=Name),Colors($select=ID,Name,HexCode),Variants($select=ID,Size,Stock,Color_ID),Images($select=ID,Color_ID,SortOrder)";
   var PickerMode = /*#__PURE__*/function (PickerMode) {
     PickerMode["Variant"] = "variant";
+    PickerMode["Restock"] = "restock";
     PickerMode["Product"] = "product";
     return PickerMode;
   }(PickerMode || {});
@@ -22,6 +23,9 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../uti
     }
     pickVariant() {
       return this.open(PickerMode.Variant);
+    }
+    pickRestockVariant() {
+      return this.open(PickerMode.Restock);
     }
     pickProduct() {
       return this.open(PickerMode.Product);
@@ -55,18 +59,21 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../uti
     onConfirm = () => {
       const product = this.model.getProperty("/product");
       const variant = product.Variants.find(item => item.ID === this.model.getProperty("/selectedVariantId"));
-      if (!variant || variant.Stock < 1) {
+      const restock = this.isRestock();
+      if (!variant || !restock && variant.Stock < 1) {
         this.controller.showToast("selectAvailableSize");
         return;
       }
-      this.quantity = Math.min(Math.max(1, Number(this.model.getProperty("/quantity")) || 1), variant.Stock);
+      const requested = Math.max(1, Number(this.model.getProperty("/quantity")) || 1);
+      this.quantity = restock ? requested : Math.min(requested, variant.Stock);
       this.finish({
         ID: variant.ID,
         Size: variant.Size,
         Stock: variant.Stock,
         Product: {
           Name: product.Name,
-          Price: Number(product.Price)
+          Price: Number(product.Price),
+          CostPrice: Number(product.CostPrice ?? 0)
         },
         Color: product.Colors.find(color => color.ID === variant.Color_ID) ?? null
       });
@@ -130,13 +137,16 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/json/JSONModel", "../../uti
       this.model.setProperty("/selectedColorName", product.Colors.find(color => color.ID === colorId)?.Name ?? "");
       this.model.setProperty("/sizes", variants);
       this.model.setProperty("/imageId", imagesForColor(product.Images, colorId)[0]?.ID ?? "");
-      this.selectVariant(variants.find(variant => variant.Stock > 0)?.ID ?? "");
+      this.selectVariant((this.isRestock() ? variants[0] : variants.find(variant => variant.Stock > 0))?.ID ?? "");
     }
     selectVariant(variantId) {
       const product = this.model.getProperty("/product");
       this.model.setProperty("/selectedVariantId", variantId);
       this.model.setProperty("/stock", product.Variants.find(variant => variant.ID === variantId)?.Stock ?? 0);
       this.model.setProperty("/quantity", 1);
+    }
+    isRestock() {
+      return this.model.getProperty("/mode") === PickerMode.Restock;
     }
     emptyState(mode) {
       return {

@@ -1,0 +1,74 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="stockEntryDialog"
+        title="{i18n>newStockEntry}"
+        contentWidth="48rem"
+        resizable="true"
+        class="blDialog"
+    >
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <MessageStrip text="{i18n>stockEntryInfo}" type="Information" showIcon="true" class="sapUiSmallMarginBottom" />
+
+                <Button text="{i18n>pickProduct}" icon="sap-icon://add-product" type="Emphasized" press=".stock.onAddLine" class="blPickButton" />
+
+                <Table items="{stock>/lines}" noDataText="{i18n>stockEntryNoItems}" popinLayout="GridSmall" class="blTable sapUiSmallMarginTop">
+                    <columns>
+                        <Column>
+                            <Text text="{i18n>product}" />
+                        </Column>
+                        <Column hAlign="Center" width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>stockCurrent}" />
+                        </Column>
+                        <Column hAlign="Center" width="8rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>quantity}" />
+                        </Column>
+                        <Column hAlign="End" width="9rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>unitCost}" />
+                        </Column>
+                        <Column width="3rem" hAlign="End" />
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{stock>Description}" />
+                                <Text text="{stock>Stock}" />
+                                <StepInput value="{stock>Quantity}" min="1" max="999" width="7rem" change=".stock.onLineChange" />
+                                <Input
+                                    value="{stock>UnitCost}"
+                                    type="Number"
+                                    description="{i18n>currencySymbol}"
+                                    width="8rem"
+                                    textAlign="End"
+                                    change=".stock.onLineChange"
+                                />
+                                <Button icon="sap-icon://delete" type="Transparent" tooltip="{i18n>remove}" press=".stock.onRemoveLine" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+
+                <Label text="{i18n>notes}" class="sapUiSmallMarginTop" />
+                <TextArea value="{stock>/note}" maxLength="255" rows="2" width="100%" placeholder="{i18n>stockEntryNotePlaceholder}" />
+
+                <VBox class="blReturnSummary">
+                    <HBox justifyContent="SpaceBetween">
+                        <Text text="{i18n>stockEntryPieces}" />
+                        <Text text="{stock>/totalQuantity}" />
+                    </HBox>
+                    <HBox justifyContent="SpaceBetween">
+                        <Text text="{i18n>stockEntryTotal}" />
+                        <Text text="{path: 'stock>/totalCost', formatter: '.formatter.currency'}" class="blReturnBalance" />
+                    </HBox>
+                </VBox>
+            </VBox>
+        </content>
+        <buttons>
+            <Button text="{i18n>stockEntryConfirm}" type="Emphasized" icon="sap-icon://accept" press=".stock.onConfirm" />
+            <Button text="{i18n>cancel}" press=".stock.onClose" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>
