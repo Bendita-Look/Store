@@ -86,6 +86,33 @@ sap.ui.define(["sap/ui/core/Fragment", "sap/ui/model/Filter", "sap/ui/model/Filt
       this.deliveryModel.setData(this.emptyDelivery());
       (await this.getDeliveryDialog()).open();
     };
+    onReturnDetails = async event => {
+      const context = event.getSource().getBindingContext();
+      if (!this.returnDetailsDialog) {
+        this.returnDetailsDialog = await this.loadFragment("ReturnDetailsDialog");
+      }
+      this.returnDetailsDialog.bindElement({
+        path: context.getPath(),
+        parameters: {
+          $expand: "Items"
+        }
+      });
+      this.returnDetailsDialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
+      this.returnDetailsDialog.open();
+    };
+    onReturnItemPress = event => {
+      const productId = event.getSource().getBindingContext()?.getProperty("Product_ID");
+      if (productId) {
+        this.onCloseReturnDetails();
+        this.onCloseDialog();
+        this.controller.navTo("product", {
+          productId
+        });
+      }
+    };
+    onCloseReturnDetails = () => {
+      this.returnDetailsDialog?.close();
+    };
     onCloseDeliveryDialog = () => {
       this.deliveryDialog?.close();
     };

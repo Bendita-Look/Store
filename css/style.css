@@ -1015,6 +1015,11 @@
     margin: 0.5rem 0;
 }
 
+.blReturnDetailsButton.sapMBtn {
+    align-self: flex-start;
+    margin-top: 0.25rem;
+}
+
 /* Footer */
 
 .blFooter {

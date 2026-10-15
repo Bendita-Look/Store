@@ -36,6 +36,8 @@ export default class OrdersSection {
 
     private deliveryDialog?: Dialog;
 
+    private returnDetailsDialog?: Dialog;
+
     constructor(private readonly controller: Admin) { }
 
     public readonly filterModel = new JSONModel({ status: ALL_STATUSES });
@@ -112,6 +114,32 @@ export default class OrdersSection {
     public onOpenDeliveryDialog = async (): Promise<void> => {
         this.deliveryModel.setData(this.emptyDelivery());
         (await this.getDeliveryDialog()).open();
+    };
+
+    public onReturnDetails = async (event: Event): Promise<void> => {
+        const context = (event.getSource() as Control).getBindingContext() as Context;
+
+        if (!this.returnDetailsDialog) {
+            this.returnDetailsDialog = await this.loadFragment("ReturnDetailsDialog");
+        }
+
+        this.returnDetailsDialog.bindElement({ path: context.getPath(), parameters: { $expand: "Items" } });
+        this.returnDetailsDialog.setStretch(window.innerWidth < FULL_SCREEN_MAX_WIDTH);
+        this.returnDetailsDialog.open();
+    };
+
+    public onReturnItemPress = (event: Event): void => {
+        const productId = (event.getSource() as Control).getBindingContext()?.getProperty("Product_ID") as string | undefined;
+
+        if (productId) {
+            this.onCloseReturnDetails();
+            this.onCloseDialog();
+            this.controller.navTo("product", { productId });
+        }
+    };
+
+    public onCloseReturnDetails = (): void => {
+        this.returnDetailsDialog?.close();
     };
 
     public onCloseDeliveryDialog = (): void => {
