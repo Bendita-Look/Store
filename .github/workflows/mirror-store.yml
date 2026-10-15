@@ -1,0 +1,38 @@
+name: Mirror to benditalook/Store
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: mirror-store
+  cancel-in-progress: true
+
+jobs:
+  mirror:
+    if: github.repository == 'DaviCastr/SAP-UI5-BenditaLook'
+    runs-on: ubuntu-latest
+    env:
+      MIRROR_REPOSITORY: ${{ vars.MIRROR_REPOSITORY || 'benditalook/Store' }}
+      MIRROR_TOKEN: ${{ secrets.STORE_MIRROR_TOKEN }}
+
+    steps:
+      - name: Check mirror token
+        run: |
+          if [ -z "$MIRROR_TOKEN" ]; then
+            echo "::error::Missing repository secret STORE_MIRROR_TOKEN (token from the account that owns ${MIRROR_REPOSITORY} with Contents and Workflows read and write)."
+            exit 1
+          fi
+
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Push to mirror
+        run: |
+          git remote add mirror "https://x-access-token:${MIRROR_TOKEN}@github.com/${MIRROR_REPOSITORY}.git"
+          git push --force mirror HEAD:main
