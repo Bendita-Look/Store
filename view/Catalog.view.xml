@@ -119,8 +119,8 @@
                     items="{
                         path: 'catalog>/Products',
                         parameters: {
-                            $expand: 'Images($select=ID,SortOrder),Variants($select=ID,Stock)',
-                            $orderby: 'Featured desc,Name'
+                            $expand: 'Images($select=ID,SortOrder)',
+                            $orderby: 'Available desc,Featured desc,Name'
                         }
                     }"
                 >
@@ -128,8 +128,11 @@
                         <grid:GridBoxLayout boxMinWidth="15rem" />
                     </f:customLayout>
                     <f:GridListItem type="Active" press=".onProductPress" class="blProductCard">
+                        <f:customData>
+                            <core:CustomData key="soldout" value="{= ${catalog>Available} ? 'false' : 'true' }" writeToDom="true" />
+                        </f:customData>
                         <VBox>
-                            <VBox class="blProductImageWrapper">
+                            <VBox renderType="Bare" class="blProductImageWrapper">
                                 <Image
                                     src="{path: 'catalog>Images', targetType: 'any', formatter: '.formatter.coverImageUrl'}"
                                     alt="{catalog>Name}"
@@ -139,12 +142,12 @@
                                 />
                                 <Text
                                     text="{i18n>featured}"
-                                    visible="{= ${catalog>Featured} === true }"
+                                    visible="{= ${catalog>Featured} === true &amp;&amp; ${catalog>Available} === true }"
                                     class="blFeaturedTag"
                                 />
                                 <Text
                                     text="{i18n>soldOut}"
-                                    visible="{path: 'catalog>Variants', targetType: 'any', formatter: '.formatter.isSoldOut'}"
+                                    visible="{= !${catalog>Available} }"
                                     class="blSoldOutTag"
                                 />
                             </VBox>

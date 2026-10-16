@@ -142,10 +142,6 @@ export default {
         return catalogImageUrl(cover?.ID);
     },
 
-    isSoldOut(variants: StockReference[] | null | undefined): boolean {
-        return totalStock(variants) === 0;
-    },
-
     statusState(status: string | null | undefined): ValueState {
         return STATUS_STATES[status ?? ""] ?? ValueState.None;
     },

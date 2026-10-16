@@ -109,9 +109,6 @@ sap.ui.define(["sap/base/strings/formatMessage", "sap/base/i18n/Localization", "
       const cover = [...(images ?? [])].sort((first, second) => (first.SortOrder ?? 0) - (second.SortOrder ?? 0))[0];
       return catalogImageUrl(cover?.ID);
     },
-    isSoldOut(variants) {
-      return totalStock(variants) === 0;
-    },
     statusState(status) {
       return STATUS_STATES[status ?? ""] ?? ValueState.None;
     },
