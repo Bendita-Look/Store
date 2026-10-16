@@ -43,7 +43,7 @@
                     </f:customLayout>
                     <f:GridListItem type="Active" press=".productPicker.onProductPress" class="blProductCard">
                         <VBox>
-                            <VBox class="blProductImageWrapper">
+                            <VBox renderType="Bare" class="blProductImageWrapper">
                                 <Image
                                     src="{path: 'Images', targetType: 'any', formatter: '.formatter.coverImageUrl'}"
                                     alt="{Name}"

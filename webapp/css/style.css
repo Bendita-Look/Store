@@ -613,6 +613,15 @@
     background: rgba(74, 53, 39, 0.85);
 }
 
+.blProductCard[data-soldout="true"] .blProductImage {
+    filter: grayscale(0.7);
+    opacity: 0.6;
+}
+
+.blProductCard[data-soldout="true"] .blProductInfo {
+    opacity: 0.6;
+}
+
 .blProductInfo {
     gap: 0.35rem;
     padding: 0.9rem 0.5rem 1rem;
