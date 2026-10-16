@@ -613,11 +613,6 @@
     background: rgba(74, 53, 39, 0.85);
 }
 
-.blProductCard[data-soldout="true"] .blProductImage {
-    filter: grayscale(0.7);
-    opacity: 0.6;
-}
-
 .blProductCard[data-soldout="true"] .blProductInfo {
     opacity: 0.6;
 }
