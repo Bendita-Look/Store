@@ -24,6 +24,15 @@
             />
         </contentMiddle>
         <contentRight>
+            <!-- Só no navegador; some quando o app já está instalado. -->
+            <Button
+                icon="sap-icon://download"
+                type="Transparent"
+                tooltip="{i18n>installAppTooltip}"
+                visible="{pwa>/canInstall}"
+                press=".onInstallApp"
+                class="blHeaderAction"
+            />
             <Button
                 icon="sap-icon://discussion"
                 text="{i18n>headerService}"

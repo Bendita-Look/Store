@@ -6,6 +6,7 @@ import MessageBox from "sap/m/MessageBox";
 import type ResourceModel from "sap/ui/model/resource/ResourceModel";
 import type ResourceBundle from "sap/base/i18n/ResourceBundle";
 import { createDeviceModel } from "./model/models";
+import { createPwaModel } from "./util/pwa";
 import CartModel from "./model/CartModel";
 import { AuthenticationService } from "./auth/AuthenticationService";
 import { AuthenticatedProviderFactory } from "./auth/providers/AuthenticatedProviderFactory";
@@ -53,6 +54,7 @@ export default class Component extends BaseComponent {
         this.registerGlobalErrorHandlers();
 
         this.setModel(createDeviceModel(), "device");
+        this.setModel(createPwaModel(), "pwa");
         this.setModel(new CartModel(), "cart");
         this.setModel(new JSONModel({}), "store");
         this.setModel(this.createODataModel(XsuaaAuthHelper.getConfig().catalogService), "catalog");
