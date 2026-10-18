@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/core/routing/History", "sap/m/MessageBox", "sap/m/MessageToast", "sap/m/InstanceManager", "../model/formatter", "../util/feedback", "../util/http", "../auth/AuthenticationService"], function (Controller, UIComponent, History, MessageBox, MessageToast, InstanceManager, __formatter, ___util_feedback, ___util_http, ___auth_AuthenticationService) {
+sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/core/routing/History", "sap/m/MessageBox", "sap/m/MessageToast", "sap/m/InstanceManager", "../model/formatter", "../util/feedback", "../util/pwa", "../util/http", "../auth/AuthenticationService"], function (Controller, UIComponent, History, MessageBox, MessageToast, InstanceManager, __formatter, ___util_feedback, ___util_pwa, ___util_http, ___auth_AuthenticationService) {
   "use strict";
 
   function _interopRequireDefault(obj) {
@@ -6,6 +6,7 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
   }
   const formatter = _interopRequireDefault(__formatter);
   const getBackendErrorMessage = ___util_feedback["getBackendErrorMessage"];
+  const promptInstall = ___util_pwa["promptInstall"];
   const isAuthenticationError = ___util_http["isAuthenticationError"];
   const isBackendUnavailableError = ___util_http["isBackendUnavailableError"];
   const isSessionExpiredError = ___util_http["isSessionExpiredError"];
@@ -42,6 +43,19 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent", "sap/ui/
     },
     onOpenAdmin: function _onOpenAdmin() {
       this.navTo("admin");
+    },
+    /**
+     * Botão "Instalar app" (visível só no navegador, model "pwa"): abre o prompt
+     * nativo do Chrome/Edge ou, no iPhone, explica o "Adicionar à Tela de Início".
+     */
+    onInstallApp: async function _onInstallApp() {
+      const model = this.getOwnerComponent()?.getModel("pwa");
+      const result = await promptInstall(model);
+      if (result === "ios") {
+        MessageBox.information(this.getText("installIosMessage"), {
+          title: this.getText("installIosTitle")
+        });
+      }
     },
     onContactWhatsapp: function _onContactWhatsapp() {
       this.openWhatsapp(this.getText("whatsappGreeting"));

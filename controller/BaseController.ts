@@ -13,6 +13,7 @@ import formatter from "../model/formatter";
 import type CartModel from "../model/CartModel";
 import type Component from "../Component";
 import { getBackendErrorMessage } from "../util/feedback";
+import { promptInstall } from "../util/pwa";
 import { isAuthenticationError, isBackendUnavailableError, isSessionExpiredError } from "../util/http";
 import { AuthenticationService } from "../auth/AuthenticationService";
 
@@ -54,6 +55,21 @@ export default abstract class BaseController extends Controller {
 
     public onOpenAdmin(): void {
         this.navTo("admin");
+    }
+
+    /**
+     * Botão "Instalar app" (visível só no navegador, model "pwa"): abre o prompt
+     * nativo do Chrome/Edge ou, no iPhone, explica o "Adicionar à Tela de Início".
+     */
+    public async onInstallApp(): Promise<void> {
+        const model = this.getOwnerComponent()?.getModel("pwa") as JSONModel;
+        const result = await promptInstall(model);
+
+        if (result === "ios") {
+            MessageBox.information(this.getText("installIosMessage"), {
+                title: this.getText("installIosTitle")
+            });
+        }
     }
 
     public onContactWhatsapp(): void {

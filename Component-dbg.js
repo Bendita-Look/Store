@@ -1,10 +1,11 @@
-sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "sap/ui/model/json/JSONModel", "sap/m/MessageBox", "./model/models", "./model/CartModel", "./auth/AuthenticationService", "./auth/providers/AuthenticatedProviderFactory", "./auth/providers/XsuaaAuthHelper", "./auth/storage/SessionStorage", "./util/Environment", "./util/http", "./util/feedback", "./service/StoreService"], function (BaseComponent, ODataModel, JSONModel, MessageBox, ___model_models, __CartModel, ___auth_AuthenticationService, ___auth_providers_AuthenticatedProviderFactory, ___auth_providers_XsuaaAuthHelper, ___auth_storage_SessionStorage, __Environment, ___util_http, ___util_feedback, __StoreService) {
+sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "sap/ui/model/json/JSONModel", "sap/m/MessageBox", "./model/models", "./util/pwa", "./model/CartModel", "./auth/AuthenticationService", "./auth/providers/AuthenticatedProviderFactory", "./auth/providers/XsuaaAuthHelper", "./auth/storage/SessionStorage", "./util/Environment", "./util/http", "./util/feedback", "./service/StoreService"], function (BaseComponent, ODataModel, JSONModel, MessageBox, ___model_models, ___util_pwa, __CartModel, ___auth_AuthenticationService, ___auth_providers_AuthenticatedProviderFactory, ___auth_providers_XsuaaAuthHelper, ___auth_storage_SessionStorage, __Environment, ___util_http, ___util_feedback, __StoreService) {
   "use strict";
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
   }
   const createDeviceModel = ___model_models["createDeviceModel"];
+  const createPwaModel = ___util_pwa["createPwaModel"];
   const CartModel = _interopRequireDefault(__CartModel);
   const AuthenticationService = ___auth_AuthenticationService["AuthenticationService"];
   const AuthenticatedProviderFactory = ___auth_providers_AuthenticatedProviderFactory["AuthenticatedProviderFactory"];
@@ -45,6 +46,7 @@ sap.ui.define(["sap/ui/core/UIComponent", "sap/ui/model/odata/v4/ODataModel", "s
       AuthenticationService.onAuthError(message => this.handleAuthError(message));
       this.registerGlobalErrorHandlers();
       this.setModel(createDeviceModel(), "device");
+      this.setModel(createPwaModel(), "pwa");
       this.setModel(new CartModel(), "cart");
       this.setModel(new JSONModel({}), "store");
       this.setModel(this.createODataModel(XsuaaAuthHelper.getConfig().catalogService), "catalog");

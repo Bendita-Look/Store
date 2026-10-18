@@ -12,6 +12,27 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;display=swap">
     <link rel="icon" href="img/favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+    <script>
+        // Instalação (PWA). O manifest só entra fora do iOS: no iPhone ele faria
+        // a barra de status usar as cores fixas do manifest, e sem ele a barra
+        // herda a cor do header. No Chrome/Edge (Android e PC) o manifest é o que
+        // libera "Instalar app"; o evento é guardado cedo para o botão da tela.
+        (function () {
+            var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent)
+                || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+            if (!isIos) {
+                var link = document.createElement("link");
+                link.rel = "manifest";
+                link.href = "manifest.webmanifest";
+                document.head.appendChild(link);
+            }
+            window.addEventListener("beforeinstallprompt", function (event) {
+                event.preventDefault();
+                window.__blInstallPrompt = event;
+                window.dispatchEvent(new Event("bl-installable"));
+            });
+        })();
+    </script>
     <style>
         html, body, body > div, #container, #container-uiarea {
             height: 100%;
