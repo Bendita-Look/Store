@@ -24,14 +24,15 @@
         /* Com viewport-fit=cover o app ocupa a tela física inteira, ficando
            debaixo do notch/Dynamic Island, dos cantos arredondados e da barra
            de gestos (site salvo na tela inicial, em tela cheia). Reservamos as
-           safe areas no body (a de baixo com uma folga extra, proporcional,
-           que some fora da tela cheia); a faixa de cima fica na cor do header e
-           a de baixo na cor do conteúdo. Fora do modo tela cheia o env() vale 0. */
+           safe areas das laterais e de baixo no body (a de baixo com uma folga
+           extra, proporcional, que some fora da tela cheia), na cor do conteúdo.
+           A de cima fica a cargo do header (style.css), que se estende por baixo
+           da barra de status. Fora do modo tela cheia o env() vale 0. */
         html body {
             box-sizing: border-box;
-            padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+            padding: 0 env(safe-area-inset-right, 0px)
                 calc(env(safe-area-inset-bottom, 0px) * 1.5) env(safe-area-inset-left, 0px);
-            background: linear-gradient(to bottom, #ffcad4 50%, #fffafa 50%) !important;
+            background: #fffafa !important;
         }
         body > div, #container, #container-uiarea {
             height: 100%;
