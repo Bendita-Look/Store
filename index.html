@@ -25,14 +25,29 @@
            debaixo do notch/Dynamic Island, dos cantos arredondados e da barra
            de gestos (site salvo na tela inicial, em tela cheia). Reservamos as
            safe areas das laterais e de baixo no body (a de baixo com uma folga
-           extra, proporcional, que some fora da tela cheia), na cor do conteúdo.
-           A de cima fica a cargo do header (style.css), que se estende por baixo
-           da barra de status. Fora do modo tela cheia o env() vale 0. */
+           extra, proporcional, que some fora da tela cheia). A de cima fica a
+           cargo do header (style.css), que se estende por baixo da barra de
+           status. Fora do modo tela cheia o env() vale 0.
+           O iOS 26 pinta a barra de status com a cor de fundo do body (não usa
+           mais o theme-color), por isso o body tem a cor do header e só a faixa
+           de baixo recebe a cor do conteúdo (body::after). */
+        html, html body {
+            background: #ffcad4 !important;
+        }
         html body {
             box-sizing: border-box;
             padding: 0 env(safe-area-inset-right, 0px)
                 calc(env(safe-area-inset-bottom, 0px) * 1.5) env(safe-area-inset-left, 0px);
-            background: #fffafa !important;
+        }
+        html body::after {
+            content: "";
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: calc(env(safe-area-inset-bottom, 0px) * 1.5);
+            background: #fffafa;
+            pointer-events: none;
         }
         body > div, #container, #container-uiarea {
             height: 100%;

@@ -1213,7 +1213,7 @@
 .blWhatsappFab.sapMBtn {
     position: fixed;
     right: calc(1.25rem + env(safe-area-inset-right, 0px));
-    bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+    bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
     z-index: 10;
     height: auto;
 }
@@ -1540,7 +1540,7 @@
     }
 
     .blWhatsappFab.sapMBtn {
-        right: 1rem;
-        bottom: 4rem;
+        right: calc(1rem + env(safe-area-inset-right, 0px));
+        bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
     }
 }
