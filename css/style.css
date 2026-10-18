@@ -125,8 +125,10 @@
 
 /* Header */
 
+/* No celular em tela cheia o header se estende por baixo da barra de status
+   (a cor rosa chega até o topo) e o conteúdo dele desce o tamanho da safe area. */
 .blHeader.sapMBar {
-    height: 4.5rem;
+    height: calc(4.5rem + env(safe-area-inset-top, 0px));
     background: var(--bl-blush);
     border-bottom: 1px solid #f5b6c3;
     box-shadow: 0 2px 12px rgba(168, 129, 79, 0.12);
@@ -136,7 +138,7 @@
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 0 1rem;
+    padding: env(safe-area-inset-top, 0px) 1rem 0;
     box-sizing: border-box;
 }
 
@@ -182,7 +184,7 @@
 }
 
 .blPage.sapMPageWithHeader > section {
-    top: 4.5rem;
+    top: calc(4.5rem + env(safe-area-inset-top, 0px));
 }
 
 .blHeaderLogo,
@@ -1418,12 +1420,12 @@
     }
 
     .blHeader.sapMBar {
-        height: 4rem;
-        padding: 0 0.25rem;
+        height: calc(4rem + env(safe-area-inset-top, 0px));
+        padding: env(safe-area-inset-top, 0px) 0.25rem 0;
     }
 
     .blPage.sapMPageWithHeader > section {
-        top: 4rem;
+        top: calc(4rem + env(safe-area-inset-top, 0px));
     }
 
     .blHeaderLogo,
