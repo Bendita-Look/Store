@@ -5,7 +5,7 @@
     "authDomain": "https://d4e1c97ctrial.authentication.us10.hana.ondemand.com",
     "clientId": "sb-BenditaLook-uaa-dev!t724933",
     "scope": "openid BenditaLook-uaa-dev!t724933.Admin",
-    "redirectUri": "https://bendita-look.github.io/Store/",
+    "redirectUri": "https://bendita-look.github.io/",
     "tokenEndpoint": "https://d4e1c97ctrial-dev-benditalook-srv.cfapps.us10-001.hana.ondemand.com/auth/login",
     "refreshEndpoint": "https://d4e1c97ctrial-dev-benditalook-srv.cfapps.us10-001.hana.ondemand.com/auth/refresh",
     "passwordEndpoint": "https://d4e1c97ctrial-dev-benditalook-srv.cfapps.us10-001.hana.ondemand.com/auth/password"
